@@ -1,0 +1,569 @@
+---
+title: "Assign ESS voted party numbers to CHES data"
+output: 
+  html_document: 
+    toc: yes
+    number_sections: yes
+    keep_md: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preparations
+
+## Load packages
+
+```{r}
+
+library(rio)
+library(dplyr)
+source("../custom_functions.R")
+```
+
+## Import CHES data and parties voted in ESS data
+
+```{r}
+# CHES file
+CHES_2014<-
+  read.csv2("../../data/raw/2014_CHES_dataset_means.csv",
+            sep = ",",dec = ".")
+
+# check structure
+str(CHES_2014)
+
+# vote data constructed with Extract_parties_voted_in_ESS -script file
+vote.dat<-
+  import("../../data/processed/vote.dat.xlsx")
+
+```
+
+
+# Recode country to CHES_2014 so that it matches with ESS
+
+```{r}
+# countries in ESS
+unique(vote.dat$cntry)
+
+# countries in CHES
+unique(CHES_2014$cname)
+
+# make a new variable (cntry) to CHES data file with ESS country names
+CHES_2014$cntry<-
+  case_when(CHES_2014$cname=="bel"~"BE",
+            CHES_2014$cname=="den"~"DK",
+            CHES_2014$cname=="ger"~"DE",
+            CHES_2014$cname=="spa"~"ES",
+            CHES_2014$cname=="fra"~"FR",
+            CHES_2014$cname=="ire"~"IE",
+            CHES_2014$cname=="net"~"NL",
+            CHES_2014$cname=="uk"~"GB",
+            CHES_2014$cname=="por"~"PT",
+            CHES_2014$cname=="aus"~"AT",
+            CHES_2014$cname=="fin"~"FI",
+            CHES_2014$cname=="swe"~"SE",
+            CHES_2014$cname=="cze"~"CZ",
+            CHES_2014$cname=="est"~"EE",
+            CHES_2014$cname=="hun"~"HU",
+            CHES_2014$cname=="lith"~"LT",
+            CHES_2014$cname=="pol"~"PL",
+            CHES_2014$cname=="sle"~"SI",
+            CHES_2014$cname=="nor"~"NO",
+            CHES_2014$cname=="swi"~"CH",
+            TRUE~CHES_2014$cname)
+
+table(CHES_2014$cntry,useNA="always")
+```
+
+# Recode party names as they are in ESS
+
+This is done by adding "pt.nmbr" variable to CHES_2014 data frame. The variable is a number that matches with the party number for each country in ESS.
+
+## AT
+
+```{r}
+vote.dat[vote.dat$cntry=="AT",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="AT","party_name"]
+
+CHES_2014$pt.nmbr.AT<-case_when(
+  CHES_2014$cntry=="AT" & CHES_2014$party_name=="SPO"~1,
+  CHES_2014$cntry=="AT" & CHES_2014$party_name=="OVP"~2,
+  CHES_2014$cntry=="AT" & CHES_2014$party_name=="FPO"~3,
+  CHES_2014$cntry=="AT" & CHES_2014$party_name=="GRUNE"~5,
+  CHES_2014$cntry=="AT" & CHES_2014$party_name=="NEOS"~7,
+  CHES_2014$cntry=="AT" & CHES_2014$party_name=="BZO"~4,
+  CHES_2014$cntry=="AT" & CHES_2014$party_name=="TeamStronach"~9
+)
+
+table(CHES_2014$pt.nmbr.AT)
+```
+
+## BE
+
+```{r}
+vote.dat[vote.dat$cntry=="BE",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="BE","party_name"]
+
+CHES_2014$pt.nmbr.BE<-case_when(
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="PS"~13,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="SPA"~5,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="ECOLO"~10,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="Groen"~1,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="MR"~12,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="VLD"~8,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="cdH"~9,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="CD&V"~2,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="N-VA"~3,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="FDF"~NA_real_, #Francophone Democratic Federalists
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="VB"~7,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="PVDA"~6,
+  CHES_2014$cntry=="BE" & CHES_2014$party_name=="PP"~15
+)
+
+table(CHES_2014$pt.nmbr.BE)
+```
+
+
+## CH
+
+```{r}
+vote.dat[vote.dat$cntry=="CH",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="CH","party_name"]
+
+CHES_2014$pt.nmbr.CH<-case_when(
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="SVP/UDC"~1,#Swiss People’s Party
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="SP/PS"~2,#Social Democratic Party of Switzerland
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="FDP/PLR"~3,#FDP. The Liberals
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="CVP/PVC"~4,#Christian Democratic People’s Party
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="GPS/PES"~5,#Green Party
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="GLP/PVL"~6,#Green Liberal Party
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="EVP/PEV"~8,#Evangelical People’s Party
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="EDU/UDF"~9,#Federal Democratic Union
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="LdT"~10,#Ticino League
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="CSP/PCS"~13,#Christian Social Party
+  CHES_2014$cntry=="CH" & CHES_2014$party_name=="BDP"~7#Conservative Democratic Party
+)
+
+table(CHES_2014$pt.nmbr.CH)
+```
+
+## CZ
+
+```{r}
+vote.dat[vote.dat$cntry=="CZ",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="CZ","party_name"]
+
+CHES_2014$pt.nmbr.CZ<-case_when(
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="CSSD"~2,
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="ODS"~5,
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="KSCM"~1,
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="KDU-CSL"~6,
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="SZ"~NA_real_, #Green Party
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="TOP09"~3,
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="ANO2011"~4,
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="USVIT"~7,
+  CHES_2014$cntry=="CZ" & CHES_2014$party_name=="SVOBODNI"~NA_real_ #Party of Free Citizens
+)
+
+table(CHES_2014$pt.nmbr.CZ)
+```
+
+## DE
+
+Parties based on prtvede2 variable (specific party).
+
+```{r}
+vote.dat[vote.dat$cntry=="DE" & vote.dat$vote.var=="prtvede2",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="DE","party_name"]
+
+CHES_2014$pt.nmbr.DE<-case_when(
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="CDU"~1, #Coalition is ESS2014
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="SPD"~2,
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="FDP"~5,
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="Grunen"~4,
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="Linke"~3, 
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="CSU"~1,#Coalition is ESS2014
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="NPD"~8,
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="AfD"~6,
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="Piraten"~7,
+  CHES_2014$cntry=="DE" & CHES_2014$party_name=="DieTier"~NA_real_ #Human Environment Animal Protection
+)
+
+table(CHES_2014$pt.nmbr.DE)
+```
+
+## DK
+
+```{r}
+vote.dat[vote.dat$cntry=="DK",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="DK","party_name"]
+
+CHES_2014$pt.nmbr.DK<-case_when(
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="SD"~1, 
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="RV"~2,
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="KF"~3,
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="SF"~4,
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="V"~7, 
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="EL"~9,
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="DF"~5,
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="FolkB"~NA_real_,#People’s Movement Against the EU
+  CHES_2014$cntry=="DK" & CHES_2014$party_name=="LA"~8
+)
+
+table(CHES_2014$pt.nmbr.DK)
+```
+
+## EE
+
+```{r}
+vote.dat[vote.dat$cntry=="EE",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="EE","party_name"]
+
+CHES_2014$pt.nmbr.EE<-case_when(
+  CHES_2014$cntry=="EE" & CHES_2014$party_name=="IRL"~3, 
+  CHES_2014$cntry=="EE" & CHES_2014$party_name=="EK"~2,
+  CHES_2014$cntry=="EE" & CHES_2014$party_name=="ER"~1,
+  CHES_2014$cntry=="EE" & CHES_2014$party_name=="SDE"~4,
+  CHES_2014$cntry=="EE" & CHES_2014$party_name=="EER"~5, 
+  CHES_2014$cntry=="EE" & CHES_2014$party_name=="EVE"~NA_real_ #Eesti Vabaerakond/Estonian Free Party
+)
+
+table(CHES_2014$pt.nmbr.EE)
+```
+
+## ES
+
+```{r}
+vote.dat[vote.dat$cntry=="ES",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="ES","party_name"]
+
+CHES_2014$pt.nmbr.ES<-case_when(
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="PSOE"~2, 
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="PP"~1,
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="IU"~4,
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="CiU"~3,
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="EAJ/PNV"~7,#EAJ is the basque name 
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="EA"~NA_real_,#Eusko Alkartasuna/Basque Solidarity
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="ERC"~8,
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="BNG"~9,
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="CC"~10,
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="ICV"~4,#Party with which IU coalesces in Catalonia
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="UpyD"~6,
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="Amaiur"~5,
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="Podemos"~NA_real_,#Did not exist in 2011 (election year)
+  CHES_2014$cntry=="ES" & CHES_2014$party_name=="C's"~NA_real_ #Ciudadanos - Citizens - (Did not run in the 2011 general elections)
+)
+
+table(CHES_2014$pt.nmbr.ES)
+```
+
+## FI
+
+```{r}
+vote.dat[vote.dat$cntry=="FI",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="FI","party_name"]
+
+CHES_2014$pt.nmbr.FI<-case_when(
+  CHES_2014$cntry=="FI" & CHES_2014$party_name=="SDP"~13, 
+  CHES_2014$cntry=="FI" & CHES_2014$party_name=="KOK"~1,
+  CHES_2014$cntry=="FI" & CHES_2014$party_name=="KESK"~3,
+  CHES_2014$cntry=="FI" & CHES_2014$party_name=="VAS"~14,
+  CHES_2014$cntry=="FI" & CHES_2014$party_name=="PS"~4,
+  CHES_2014$cntry=="FI" & CHES_2014$party_name=="RKP/SFP"~2,
+  CHES_2014$cntry=="FI" & CHES_2014$party_name=="VIHR"~12,
+  CHES_2014$cntry=="FI" & CHES_2014$party_name=="KD"~5
+)
+
+table(CHES_2014$pt.nmbr.FI)
+```
+
+## FR
+
+```{r}
+vote.dat[vote.dat$cntry=="FR",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="FR","party_name"]
+
+CHES_2014$pt.nmbr.FR<-case_when(
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="PCF"~NA_real_, #PCF (Parti Communiste Français) - French Communist Party (no voters)
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="PS"~9, #PS (Parti Socialiste)
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="PRG"~7, #Parti Radical de Gauche
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="EELV"~12,
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="UMP"~10,
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="FN"~2,
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="MPF"~8,
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="MODEM"~11,
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="NC"~1,
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="PRV"~3, #PR (Parti Radical Valoisien)
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="AC"~NA_real_,#Alliance centriste/Centrist Alliance
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="PG"~NA_real_,#PG (Parti de Gauche) - Left party (no voters)
+  CHES_2014$cntry=="FR" & CHES_2014$party_name=="Ens"~NA_real_#Ensemble/Together
+)
+
+table(CHES_2014$pt.nmbr.FR)
+```
+
+## GB
+
+```{r}
+vote.dat[vote.dat$cntry=="GB",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="GB","party_name"]
+
+CHES_2014$pt.nmbr.GB<-case_when(
+  CHES_2014$cntry=="GB" & CHES_2014$party_name=="CONS"~1, 
+  CHES_2014$cntry=="GB" & CHES_2014$party_name=="LAB"~2,
+  CHES_2014$cntry=="GB" & CHES_2014$party_name=="LIBDEM"~3,
+  CHES_2014$cntry=="GB" & CHES_2014$party_name=="SNP"~4,
+  CHES_2014$cntry=="GB" & CHES_2014$party_name=="PLAID"~5,
+  CHES_2014$cntry=="GB" & CHES_2014$party_name=="GREEN"~6,
+  CHES_2014$cntry=="GB" & CHES_2014$party_name=="UKIP"~7
+)
+
+table(CHES_2014$pt.nmbr.GB)
+```
+
+
+## HU
+
+```{r}
+vote.dat[vote.dat$cntry=="HU",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="HU","party_name"]
+
+CHES_2014$pt.nmbr.HU<-case_when(
+  CHES_2014$cntry=="HU" & CHES_2014$party_name=="MSZP"~4, #coalition of MSZP-Együtt-DK-PM-MLP (Kormányváltók)
+  CHES_2014$cntry=="HU" & CHES_2014$party_name=="Fidesz"~1, #coalition of Fidesz - KDNP (Fidesz – Magyar Polgári Szövetség Keresztényd)
+  CHES_2014$cntry=="HU" & CHES_2014$party_name=="JOBBIK"~2,
+  CHES_2014$cntry=="HU" & CHES_2014$party_name=="LMP"~3,
+  CHES_2014$cntry=="HU" & CHES_2014$party_name=="E14"~NA_real_, #Együtt2014 - Together2014 (no voters)
+  CHES_2014$cntry=="HU" & CHES_2014$party_name=="DK"~4 #coalition of MSZP-Együtt-DK-PM-MLP (Kormányváltók)
+)
+
+table(CHES_2014$pt.nmbr.HU)
+```
+
+
+## IE
+
+```{r}
+vote.dat[vote.dat$cntry=="IE",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="IE","party_name"]
+
+CHES_2014$pt.nmbr.IE<-case_when(
+  CHES_2014$cntry=="IE" & CHES_2014$party_name=="FF"~1, 
+  CHES_2014$cntry=="IE" & CHES_2014$party_name=="FG"~2,
+  CHES_2014$cntry=="IE" & CHES_2014$party_name=="Lab"~5,
+  CHES_2014$cntry=="IE" & CHES_2014$party_name=="GP"~3,
+  CHES_2014$cntry=="IE" & CHES_2014$party_name=="SF"~7,
+  CHES_2014$cntry=="IE" & CHES_2014$party_name=="SP"~8,
+  CHES_2014$cntry=="IE" & CHES_2014$party_name=="PBPA"~6
+)
+
+table(CHES_2014$pt.nmbr.IE)
+```
+
+## IL (not in CHES)
+
+
+## LT
+
+```{r}
+vote.dat[vote.dat$cntry=="LT" & vote.dat$vote.var=="prtvalt1",
+         c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="LT","party_name"]
+
+CHES_2014$pt.nmbr.LT<-case_when(
+  CHES_2014$cntry=="LT" & CHES_2014$party_name=="LSDP"~8, 
+  CHES_2014$cntry=="LT" & CHES_2014$party_name=="TS-LKD"~5,
+  CHES_2014$cntry=="LT" & CHES_2014$party_name=="LVZS"~14,
+  CHES_2014$cntry=="LT" & CHES_2014$party_name=="LLRA"~7,
+  CHES_2014$cntry=="LT" & CHES_2014$party_name=="TT"~9,
+  CHES_2014$cntry=="LT" & CHES_2014$party_name=="DP"~3,
+  CHES_2014$cntry=="LT" & CHES_2014$party_name=="LRLS"~1,
+  CHES_2014$cntry=="LT" & CHES_2014$party_name=="DK"~6
+)
+
+table(CHES_2014$pt.nmbr.LT)
+```
+
+## NL
+
+```{r}
+vote.dat[vote.dat$cntry=="NL",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="NL","party_name"]
+
+CHES_2014$pt.nmbr.NL<-case_when(
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="CDA"~5,#Christen-Democratisch Appel/Christian Democratic Appeal 
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="PvdA"~2,#Partij van de Arbeid/Labour Party
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="VVD"~1,#Volkspartij voor Vrijheid en Demokratie/People’s Party for Freedom and Democracy
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="D66"~6,
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="GL"~8,
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="SGP"~9,#Staatkundig Gereformeerde Partij/Political Reformed Party
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="SP"~4,
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="CU"~7,
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="PVV"~3,#Partij voor de Vrijheid/Party for Freedom
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="PvdD"~10,#Partij voor de Dieren/Party for the Animals
+  CHES_2014$cntry=="NL" & CHES_2014$party_name=="50PLUS"~11
+)
+
+table(CHES_2014$pt.nmbr.NL)
+```
+
+## NO
+
+```{r}
+vote.dat[vote.dat$cntry=="NO",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="NO","party_name"]
+
+CHES_2014$pt.nmbr.NO<-case_when(
+  CHES_2014$cntry=="NO" & CHES_2014$party_name=="AP"~3,#Arbeiderpartiet/Labour Party
+  CHES_2014$cntry=="NO" & CHES_2014$party_name=="FrP"~8,
+  CHES_2014$cntry=="NO" & CHES_2014$party_name=="H"~7,
+  CHES_2014$cntry=="NO" & CHES_2014$party_name=="SV"~2,
+  CHES_2014$cntry=="NO" & CHES_2014$party_name=="Sp"~6,
+  CHES_2014$cntry=="NO" & CHES_2014$party_name=="KrF"~5,
+  CHES_2014$cntry=="NO" & CHES_2014$party_name=="V"~4,
+  CHES_2014$cntry=="NO" & CHES_2014$party_name=="MDG"~10
+)
+
+table(CHES_2014$pt.nmbr.NO)
+```
+
+## PL
+
+```{r}
+vote.dat[vote.dat$cntry=="PL",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="PL","party_name"]
+
+CHES_2014$pt.nmbr.PL<-case_when(
+  CHES_2014$cntry=="PL" & CHES_2014$party_name=="SLD"~8,#Sojusz Lewicy Demokratycznej/Democratic Left Alliance
+  CHES_2014$cntry=="PL" & CHES_2014$party_name=="PO"~2,#Platforma Obywatelska/Civic Platform
+  CHES_2014$cntry=="PL" & CHES_2014$party_name=="PiS"~6,#Prawo i Sprawiedliwosc/Law and Justice Party
+  CHES_2014$cntry=="PL" & CHES_2014$party_name=="PSL"~5,#Polskie Stronnictwo Ludowe/Polish People’s Party
+  CHES_2014$cntry=="PL" & CHES_2014$party_name=="RP"~7,#Twój Ruch (Ruch Palikota)/Your Movement (Palikot’s Movement)
+  CHES_2014$cntry=="PL" & CHES_2014$party_name=="KNP"~1,#Kongres Nowej Prawicy/Congress of the New Right
+  CHES_2014$cntry=="PL" & CHES_2014$party_name=="PR"~NA_real_,#Polska Razem/Poland Together // Polska Razem Zjednoczona Prawica (PR) - Poland Together United Right
+  CHES_2014$cntry=="PL" & CHES_2014$party_name=="SP"~NA_real_#Solidarna Polska/United Poland (this was split from law and justice party in 2012)
+)
+
+table(CHES_2014$pt.nmbr.PL)
+```
+
+## PT
+
+```{r}
+vote.dat[vote.dat$cntry=="PT",c("pt.nmbr","pt.name")]
+
+CHES_2014[CHES_2014$cntry=="PT","party_name"]
+
+CHES_2014$pt.nmbr.PT<-case_when(
+  CHES_2014$cntry=="PT" & CHES_2014$party_name=="CDU"~3,#Coligação Democrática Unitária/Democratic Unitarian Coalition
+  CHES_2014$cntry=="PT" & CHES_2014$party_name=="PP"~2,
+  CHES_2014$cntry=="PT" & CHES_2014$party_name=="PS"~11,
+  CHES_2014$cntry=="PT" & CHES_2014$party_name=="PSD"~10,
+  CHES_2014$cntry=="PT" & CHES_2014$party_name=="BE"~1,
+  CHES_2014$cntry=="PT" & CHES_2014$party_name=="MPT"~NA_real_ #Partido da Terra/Earth Party (no voters)
+)
+
+table(CHES_2014$pt.nmbr.PT)
+```
+
+## SI
+
+```{r}
+vote.dat[vote.dat$cntry=="SI",c("pt.nmbr","pt.name")]
+
+CHES_2014[CHES_2014$cntry=="SI","party_name"]
+
+CHES_2014$pt.nmbr.SI<-case_when(
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="SDS"~6,
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="SD"~5,
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="SLS"~7,
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="NSI"~3,
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="DeSUS"~1,
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="SMC"~8,
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="ZL"~11,
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="ZaAB"~10,
+  CHES_2014$cntry=="SI" & CHES_2014$party_name=="PS"~4
+)
+
+table(CHES_2014$pt.nmbr.SI)
+```
+
+## SE
+
+```{r}
+vote.dat[vote.dat$cntry=="SE",c("pt.nmbr","pt.name")]
+CHES_2014[CHES_2014$cntry=="SE","party_name"]
+
+CHES_2014$pt.nmbr.SE<-case_when(
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="V"~7,
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="SAP"~6,#Sveriges Socialdemokratiska Arbetareparti/Swedish Social Democratic Party
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="C"~1,
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="FP"~2,
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="M"~5,#Moderata Samlingspartiet/Moderate Party
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="KD"~3,
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="MP"~4,
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="SD"~10,
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="PIRAT"~9,
+  CHES_2014$cntry=="SE" & CHES_2014$party_name=="FI"~8
+)
+
+table(CHES_2014$pt.nmbr.SE)
+```
+
+# Obtain the ESS party names through the party number values within countries
+
+```{r}
+# obtain vector for countries, exclude IL
+countries<-unique(vote.dat$cntry)
+countries<-countries[-which(countries=="IL")]
+countries
+
+# obtain vector for party numbers within countries
+nmbr.vars<-paste0("pt.nmbr.",countries)
+nmbr.vars
+
+# check if each country-party number variables is in the CHES Data
+
+nmbr.vars %in% names(CHES_2014)
+
+# sum across the rows to construct a single party number variable
+CHES_2014$pt.nmbr<-rowSums(CHES_2014[,nmbr.vars],na.rm=T)
+table(CHES_2014$pt.nmbr,useNA="always")
+
+# code zeros as NA
+CHES_2014$pt.nmbr<-ifelse(CHES_2014$pt.nmbr==0,NA,CHES_2014$pt.nmbr)
+table(CHES_2014$pt.nmbr,useNA="always")
+
+# Join CHES and ESS party data by country and party number
+CHES_2014.vote.keys<-left_join(
+  x=CHES_2014,
+  y=vote.dat,
+  by=c("cntry","pt.nmbr")
+)
+
+
+# exclude the country-specific party number variables
+CHES_2014.vote.keys<-
+  CHES_2014.vote.keys[,-which(names(CHES_2014.vote.keys) %in% nmbr.vars)]
+
+# check if the variable names look like they should
+names(CHES_2014.vote.keys)
+
+# save to a file
+
+export(CHES_2014.vote.keys,
+       "../../data/processed/CHES_2014.vote.keys.xlsx",
+       overwrite=T)
+
+```
+
+# Session information
+
+```{r}
+s<-sessionInfo()
+print(s,locale=F)
+```
+
+
+
