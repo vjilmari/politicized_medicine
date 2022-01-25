@@ -95,33 +95,56 @@ plot.dat<-left_join(
   by=c("cntry","pt.name")
 )
 
+# add criterion for labels and for dot color
+
+plot.dat$lab.criterion<-
+  ifelse(
+    ((plot.dat$galtan>7.5 | plot.dat$galtan <2.5) & 
+       (plot.dat$corrupt_salience>7.5 | plot.dat$corrupt_salience<2.5) & 
+       plot.dat$vote.share > 0.0199),TRUE,FALSE)
+
+table(plot.dat$lab.criterion)
+
+plot.dat$lab.criterion.2<-
+  ifelse(
+    ((plot.dat$lrecon>7.5 | plot.dat$lrecon <2.5) & 
+       (plot.dat$galtan>7.5 | plot.dat$galtan<2.5) & 
+       plot.dat$vote.share > 0.0199),TRUE,FALSE)
+
+table(plot.dat$lab.criterion.2)
+
+plot.dat$size.criterion<-
+  ifelse(
+    plot.dat$vote.share > 0.29999,TRUE,FALSE)
+
+table(plot.dat$size.criterion)
+
+
+table(plot.dat$lab.criterion,
+      plot.dat$size.criterion
+      )
+
+
+# galtan_corrupt
 
 galtan_corrupt_sp <- 
-  ggplot(plot.dat, aes(x = corrupt_salience, y = galtan)) +
-  geom_point(aes(size=2*vote.share))+
-  #geom_text(aes(label = CHES$plot.name), size = 2)+
-  #geom_text_repel(aes(label = plot.name,
-  #                    x = corrupt_salience+0.2), size = 2,hjust = 0)+
-  #geom_text_repel(aes(label = plot.name), size = 2)+
-  #geom_label_repel(aes(label = plot.name), size = 2)+
+  ggplot(plot.dat, aes(x = corrupt_salience,
+                       y = galtan)) +
+  geom_point(aes(size=2*vote.share,
+                 color=lab.criterion | size.criterion))+
+  scale_color_manual(values=c("darkgray","black"))+
+  #scale_fill_manual(values=c("gray","black"))+
   xlim(0,10)+
   ylim(0,10)+
   xlab("Corrupt salience")+
   ylab("GAL-TAN")+
-  #geom_label_repel(aes(label= ifelse(vote.share > 0.1999,
-  #                            as.character(pt.name),
-  #                            ''),fill=cntry),size = 2.0)+
   geom_label_repel(aes(label= ifelse(
-    ((galtan>7.5 | galtan <2.5) & 
-      (corrupt_salience>7.5 | corrupt_salience<2.5) & 
-       vote.share > 0.0499) |
-      #((corrupt_salience>4 & corrupt_salience<6) & 
-      #   (galtan>4 & galtan<6) &
-      #   vote.share > 0.0499) | 
-      vote.share > 0.24999,
+    size.criterion | lab.criterion,
                               as.character(pt.cntry),
-                              '')),size = 2.5,
-    max.overlaps = 200)+
+                              '')),size = 3.0,
+    max.overlaps = 300,seed = 1236,
+    label.padding = 0.15,
+    box.padding = 0.50)+
   theme(legend.position = "none")
 
 galtan_corrupt_sp
@@ -130,6 +153,41 @@ png(filename = "results/galtan_corrupt_sp.png",units = "cm",
     width = 15.0,height=15.0,res = 300)
 galtan_corrupt_sp
 dev.off()
+
+
+# 
+
+# galtan_lrecon
+
+galtan_lrecon_sp <- 
+  ggplot(plot.dat, aes(x = lrecon,
+                       y = galtan)) +
+  geom_point(aes(size=2*vote.share,
+                 color=lab.criterion.2 | size.criterion))+
+  scale_color_manual(values=c("darkgray","black"))+
+  #scale_fill_manual(values=c("gray","black"))+
+  xlim(0,10)+
+  ylim(0,10)+
+  xlab("Left-Right Economic")+
+  ylab("GAL-TAN")+
+  geom_label_repel(aes(label= ifelse(
+    size.criterion | lab.criterion.2,
+    as.character(pt.cntry),
+    '')),size = 3.0,
+    max.overlaps = 300,seed = 1236,
+    label.padding = 0.15,
+    box.padding = 0.50)+
+  theme(legend.position = "none")
+
+galtan_lrecon_sp
+
+png(filename = "results/galtan_lrecon_sp.png",units = "cm",
+    width = 15.0,height=15.0,res = 300)
+galtan_lrecon_sp
+dev.off()
+
+cor(plot.dat$lrecon,plot.dat$galtan)
+
 
 # make another with pre-selected parties
 
@@ -192,3 +250,28 @@ png(filename = "results/galtan_corrupt_sp_ext.png",units = "cm",
 galtan_corrupt_sp_ext
 dev.off()
   
+
+# some extra stuff
+
+cor(plot.dat$corrupt_salience,
+    plot.dat$galtan)
+
+cor(I(plot.dat$corrupt_salience^2),
+    plot.dat$galtan)
+
+cor(plot.dat$corrupt_salience,
+    I(plot.dat$galtan^2))
+
+lm1<-lm(corrupt_salience~galtan,data=plot.dat)
+summary(lm1)
+
+lm2<-lm(corrupt_salience~galtan+I(galtan^2),data=plot.dat)
+summary(lm2)
+
+anova(lm1,lm2)
+
+lm3<-lm(corrupt_salience~galtan+I(galtan^2)+I(galtan^3),data=plot.dat)
+summary(lm3)
+
+anova(lm1,lm3)
+anova(lm2,lm3)
