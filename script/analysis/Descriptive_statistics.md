@@ -259,10 +259,12 @@ table(dat$DV.no.home.f,useNA="always")
 
 ### Strain on health and political orientation
 
-Calculate country means for centering
+
 
 
 ```r
+# Calculate country means for centering
+
 cntry.means<-dat %>%
   group_by(cntry) %>%
   summarise(strain.on.health.cntry.mean=
@@ -671,7 +673,94 @@ fdat %>%
 ## perc   18.5  1.0  9.0 71.6 11.0  1.2 17.2 70.7
 ```
 
-## Correlations between variables
+## Cross-tabs of DV categories
+
+
+```r
+(ct.use<-table(fdat$used.conv,fdat$used.CAM,dnn = c("CM","CAM")))
+```
+
+```
+##    CAM
+## CM      0     1
+##   0  3017   221
+##   1 14645  2709
+```
+
+```r
+(pt.use<-round(100*prop.table(ct.use),1))
+```
+
+```
+##    CAM
+## CM     0    1
+##   0 14.7  1.1
+##   1 71.1 13.2
+```
+
+```r
+(t.CAM.use<-table(fdat$used.CAM))
+```
+
+```
+## 
+##     0     1 
+## 17662  2930
+```
+
+```r
+(pt.CAM.use<-round(100*prop.table(t.CAM.use),1))
+```
+
+```
+## 
+##    0    1 
+## 85.8 14.2
+```
+
+```r
+(t.conv.use<-table(fdat$used.conv))
+```
+
+```
+## 
+##     0     1 
+##  3238 17354
+```
+
+```r
+(pt.conv.use<-round(100*prop.table(t.conv.use),1))
+```
+
+```
+## 
+##    0    1 
+## 15.7 84.3
+```
+
+```r
+round(100*prop.table(ct.use,margin = c(1)),1)
+```
+
+```
+##    CAM
+## CM     0    1
+##   0 93.2  6.8
+##   1 84.4 15.6
+```
+
+```r
+round(100*prop.table(ct.use,margin = c(2)),1)
+```
+
+```
+##    CAM
+## CM     0    1
+##   0 17.1  7.5
+##   1 82.9 92.5
+```
+
+# Correlations between variables
 
 
 ```r
@@ -777,8 +866,7 @@ pearson<-
 ```
 
 ```
-## Warning in cor(x, use = use, method = method): the standard deviation is
-## zero
+## Warning in cor(x, use = use, method = method): the standard deviation is zero
 ```
 
 ```r
@@ -793,8 +881,7 @@ spearman<-
 ```
 
 ```
-## Warning in cor(x, use = use, method = method): the standard deviation is
-## zero
+## Warning in cor(x, use = use, method = method): the standard deviation is zero
 ```
 
 ```r
@@ -914,7 +1001,7 @@ export(corr_matrix.p,
        overwrite=T)
 ```
 
-## Weighted descriptive statistics
+# Weighted descriptive statistics
 
 
 ```r

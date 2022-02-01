@@ -250,7 +250,26 @@ fdat %>%
 
 ```
 
-## Correlations between variables
+## Cross-tabs of DV categories
+
+```{r}
+
+(ct.use<-table(fdat$used.conv,fdat$used.CAM,dnn = c("CM","CAM")))
+(pt.use<-round(100*prop.table(ct.use),1))
+
+
+(t.CAM.use<-table(fdat$used.CAM))
+(pt.CAM.use<-round(100*prop.table(t.CAM.use),1))
+
+(t.conv.use<-table(fdat$used.conv))
+(pt.conv.use<-round(100*prop.table(t.conv.use),1))
+
+
+round(100*prop.table(ct.use,margin = c(1)),1)
+round(100*prop.table(ct.use,margin = c(2)),1)
+```
+
+# Correlations between variables
 
 ```{r}
 #recode categorical variables to numeric
@@ -324,7 +343,7 @@ export(corr_matrix.p,
 
 ```
 
-## Weighted descriptive statistics
+# Weighted descriptive statistics
 
 ```{r}
 #gender
