@@ -449,6 +449,31 @@ export(desc.tbl.wt,"../../results/desc.tbl.wt.xlsx",
        overwrite=T)
 ```
 
+# Party count 
+
+```{r}
+
+CHES<-import("../../data/processed/CHES_2014.vote.keys.combined.xlsx")
+
+# total number of parties
+nrow(CHES)
+
+# parties per country
+party.count<-
+  CHES %>%
+  filter(cntry!="EE" & cntry!="IL") %>%
+  group_by(cntry) %>%
+  summarise(n=n())
+
+sum(party.count$n)
+min(party.count$n)
+median(party.count$n)
+mean(party.count$n)
+max(party.count$n)
+nrow(party.count)
+
+```
+
 # Session information
 
 ```{r}
