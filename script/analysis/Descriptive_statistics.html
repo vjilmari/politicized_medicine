@@ -194,7 +194,9 @@ pre code {
 <li><a href="#correlations-between-variables"><span class="toc-section-number">5</span> Correlations between variables</a></li>
 <li><a href="#weighted-descriptive-statistics"><span class="toc-section-number">6</span> Weighted descriptive statistics</a></li>
 <li><a href="#party-count"><span class="toc-section-number">7</span> Party count</a></li>
-<li><a href="#session-information"><span class="toc-section-number">8</span> Session information</a></li>
+<li><a href="#descriptives-of-po-variables-at-the-country-level"><span class="toc-section-number">8</span> Descriptives of PO-variables at the country-level</a></li>
+<li><a href="#correlations-between-po-variables-at-the-country-level"><span class="toc-section-number">9</span> Correlations between PO-variables at the country-level</a></li>
+<li><a href="#session-information"><span class="toc-section-number">10</span> Session information</a></li>
 </ul>
 </div>
 
@@ -313,30 +315,30 @@ table(dat$edu.f,useNA=&quot;always&quot;)</code></pre>
 <h3><span class="header-section-number">1.3.3</span> DV</h3>
 <pre class="r"><code>table(dat$DV,useNA=&quot;always&quot;)</code></pre>
 <pre><code>## 
-##                NN     Used_CAM_ONLY Used_conv_and_CAM 
-##              6877               503              5100 
-##    Used_conv_ONLY              &lt;NA&gt; 
-##             27705                 0</code></pre>
+##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
+##              6877               503              5100             27705 
+##              &lt;NA&gt; 
+##                 0</code></pre>
 <pre class="r"><code>dat$DV.f&lt;-relevel(as.factor(dat$DV),ref=&quot;NN&quot;)
 table(dat$DV.f,useNA=&quot;always&quot;)</code></pre>
 <pre><code>## 
-##                NN     Used_CAM_ONLY Used_conv_and_CAM 
-##              6877               503              5100 
-##    Used_conv_ONLY              &lt;NA&gt; 
-##             27705                 0</code></pre>
+##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
+##              6877               503              5100             27705 
+##              &lt;NA&gt; 
+##                 0</code></pre>
 <pre class="r"><code>table(dat$DV.no.home,useNA=&quot;always&quot;)</code></pre>
 <pre><code>## 
-##                NN     Used_CAM_ONLY Used_conv_and_CAM 
-##              6957               423              4155 
-##    Used_conv_ONLY              &lt;NA&gt; 
-##             28650                 0</code></pre>
+##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
+##              6957               423              4155             28650 
+##              &lt;NA&gt; 
+##                 0</code></pre>
 <pre class="r"><code>dat$DV.no.home.f&lt;-relevel(as.factor(dat$DV.no.home),ref=&quot;NN&quot;)
 table(dat$DV.no.home.f,useNA=&quot;always&quot;)</code></pre>
 <pre><code>## 
-##                NN     Used_CAM_ONLY Used_conv_and_CAM 
-##              6957               423              4155 
-##    Used_conv_ONLY              &lt;NA&gt; 
-##             28650                 0</code></pre>
+##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
+##              6957               423              4155             28650 
+##              &lt;NA&gt; 
+##                 0</code></pre>
 </div>
 <div id="strain-on-health-and-political-orientation" class="section level3" number="1.3.4">
 <h3><span class="header-section-number">1.3.4</span> Strain on health and political orientation</h3>
@@ -504,16 +506,16 @@ table(dat[dat$has.PO.and.cntry==1,&quot;has.covariates&quot;])</code></pre>
 <p>Calculations with (a) and without (b) weights</p>
 <pre class="r"><code>table(fdat$DV,useNA=&quot;always&quot;)</code></pre>
 <pre><code>## 
-##                NN     Used_CAM_ONLY Used_conv_and_CAM 
-##              3017               221              2709 
-##    Used_conv_ONLY              &lt;NA&gt; 
-##             14645                 0</code></pre>
+##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
+##              3017               221              2709             14645 
+##              &lt;NA&gt; 
+##                 0</code></pre>
 <pre class="r"><code>prop.table(100*table(fdat$DV,useNA=&quot;always&quot;))</code></pre>
 <pre><code>## 
-##                NN     Used_CAM_ONLY Used_conv_and_CAM 
-##        0.14651321        0.01073232        0.13155594 
-##    Used_conv_ONLY              &lt;NA&gt; 
-##        0.71119852        0.00000000</code></pre>
+##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
+##        0.14651321        0.01073232        0.13155594        0.71119852 
+##              &lt;NA&gt; 
+##        0.00000000</code></pre>
 <pre class="r"><code>(a&lt;-count(x = fdat, DV))</code></pre>
 <pre><code>##                  DV     n
 ## 1                NN  3017
@@ -679,8 +681,7 @@ psych::describe(fdat[,cor.vars],
 pearson&lt;-
   corr.test(fdat[,cor.vars],
             method = &quot;pearson&quot;,adjust = &quot;none&quot;)</code></pre>
-<pre><code>## Warning in cor(x, use = use, method = method): the standard
-## deviation is zero</code></pre>
+<pre><code>## Warning in cor(x, use = use, method = method): the standard deviation is zero</code></pre>
 <pre class="r"><code>export(pearson$r,
        &quot;../../results/cors.pearson.r.xlsx&quot;,
        overwrite=T)
@@ -689,8 +690,7 @@ pearson&lt;-
 spearman&lt;-
   corr.test(fdat[,cor.vars],
             method = &quot;spearman&quot;,adjust = &quot;none&quot;)</code></pre>
-<pre><code>## Warning in cor(x, use = use, method = method): the standard
-## deviation is zero</code></pre>
+<pre><code>## Warning in cor(x, use = use, method = method): the standard deviation is zero</code></pre>
 <pre class="r"><code>export(spearman$r,&quot;../../results/cors.spearman.r.xlsx&quot;,
        overwrite=T)
 
@@ -702,54 +702,42 @@ weighted_corr &lt;-
                    &quot;anweight&quot;], cor = TRUE)
 corr_matrix &lt;- weighted_corr$cor
 round(corr_matrix,2)</code></pre>
-<pre><code>##                      gndr.c age10.c edu.ord income.ord
-## gndr.c                 1.00    0.04   -0.04      -0.11
-## age10.c                0.04    1.00   -0.32      -0.23
-## edu.ord               -0.04   -0.32    1.00       0.41
-## income.ord            -0.11   -0.23    0.41       1.00
-## income.missing          NaN     NaN     NaN        NaN
-## strain.on.health.c     0.12    0.16   -0.12      -0.16
-## lrgen.z               -0.03    0.04   -0.06       0.04
-## lrecon.z              -0.03    0.05    0.01       0.09
-## galtan.z              -0.03    0.09   -0.12      -0.02
-## antielite_salience.z  -0.04   -0.10   -0.05      -0.10
-## corrupt_salience.z    -0.02   -0.11   -0.01      -0.07
-##                      income.missing strain.on.health.c lrgen.z
-## gndr.c                          NaN               0.12   -0.03
-## age10.c                         NaN               0.16    0.04
-## edu.ord                         NaN              -0.12   -0.06
-## income.ord                      NaN              -0.16    0.04
-## income.missing                  NaN                NaN     NaN
-## strain.on.health.c              NaN               1.00   -0.02
-## lrgen.z                         NaN              -0.02    1.00
-## lrecon.z                        NaN              -0.03    0.85
-## galtan.z                        NaN               0.00    0.82
-## antielite_salience.z            NaN               0.02    0.08
-## corrupt_salience.z              NaN               0.01    0.00
-##                      lrecon.z galtan.z antielite_salience.z
-## gndr.c                  -0.03    -0.03                -0.04
-## age10.c                  0.05     0.09                -0.10
-## edu.ord                  0.01    -0.12                -0.05
-## income.ord               0.09    -0.02                -0.10
-## income.missing            NaN      NaN                  NaN
-## strain.on.health.c      -0.03     0.00                 0.02
-## lrgen.z                  0.85     0.82                 0.08
-## lrecon.z                 1.00     0.59                -0.25
-## galtan.z                 0.59     1.00                 0.21
-## antielite_salience.z    -0.25     0.21                 1.00
-## corrupt_salience.z      -0.28    -0.06                 0.77
-##                      corrupt_salience.z
-## gndr.c                            -0.02
-## age10.c                           -0.11
-## edu.ord                           -0.01
-## income.ord                        -0.07
-## income.missing                      NaN
-## strain.on.health.c                 0.01
-## lrgen.z                            0.00
-## lrecon.z                          -0.28
-## galtan.z                          -0.06
-## antielite_salience.z               0.77
-## corrupt_salience.z                 1.00</code></pre>
+<pre><code>##                      gndr.c age10.c edu.ord income.ord income.missing
+## gndr.c                 1.00    0.04   -0.04      -0.11            NaN
+## age10.c                0.04    1.00   -0.32      -0.23            NaN
+## edu.ord               -0.04   -0.32    1.00       0.41            NaN
+## income.ord            -0.11   -0.23    0.41       1.00            NaN
+## income.missing          NaN     NaN     NaN        NaN            NaN
+## strain.on.health.c     0.12    0.16   -0.12      -0.16            NaN
+## lrgen.z               -0.03    0.04   -0.06       0.04            NaN
+## lrecon.z              -0.03    0.05    0.01       0.09            NaN
+## galtan.z              -0.03    0.09   -0.12      -0.02            NaN
+## antielite_salience.z  -0.04   -0.10   -0.05      -0.10            NaN
+## corrupt_salience.z    -0.02   -0.11   -0.01      -0.07            NaN
+##                      strain.on.health.c lrgen.z lrecon.z galtan.z
+## gndr.c                             0.12   -0.03    -0.03    -0.03
+## age10.c                            0.16    0.04     0.05     0.09
+## edu.ord                           -0.12   -0.06     0.01    -0.12
+## income.ord                        -0.16    0.04     0.09    -0.02
+## income.missing                      NaN     NaN      NaN      NaN
+## strain.on.health.c                 1.00   -0.02    -0.03     0.00
+## lrgen.z                           -0.02    1.00     0.85     0.82
+## lrecon.z                          -0.03    0.85     1.00     0.59
+## galtan.z                           0.00    0.82     0.59     1.00
+## antielite_salience.z               0.02    0.08    -0.25     0.21
+## corrupt_salience.z                 0.01    0.00    -0.28    -0.06
+##                      antielite_salience.z corrupt_salience.z
+## gndr.c                              -0.04              -0.02
+## age10.c                             -0.10              -0.11
+## edu.ord                             -0.05              -0.01
+## income.ord                          -0.10              -0.07
+## income.missing                        NaN                NaN
+## strain.on.health.c                   0.02               0.01
+## lrgen.z                              0.08               0.00
+## lrecon.z                            -0.25              -0.28
+## galtan.z                             0.21              -0.06
+## antielite_salience.z                 1.00               0.77
+## corrupt_salience.z                   0.77               1.00</code></pre>
 <pre class="r"><code>export(corr_matrix,
        &quot;../../results/cors.weighted.pearson.r.xlsx&quot;,
        overwrite=T)
@@ -760,54 +748,42 @@ corr_matrix.t&lt;-
 <pre class="r"><code>corr_matrix.p&lt;-
   2*(1-pt(abs(corr_matrix.t),df=weighted_corr$n.obs-2))
 round(corr_matrix.p,3)</code></pre>
-<pre><code>##                      gndr.c age10.c edu.ord income.ord
-## gndr.c                0.000       0   0.000      0.000
-## age10.c               0.000       0   0.000      0.000
-## edu.ord               0.000       0     NaN      0.000
-## income.ord            0.000       0   0.000      0.000
-## income.missing          NaN     NaN     NaN        NaN
-## strain.on.health.c    0.000       0   0.000      0.000
-## lrgen.z               0.000       0   0.000      0.000
-## lrecon.z              0.001       0   0.436      0.000
-## galtan.z              0.000       0   0.000      0.001
-## antielite_salience.z  0.000       0   0.000      0.000
-## corrupt_salience.z    0.006       0   0.159      0.000
-##                      income.missing strain.on.health.c lrgen.z
-## gndr.c                          NaN              0.000   0.000
-## age10.c                         NaN              0.000   0.000
-## edu.ord                         NaN              0.000   0.000
-## income.ord                      NaN              0.000   0.000
-## income.missing                  NaN                NaN     NaN
-## strain.on.health.c              NaN              0.000   0.001
-## lrgen.z                         NaN              0.001     NaN
-## lrecon.z                        NaN              0.000   0.000
-## galtan.z                        NaN              0.563   0.000
-## antielite_salience.z            NaN              0.012   0.000
-## corrupt_salience.z              NaN              0.489   0.797
-##                      lrecon.z galtan.z antielite_salience.z
-## gndr.c                  0.001    0.000                0.000
-## age10.c                 0.000    0.000                0.000
-## edu.ord                 0.436    0.000                0.000
-## income.ord              0.000    0.001                0.000
-## income.missing            NaN      NaN                  NaN
-## strain.on.health.c      0.000    0.563                0.012
-## lrgen.z                 0.000    0.000                0.000
-## lrecon.z                  NaN    0.000                0.000
-## galtan.z                0.000    0.000                0.000
-## antielite_salience.z    0.000    0.000                0.000
-## corrupt_salience.z      0.000    0.000                0.000
-##                      corrupt_salience.z
-## gndr.c                            0.006
-## age10.c                           0.000
-## edu.ord                           0.159
-## income.ord                        0.000
-## income.missing                      NaN
-## strain.on.health.c                0.489
-## lrgen.z                           0.797
-## lrecon.z                          0.000
-## galtan.z                          0.000
-## antielite_salience.z              0.000
-## corrupt_salience.z                  NaN</code></pre>
+<pre><code>##                      gndr.c age10.c edu.ord income.ord income.missing
+## gndr.c                0.000       0   0.000      0.000            NaN
+## age10.c               0.000       0   0.000      0.000            NaN
+## edu.ord               0.000       0     NaN      0.000            NaN
+## income.ord            0.000       0   0.000      0.000            NaN
+## income.missing          NaN     NaN     NaN        NaN            NaN
+## strain.on.health.c    0.000       0   0.000      0.000            NaN
+## lrgen.z               0.000       0   0.000      0.000            NaN
+## lrecon.z              0.001       0   0.436      0.000            NaN
+## galtan.z              0.000       0   0.000      0.001            NaN
+## antielite_salience.z  0.000       0   0.000      0.000            NaN
+## corrupt_salience.z    0.006       0   0.159      0.000            NaN
+##                      strain.on.health.c lrgen.z lrecon.z galtan.z
+## gndr.c                            0.000   0.000    0.001    0.000
+## age10.c                           0.000   0.000    0.000    0.000
+## edu.ord                           0.000   0.000    0.436    0.000
+## income.ord                        0.000   0.000    0.000    0.001
+## income.missing                      NaN     NaN      NaN      NaN
+## strain.on.health.c                0.000   0.001    0.000    0.563
+## lrgen.z                           0.001     NaN    0.000    0.000
+## lrecon.z                          0.000   0.000      NaN    0.000
+## galtan.z                          0.563   0.000    0.000    0.000
+## antielite_salience.z              0.012   0.000    0.000    0.000
+## corrupt_salience.z                0.489   0.797    0.000    0.000
+##                      antielite_salience.z corrupt_salience.z
+## gndr.c                              0.000              0.006
+## age10.c                             0.000              0.000
+## edu.ord                             0.000              0.159
+## income.ord                          0.000              0.000
+## income.missing                        NaN                NaN
+## strain.on.health.c                  0.012              0.489
+## lrgen.z                             0.000              0.797
+## lrecon.z                            0.000              0.000
+## galtan.z                            0.000              0.000
+## antielite_salience.z                0.000              0.000
+## corrupt_salience.z                  0.000                NaN</code></pre>
 <pre class="r"><code>export(corr_matrix.p,
        &quot;../../results/cors.weighted.pearson.r.p.xlsx&quot;,
        overwrite=T)</code></pre>
@@ -952,8 +928,42 @@ sum(party.count$n)</code></pre>
 <pre class="r"><code>nrow(party.count)</code></pre>
 <pre><code>## [1] 19</code></pre>
 </div>
-<div id="session-information" class="section level1" number="8">
-<h1><span class="header-section-number">8</span> Session information</h1>
+<div id="descriptives-of-po-variables-at-the-country-level" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> Descriptives of PO-variables at the country-level</h1>
+<pre class="r"><code>PO.cntry.desc&lt;-
+  psych::describe(CHES[,c(&quot;lrgen&quot;,&quot;lrecon&quot;,
+                    &quot;galtan&quot;,&quot;antielite_salience&quot;,
+                    &quot;corrupt_salience&quot;)])
+
+export(cbind(PO=rownames(PO.cntry.desc),
+      PO.cntry.desc),
+       &quot;../../results/PO.cntry.desc.xlsx&quot;,
+       overwrite=T)</code></pre>
+</div>
+<div id="correlations-between-po-variables-at-the-country-level" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Correlations between PO-variables at the country-level</h1>
+<pre class="r"><code>cntry.PO.corrs&lt;-
+  corr.test(CHES[,c(&quot;lrgen&quot;,&quot;lrecon&quot;,
+                    &quot;galtan&quot;,&quot;antielite_salience&quot;,
+                    &quot;corrupt_salience&quot;)],adjust=&quot;none&quot;)
+
+round(cntry.PO.corrs$r,2)</code></pre>
+<pre><code>##                    lrgen lrecon galtan antielite_salience corrupt_salience
+## lrgen               1.00   0.86   0.72               0.00            -0.01
+## lrecon              0.86   1.00   0.45              -0.27            -0.08
+## galtan              0.72   0.45   1.00               0.22             0.02
+## antielite_salience  0.00  -0.27   0.22               1.00             0.43
+## corrupt_salience   -0.01  -0.08   0.02               0.43             1.00</code></pre>
+<pre class="r"><code>export(cntry.PO.corrs$r,
+       &quot;../../results/cntry.PO.corrs.r.xlsx&quot;,
+       overwrite=T)
+
+export(cntry.PO.corrs$p,
+       &quot;../../results/cntry.PO.corrs.p.xlsx&quot;,
+       overwrite=T)</code></pre>
+</div>
+<div id="session-information" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Session information</h1>
 <pre class="r"><code>s&lt;-sessionInfo()
 print(s,locale=F)</code></pre>
 <pre><code>## R version 4.1.2 (2021-11-01)
@@ -963,14 +973,12 @@ print(s,locale=F)</code></pre>
 ## Matrix products: default
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods  
-## [7] base     
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] Hmisc_4.6-0     ggplot2_3.3.5   Formula_1.2-4  
-##  [4] survival_3.2-13 lattice_0.20-45 psych_2.1.9    
-##  [7] rio_0.5.29      dplyr_1.0.7     knitr_1.37     
-## [10] rmarkdown_2.11  devtools_2.4.3  usethis_2.0.1  
+##  [1] Hmisc_4.6-0     ggplot2_3.3.5   Formula_1.2-4   survival_3.2-13
+##  [5] lattice_0.20-45 psych_2.1.9     rio_0.5.29      dplyr_1.0.7    
+##  [9] knitr_1.37      rmarkdown_2.11  devtools_2.4.3  usethis_2.0.1  
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] nlme_3.1-153        fs_1.5.0            RColorBrewer_1.1-2 

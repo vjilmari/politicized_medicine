@@ -474,6 +474,40 @@ nrow(party.count)
 
 ```
 
+# Descriptives of PO-variables at the country-level
+
+```{r}
+PO.cntry.desc<-
+  psych::describe(CHES[,c("lrgen","lrecon",
+                    "galtan","antielite_salience",
+                    "corrupt_salience")])
+
+export(cbind(PO=rownames(PO.cntry.desc),
+      PO.cntry.desc),
+       "../../results/PO.cntry.desc.xlsx",
+       overwrite=T)
+
+```
+
+# Correlations between PO-variables at the country-level
+
+```{r}
+cntry.PO.corrs<-
+  corr.test(CHES[,c("lrgen","lrecon",
+                    "galtan","antielite_salience",
+                    "corrupt_salience")],adjust="none")
+
+round(cntry.PO.corrs$r,2)
+
+export(cntry.PO.corrs$r,
+       "../../results/cntry.PO.corrs.r.xlsx",
+       overwrite=T)
+
+export(cntry.PO.corrs$p,
+       "../../results/cntry.PO.corrs.p.xlsx",
+       overwrite=T)
+```
+
 # Session information
 
 ```{r}
