@@ -474,37 +474,37 @@ nrow(party.count)
 
 ```
 
-# Descriptives of PO-variables at the country-level
+# Descriptives of PO-variables in CHES
 
 ```{r}
-PO.cntry.desc<-
+PO.CHES.desc<-
   psych::describe(CHES[,c("lrgen","lrecon",
                     "galtan","antielite_salience",
                     "corrupt_salience")])
 
-export(cbind(PO=rownames(PO.cntry.desc),
-      PO.cntry.desc),
-       "../../results/PO.cntry.desc.xlsx",
+export(cbind(PO=rownames(PO.CHES.desc),
+      PO.CHES.desc),
+       "../../results/PO.CHES.desc.xlsx",
        overwrite=T)
 
 ```
 
-# Correlations between PO-variables at the country-level
+# Correlations between PO-variables in CHES
 
 ```{r}
-cntry.PO.corrs<-
+CHES.PO.corrs<-
   corr.test(CHES[,c("lrgen","lrecon",
                     "galtan","antielite_salience",
                     "corrupt_salience")],adjust="none")
 
-round(cntry.PO.corrs$r,2)
+round(CHES.PO.corrs$r,2)
 
-export(cntry.PO.corrs$r,
-       "../../results/cntry.PO.corrs.r.xlsx",
+export(CHES.PO.corrs$r,
+       "../../results/CHES.PO.corrs.r.xlsx",
        overwrite=T)
 
-export(cntry.PO.corrs$p,
-       "../../results/cntry.PO.corrs.p.xlsx",
+export(CHES.PO.corrs$p,
+       "../../results/CHES.PO.corrs.p.xlsx",
        overwrite=T)
 ```
 

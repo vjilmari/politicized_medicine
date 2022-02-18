@@ -17,87 +17,9 @@ output:
 
 ```r
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 library(rio)
-```
-
-```
-## The following rio suggested packages are not installed: 'arrow', 'feather', 'fst', 'hexView', 'pzfx', 'readODS', 'rmatio'
-## Use 'install_formats()' to install them
-```
-
-```r
 library(psych)
 library(Hmisc)
-```
-
-```
-## Loading required package: lattice
-```
-
-```
-## Loading required package: survival
-```
-
-```
-## Loading required package: Formula
-```
-
-```
-## Loading required package: ggplot2
-```
-
-```
-## 
-## Attaching package: 'ggplot2'
-```
-
-```
-## The following objects are masked from 'package:psych':
-## 
-##     %+%, alpha
-```
-
-```
-## 
-## Attaching package: 'Hmisc'
-```
-
-```
-## The following object is masked from 'package:psych':
-## 
-##     describe
-```
-
-```
-## The following objects are masked from 'package:dplyr':
-## 
-##     src, summarize
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     format.pval, units
 ```
 ## Dataset
 
@@ -1306,31 +1228,31 @@ nrow(party.count)
 ## [1] 19
 ```
 
-# Descriptives of PO-variables at the country-level
+# Descriptives of PO-variables in CHES
 
 
 ```r
-PO.cntry.desc<-
+PO.CHES.desc<-
   psych::describe(CHES[,c("lrgen","lrecon",
                     "galtan","antielite_salience",
                     "corrupt_salience")])
 
-export(cbind(PO=rownames(PO.cntry.desc),
-      PO.cntry.desc),
-       "../../results/PO.cntry.desc.xlsx",
+export(cbind(PO=rownames(PO.CHES.desc),
+      PO.CHES.desc),
+       "../../results/PO.CHES.desc.xlsx",
        overwrite=T)
 ```
 
-# Correlations between PO-variables at the country-level
+# Correlations between PO-variables in CHES
 
 
 ```r
-cntry.PO.corrs<-
+CHES.PO.corrs<-
   corr.test(CHES[,c("lrgen","lrecon",
                     "galtan","antielite_salience",
                     "corrupt_salience")],adjust="none")
 
-round(cntry.PO.corrs$r,2)
+round(CHES.PO.corrs$r,2)
 ```
 
 ```
@@ -1343,12 +1265,12 @@ round(cntry.PO.corrs$r,2)
 ```
 
 ```r
-export(cntry.PO.corrs$r,
-       "../../results/cntry.PO.corrs.r.xlsx",
+export(CHES.PO.corrs$r,
+       "../../results/CHES.PO.corrs.r.xlsx",
        overwrite=T)
 
-export(cntry.PO.corrs$p,
-       "../../results/cntry.PO.corrs.p.xlsx",
+export(CHES.PO.corrs$p,
+       "../../results/CHES.PO.corrs.p.xlsx",
        overwrite=T)
 ```
 

@@ -194,8 +194,8 @@ pre code {
 <li><a href="#correlations-between-variables"><span class="toc-section-number">5</span> Correlations between variables</a></li>
 <li><a href="#weighted-descriptive-statistics"><span class="toc-section-number">6</span> Weighted descriptive statistics</a></li>
 <li><a href="#party-count"><span class="toc-section-number">7</span> Party count</a></li>
-<li><a href="#descriptives-of-po-variables-at-the-country-level"><span class="toc-section-number">8</span> Descriptives of PO-variables at the country-level</a></li>
-<li><a href="#correlations-between-po-variables-at-the-country-level"><span class="toc-section-number">9</span> Correlations between PO-variables at the country-level</a></li>
+<li><a href="#descriptives-of-po-variables-in-ches"><span class="toc-section-number">8</span> Descriptives of PO-variables in CHES</a></li>
+<li><a href="#correlations-between-po-variables-in-ches"><span class="toc-section-number">9</span> Correlations between PO-variables in CHES</a></li>
 <li><a href="#session-information"><span class="toc-section-number">10</span> Session information</a></li>
 </ul>
 </div>
@@ -204,40 +204,10 @@ pre code {
 <h1><span class="header-section-number">1</span> Preparations</h1>
 <div id="packages" class="section level2" number="1.1">
 <h2><span class="header-section-number">1.1</span> Packages</h2>
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(rio)</code></pre>
-<pre><code>## The following rio suggested packages are not installed: &#39;arrow&#39;, &#39;feather&#39;, &#39;fst&#39;, &#39;hexView&#39;, &#39;pzfx&#39;, &#39;readODS&#39;, &#39;rmatio&#39;
-## Use &#39;install_formats()&#39; to install them</code></pre>
-<pre class="r"><code>library(psych)
+<pre class="r"><code>library(dplyr)
+library(rio)
+library(psych)
 library(Hmisc)</code></pre>
-<pre><code>## Loading required package: lattice</code></pre>
-<pre><code>## Loading required package: survival</code></pre>
-<pre><code>## Loading required package: Formula</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
-<pre><code>## 
-## Attaching package: &#39;ggplot2&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:psych&#39;:
-## 
-##     %+%, alpha</code></pre>
-<pre><code>## 
-## Attaching package: &#39;Hmisc&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:psych&#39;:
-## 
-##     describe</code></pre>
-<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
-## 
-##     src, summarize</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     format.pval, units</code></pre>
 </div>
 <div id="dataset" class="section level2" number="1.2">
 <h2><span class="header-section-number">1.2</span> Dataset</h2>
@@ -928,38 +898,38 @@ sum(party.count$n)</code></pre>
 <pre class="r"><code>nrow(party.count)</code></pre>
 <pre><code>## [1] 19</code></pre>
 </div>
-<div id="descriptives-of-po-variables-at-the-country-level" class="section level1" number="8">
-<h1><span class="header-section-number">8</span> Descriptives of PO-variables at the country-level</h1>
-<pre class="r"><code>PO.cntry.desc&lt;-
+<div id="descriptives-of-po-variables-in-ches" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> Descriptives of PO-variables in CHES</h1>
+<pre class="r"><code>PO.CHES.desc&lt;-
   psych::describe(CHES[,c(&quot;lrgen&quot;,&quot;lrecon&quot;,
                     &quot;galtan&quot;,&quot;antielite_salience&quot;,
                     &quot;corrupt_salience&quot;)])
 
-export(cbind(PO=rownames(PO.cntry.desc),
-      PO.cntry.desc),
-       &quot;../../results/PO.cntry.desc.xlsx&quot;,
+export(cbind(PO=rownames(PO.CHES.desc),
+      PO.CHES.desc),
+       &quot;../../results/PO.CHES.desc.xlsx&quot;,
        overwrite=T)</code></pre>
 </div>
-<div id="correlations-between-po-variables-at-the-country-level" class="section level1" number="9">
-<h1><span class="header-section-number">9</span> Correlations between PO-variables at the country-level</h1>
-<pre class="r"><code>cntry.PO.corrs&lt;-
+<div id="correlations-between-po-variables-in-ches" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Correlations between PO-variables in CHES</h1>
+<pre class="r"><code>CHES.PO.corrs&lt;-
   corr.test(CHES[,c(&quot;lrgen&quot;,&quot;lrecon&quot;,
                     &quot;galtan&quot;,&quot;antielite_salience&quot;,
                     &quot;corrupt_salience&quot;)],adjust=&quot;none&quot;)
 
-round(cntry.PO.corrs$r,2)</code></pre>
+round(CHES.PO.corrs$r,2)</code></pre>
 <pre><code>##                    lrgen lrecon galtan antielite_salience corrupt_salience
 ## lrgen               1.00   0.86   0.72               0.00            -0.01
 ## lrecon              0.86   1.00   0.45              -0.27            -0.08
 ## galtan              0.72   0.45   1.00               0.22             0.02
 ## antielite_salience  0.00  -0.27   0.22               1.00             0.43
 ## corrupt_salience   -0.01  -0.08   0.02               0.43             1.00</code></pre>
-<pre class="r"><code>export(cntry.PO.corrs$r,
-       &quot;../../results/cntry.PO.corrs.r.xlsx&quot;,
+<pre class="r"><code>export(CHES.PO.corrs$r,
+       &quot;../../results/CHES.PO.corrs.r.xlsx&quot;,
        overwrite=T)
 
-export(cntry.PO.corrs$p,
-       &quot;../../results/cntry.PO.corrs.p.xlsx&quot;,
+export(CHES.PO.corrs$p,
+       &quot;../../results/CHES.PO.corrs.p.xlsx&quot;,
        overwrite=T)</code></pre>
 </div>
 <div id="session-information" class="section level1" number="10">
