@@ -17,12 +17,110 @@ output:
 
 ```r
 library(mclogit)
+```
+
+```
+## Loading required package: Matrix
+```
+
+```r
 library(emmeans)
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(rio)
 library(memisc)
+```
+
+```
+## Loading required package: lattice
+```
+
+```
+## Loading required package: MASS
+```
+
+```
+## 
+## Attaching package: 'MASS'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+```
+
+```
+## 
+## Attaching package: 'memisc'
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     collect, recode, rename, syms
+```
+
+```
+## The following object is masked from 'package:Matrix':
+## 
+##     as.array
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     contr.sum, contr.treatment, contrasts
+```
+
+```
+## The following object is masked from 'package:base':
+## 
+##     as.array
+```
+
+```r
 library(psych)
 library(ggplot2)
+```
+
+```
+## 
+## Attaching package: 'ggplot2'
+```
+
+```
+## The following objects are masked from 'package:psych':
+## 
+##     %+%, alpha
+```
+
+```
+## The following object is masked from 'package:memisc':
+## 
+##     syms
+```
+
+```r
 source("../custom_functions.R")
 ```
 ## Dataset
@@ -374,14 +472,10 @@ mod0
 ## 
 ## (Co-)Variances:
 ## Grouping level: 1 
-##                      Used_CAM_ONLY~1  Used_conv_and_CAM~1
-## Used_CAM_ONLY~1       0.36200                            
-## Used_conv_and_CAM~1   0.20103          0.51552           
-## Used_conv_ONLY~1     -0.03013          0.23253           
-##                      Used_conv_ONLY~1
-## Used_CAM_ONLY~1                      
-## Used_conv_and_CAM~1                  
-## Used_conv_ONLY~1      0.23767        
+##                      Used_CAM_ONLY~1  Used_conv_and_CAM~1  Used_conv_ONLY~1
+## Used_CAM_ONLY~1       0.36200                                              
+## Used_conv_and_CAM~1   0.20103          0.51552                             
+## Used_conv_ONLY~1     -0.03013          0.23253              0.23767        
 ## 
 ## Null Deviance:     52210 
 ## Residual Deviance: 29730
@@ -576,46 +670,32 @@ mod1
 ## 
 ## Coefficients:
 ##                       Predictors
-## Response categories     (Intercept)  gndr.c     age10.c  
-##   Used_CAM_ONLY/NN      -1.325799     0.354890  -0.031334
-##   Used_conv_and_CAM/NN   0.546310     1.177607   0.092316
-##   Used_conv_ONLY/NN      2.023114     0.508387   0.196135
+## Response categories     (Intercept)  gndr.c     age10.c    income.frmissing
+##   Used_CAM_ONLY/NN      -1.325799     0.354890  -0.031334  -1.098502       
+##   Used_conv_and_CAM/NN   0.546310     1.177607   0.092316  -0.235971       
+##   Used_conv_ONLY/NN      2.023114     0.508387   0.196135  -0.148809       
 ##                       Predictors
-## Response categories     income.frmissing  income.frquint.1
-##   Used_CAM_ONLY/NN      -1.098502         -0.521355       
-##   Used_conv_and_CAM/NN  -0.235971         -0.093342       
-##   Used_conv_ONLY/NN     -0.148809          0.055202       
+## Response categories     income.frquint.1  income.frquint.2  income.frquint.3
+##   Used_CAM_ONLY/NN      -0.521355         -0.076317         -0.076446       
+##   Used_conv_and_CAM/NN  -0.093342         -0.083800         -0.065726       
+##   Used_conv_ONLY/NN      0.055202         -0.007559         -0.012097       
 ##                       Predictors
-## Response categories     income.frquint.2  income.frquint.3
-##   Used_CAM_ONLY/NN      -0.076317         -0.076446       
-##   Used_conv_and_CAM/NN  -0.083800         -0.065726       
-##   Used_conv_ONLY/NN     -0.007559         -0.012097       
+## Response categories     income.frquint.4  edu.f1. <LS  edu.f2. LS  edu.f3. LUS
+##   Used_CAM_ONLY/NN      -0.243059         -2.803566    -1.191947   -1.215822  
+##   Used_conv_and_CAM/NN   0.024103         -1.127776    -0.635586   -0.493907  
+##   Used_conv_ONLY/NN     -0.019223         -0.066621    -0.108945   -0.139945  
 ##                       Predictors
-## Response categories     income.frquint.4  edu.f1. <LS  edu.f2. LS
-##   Used_CAM_ONLY/NN      -0.243059         -2.803566    -1.191947 
-##   Used_conv_and_CAM/NN   0.024103         -1.127776    -0.635586 
-##   Used_conv_ONLY/NN     -0.019223         -0.066621    -0.108945 
-##                       Predictors
-## Response categories     edu.f3. LUS  edu.f4. UUS  edu.f5. AV  edu.f6. BA
-##   Used_CAM_ONLY/NN      -1.215822    -1.365780    -0.615184   -0.766101 
-##   Used_conv_and_CAM/NN  -0.493907    -0.460153    -0.302479   -0.256192 
-##   Used_conv_ONLY/NN     -0.139945    -0.069043    -0.126215   -0.050223 
-##                       Predictors
-## Response categories     strain.on.health.c
-##   Used_CAM_ONLY/NN       0.266866         
-##   Used_conv_and_CAM/NN   0.543999         
-##   Used_conv_ONLY/NN      0.412607         
+## Response categories     edu.f4. UUS  edu.f5. AV  edu.f6. BA  strain.on.health.c
+##   Used_CAM_ONLY/NN      -1.365780    -0.615184   -0.766101    0.266866         
+##   Used_conv_and_CAM/NN  -0.460153    -0.302479   -0.256192    0.543999         
+##   Used_conv_ONLY/NN     -0.069043    -0.126215   -0.050223    0.412607         
 ## 
 ## (Co-)Variances:
 ## Grouping level: 1 
-##                      Used_CAM_ONLY~1  Used_conv_and_CAM~1
-## Used_CAM_ONLY~1       0.51500                            
-## Used_conv_and_CAM~1   0.06878          0.59282           
-## Used_conv_ONLY~1     -0.09915          0.29201           
-##                      Used_conv_ONLY~1
-## Used_CAM_ONLY~1                      
-## Used_conv_and_CAM~1                  
-## Used_conv_ONLY~1      0.28397        
+##                      Used_CAM_ONLY~1  Used_conv_and_CAM~1  Used_conv_ONLY~1
+## Used_CAM_ONLY~1       0.51500                                              
+## Used_conv_and_CAM~1   0.06878          0.59282                             
+## Used_conv_ONLY~1     -0.09915          0.29201              0.28397        
 ## 
 ## Null Deviance:     52210 
 ## Residual Deviance: 27300
@@ -685,23 +765,10 @@ mtable(mod1,show.baselevel = T)
 
 
 ```r
-ref_grid(mod1)
-```
-
-```
-## 'emmGrid' object with variables:
-##     gndr.c = -0.5,  0.5
-##     age10.c = 0.39152
-##     income.fr = quint.5, missing, quint.1, quint.2, quint.3, quint.4
-##     edu.f = 7. MA, 1. <LS, 2. LS, 3. LUS, 4. UUS, 5. AV, 6. BA
-##     strain.on.health.c = 0.065329
-##     DV.f = multivariate response levels: NN, Used_CAM_ONLY, Used_conv_and_CAM, Used_conv_ONLY
-```
-
-```r
 mod1.strain.trends<-
   emtrends(mod1,~1|DV.f,
-           var="strain.on.health.c",infer=T,mode="latent",
+           var="strain.on.health.c",
+           infer=T,mode="latent",
            at=list(gndr.c=0,age10.c=0))
 
 #effects for each DV-category
@@ -774,6 +841,858 @@ export(data.frame(rbind(mod1.strain.eff.CM,
       "../../results/mod1.strain.eff.COMB.xlsx")
 ```
 
+### gender main effects
+
+
+```r
+mod1.gndr.trends<-
+  emtrends(mod1,~1|DV.f,
+           var="gndr.c",
+           infer=T,mode="latent",
+           at=list(strain.on.health.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod1.gndr.eff<-
+  contrast(mod1.gndr.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+```
+
+```
+##  contrast                 estimate     SE  df asymp.LCL asymp.UCL z.ratio
+##  NN effect                -0.51022 0.0542 Inf   -0.6164   -0.4040  -9.415
+##  Used_CAM_ONLY effect     -0.15533 0.1236 Inf   -0.3976    0.0869  -1.257
+##  Used_conv_and_CAM effect  0.66739 0.0537 Inf    0.5621    0.7727  12.424
+##  Used_conv_ONLY effect    -0.00183 0.0459 Inf   -0.0918    0.0881  -0.040
+##  p.value
+##   <.0001
+##   0.2089
+##   <.0001
+##   0.9681
+## 
+## Results are averaged over the levels of: gndr.c, income.fr, edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+#save to file
+export(data.frame(mod1.gndr.eff),
+       "../../results/mod1.gndr.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.gndr.eff.CM<-
+  contrast(mod1.gndr.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.gndr.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.f",
+           infer=c(T,T)))
+```
+
+```
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.675 0.0599 Inf     0.558     0.792  11.264  <.0001
+## 
+## Results are averaged over the levels of: gndr.c, income.fr, edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+(mod1.gndr.eff.CAM<-
+    contrast(mod1.gndr.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.gndr.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f",
+           infer=c(T,T)))
+```
+
+```
+##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM    0.645 0.0582 Inf     0.531     0.759  11.076  <.0001
+## 
+## Results are averaged over the levels of: gndr.c, income.fr, edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+# save to file
+export(data.frame(rbind(mod1.gndr.eff.CM,
+      mod1.gndr.eff.CAM,adjust="none")),
+      "../../results/mod1.gndr.eff.COMB.xlsx")
+```
+
+
+### age main effects
+
+
+```r
+mod1.age10.trends<-
+  emtrends(mod1,~1|DV.f,
+           var="age10.c",
+           infer=T,mode="latent",
+           at=list(strain.on.health.c=0,gndr.c=0))
+
+#effects for each DV-category
+(mod1.age10.eff<-
+  contrast(mod1.age10.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+```
+
+```
+##  contrast                 estimate     SE  df asymp.LCL asymp.UCL z.ratio
+##  NN effect                 -0.0643 0.0178 Inf  -0.09921   -0.0293  -3.606
+##  Used_CAM_ONLY effect      -0.0956 0.0419 Inf  -0.17771   -0.0135  -2.283
+##  Used_conv_and_CAM effect   0.0280 0.0176 Inf  -0.00643    0.0625   1.594
+##  Used_conv_ONLY effect      0.1319 0.0153 Inf   0.10182    0.1619   8.605
+##  p.value
+##   0.0003
+##   0.0225
+##   0.1109
+##   <.0001
+## 
+## Results are averaged over the levels of: income.fr, edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+#save to file
+export(data.frame(mod1.age10.eff),
+       "../../results/mod1.age10.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.age10.eff.CM<-
+  contrast(mod1.age10.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.age10.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.f",
+           infer=c(T,T)))
+```
+
+```
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.162 0.0196 Inf     0.124     0.201   8.295  <.0001
+## 
+## Results are averaged over the levels of: income.fr, edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+(mod1.age10.eff.CAM<-
+    contrast(mod1.age10.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.age10.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f",
+           infer=c(T,T)))
+```
+
+```
+##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM  -0.0576 0.0188 Inf   -0.0945   -0.0208  -3.069  0.0021
+## 
+## Results are averaged over the levels of: income.fr, edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+# save to file
+export(data.frame(rbind(mod1.age10.eff.CM,
+      mod1.age10.eff.CAM,adjust="none")),
+      "../../results/mod1.age10.eff.COMB.xlsx")
+```
+
+
+### education main effects
+
+
+```r
+# first take probabilities for all categories
+mod1.edu.f.trends<-emmeans(mod1,by="DV.f",
+        specs="edu.f",
+        infer=T,mode="prob",
+        at=list(strain.on.health.c=0,gndr.c=0,age10.c=0))
+
+mod1.edu.f.trends
+```
+
+```
+## DV.f = NN:
+##  edu.f     prob      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA  0.09820 0.01254 Inf   0.07362   0.12278   7.830  <.0001
+##  1. <LS 0.11848 0.01633 Inf   0.08646   0.15049   7.253  <.0001
+##  2. LS  0.11721 0.01452 Inf   0.08875   0.14567   8.072  <.0001
+##  3. LUS 0.11825 0.01439 Inf   0.09005   0.14644   8.219  <.0001
+##  4. UUS 0.11168 0.01396 Inf   0.08432   0.13905   7.999  <.0001
+##  5. AV  0.11364 0.01427 Inf   0.08568   0.14160   7.966  <.0001
+##  6. BA  0.10690 0.01382 Inf   0.07982   0.13398   7.737  <.0001
+## 
+## DV.f = Used_CAM_ONLY:
+##  edu.f     prob      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA  0.01956 0.00534 Inf   0.00910   0.03003   3.665  0.0002
+##  1. <LS 0.00143 0.00125 Inf  -0.00101   0.00388   1.151  0.2497
+##  2. LS  0.00710 0.00241 Inf   0.00238   0.01183   2.944  0.0032
+##  3. LUS 0.00700 0.00219 Inf   0.00270   0.01130   3.189  0.0014
+##  4. UUS 0.00569 0.00203 Inf   0.00172   0.00966   2.808  0.0050
+##  5. AV  0.01225 0.00364 Inf   0.00512   0.01939   3.366  0.0008
+##  6. BA  0.00991 0.00320 Inf   0.00364   0.01618   3.100  0.0019
+## 
+## DV.f = Used_conv_and_CAM:
+##  edu.f     prob      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA  0.15711 0.01852 Inf   0.12080   0.19341   8.481  <.0001
+##  1. <LS 0.06141 0.00936 Inf   0.04307   0.07976   6.563  <.0001
+##  2. LS  0.09937 0.01284 Inf   0.07421   0.12453   7.740  <.0001
+##  3. LUS 0.11550 0.01419 Inf   0.08769   0.14330   8.142  <.0001
+##  4. UUS 0.11283 0.01445 Inf   0.08452   0.14115   7.810  <.0001
+##  5. AV  0.13439 0.01639 Inf   0.10227   0.16651   8.200  <.0001
+##  6. BA  0.13241 0.01682 Inf   0.09944   0.16539   7.871  <.0001
+## 
+## DV.f = Used_conv_ONLY:
+##  edu.f     prob      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA  0.72513 0.02124 Inf   0.68350   0.76675  34.140  <.0001
+##  1. <LS 0.81867 0.01748 Inf   0.78440   0.85294  46.825  <.0001
+##  2. LS  0.77631 0.01785 Inf   0.74134   0.81129  43.501  <.0001
+##  3. LUS 0.75926 0.01821 Inf   0.72356   0.79496  41.684  <.0001
+##  4. UUS 0.76980 0.01817 Inf   0.73419   0.80541  42.369  <.0001
+##  5. AV  0.73972 0.01994 Inf   0.70063   0.77880  37.095  <.0001
+##  6. BA  0.75078 0.01996 Inf   0.71166   0.78989  37.620  <.0001
+## 
+## Results are averaged over the levels of: income.fr 
+## Confidence level used: 0.95
+```
+
+```r
+export(data.frame(mod1.edu.f.trends),
+       "../../results/mod1.edu.f.eff.MN.xlsx",
+       overwrite=T)
+
+
+#effects for each DV-category
+(mod1.edu.f.eff<-
+    contrast(mod1.edu.f.trends,#simple="edu.f",
+             adjust="none","eff",infer=c(T,T)))
+```
+
+```
+## DV.f = NN:
+##  contrast       estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA effect  -0.013850 0.00554 Inf  -0.02471 -3.00e-03  -2.501  0.0124
+##  1. <LS effect  0.006428 0.00867 Inf  -0.01056  2.34e-02   0.741  0.4584
+##  2. LS effect   0.005161 0.00586 Inf  -0.00632  1.66e-02   0.881  0.3785
+##  3. LUS effect  0.006195 0.00543 Inf  -0.00445  1.68e-02   1.141  0.2538
+##  4. UUS effect -0.000369 0.00584 Inf  -0.01182  1.11e-02  -0.063  0.9497
+##  5. AV effect   0.001588 0.00595 Inf  -0.01006  1.32e-02   0.267  0.7894
+##  6. BA effect  -0.005153 0.00615 Inf  -0.01720  6.89e-03  -0.838  0.4018
+## 
+## DV.f = Used_CAM_ONLY:
+##  contrast       estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA effect   0.010572 0.00353 Inf   0.00366  1.75e-02   2.998  0.0027
+##  1. <LS effect -0.007559 0.00216 Inf  -0.01179 -3.33e-03  -3.505  0.0005
+##  2. LS effect  -0.001889 0.00178 Inf  -0.00538  1.61e-03  -1.059  0.2894
+##  3. LUS effect -0.001996 0.00157 Inf  -0.00507  1.08e-03  -1.273  0.2028
+##  4. UUS effect -0.003305 0.00171 Inf  -0.00666  4.91e-05  -1.931  0.0534
+##  5. AV effect   0.003258 0.00224 Inf  -0.00114  7.66e-03   1.453  0.1463
+##  6. BA effect   0.000919 0.00204 Inf  -0.00308  4.92e-03   0.450  0.6524
+## 
+## DV.f = Used_conv_and_CAM:
+##  contrast       estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA effect   0.040962 0.00767 Inf   0.02592  5.60e-02   5.338  <.0001
+##  1. <LS effect -0.054731 0.00784 Inf  -0.07009 -3.94e-02  -6.984  <.0001
+##  2. LS effect  -0.016777 0.00551 Inf  -0.02757 -5.99e-03  -3.048  0.0023
+##  3. LUS effect -0.000649 0.00483 Inf  -0.01012  8.83e-03  -0.134  0.8932
+##  4. UUS effect -0.003314 0.00626 Inf  -0.01558  8.95e-03  -0.530  0.5963
+##  5. AV effect   0.018244 0.00625 Inf   0.00600  3.05e-02   2.921  0.0035
+##  6. BA effect   0.016265 0.00747 Inf   0.00162  3.09e-02   2.177  0.0295
+## 
+## DV.f = Used_conv_ONLY:
+##  contrast       estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA effect  -0.037683 0.00909 Inf  -0.05549 -1.99e-02  -4.147  <.0001
+##  1. <LS effect  0.055862 0.01098 Inf   0.03435  7.74e-02   5.090  <.0001
+##  2. LS effect   0.013505 0.00754 Inf  -0.00127  2.83e-02   1.791  0.0733
+##  3. LUS effect -0.003549 0.00679 Inf  -0.01686  9.76e-03  -0.523  0.6012
+##  4. UUS effect  0.006987 0.00810 Inf  -0.00888  2.29e-02   0.863  0.3882
+##  5. AV effect  -0.023090 0.00809 Inf  -0.03895 -7.23e-03  -2.853  0.0043
+##  6. BA effect  -0.012031 0.00914 Inf  -0.02995  5.88e-03  -1.316  0.1881
+## 
+## Results are averaged over the levels of: income.fr 
+## Confidence level used: 0.95
+```
+
+```r
+#save to file
+export(data.frame(mod1.edu.f.eff),
+       "../../results/mod1.edu.f.eff.MN.xlsx",
+       overwrite=T)
+
+# No Conv versus Conv
+
+(mod1.edu.f.eff_DV<-
+    contrast(mod1.edu.f.trends,simple="DV.f",
+             adjust="none","eff",infer=c(T,T)))
+```
+
+```
+## edu.f = 7. MA:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                 -0.1518 0.01254 Inf    -0.176   -0.1272  -12.104
+##  Used_CAM_ONLY effect      -0.2304 0.00534 Inf    -0.241   -0.2200  -43.164
+##  Used_conv_and_CAM effect  -0.0929 0.01852 Inf    -0.129   -0.0566   -5.015
+##  Used_conv_ONLY effect      0.4751 0.02124 Inf     0.433    0.5168   22.370
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## edu.f = 1. <LS:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                 -0.1315 0.01633 Inf    -0.164   -0.0995   -8.052
+##  Used_CAM_ONLY effect      -0.2486 0.00125 Inf    -0.251   -0.2461 -199.466
+##  Used_conv_and_CAM effect  -0.1886 0.00936 Inf    -0.207   -0.1702  -20.153
+##  Used_conv_ONLY effect      0.5687 0.01748 Inf     0.534    0.6029   32.526
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## edu.f = 2. LS:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                 -0.1328 0.01452 Inf    -0.161   -0.1043   -9.145
+##  Used_CAM_ONLY effect      -0.2429 0.00241 Inf    -0.248   -0.2382 -100.663
+##  Used_conv_and_CAM effect  -0.1506 0.01284 Inf    -0.176   -0.1255  -11.733
+##  Used_conv_ONLY effect      0.5263 0.01785 Inf     0.491    0.5613   29.492
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## edu.f = 3. LUS:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                 -0.1318 0.01439 Inf    -0.160   -0.1036   -9.158
+##  Used_CAM_ONLY effect      -0.2430 0.00219 Inf    -0.247   -0.2387 -110.749
+##  Used_conv_and_CAM effect  -0.1345 0.01419 Inf    -0.162   -0.1067   -9.482
+##  Used_conv_ONLY effect      0.5093 0.01821 Inf     0.474    0.5450   27.959
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## edu.f = 4. UUS:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                 -0.1383 0.01396 Inf    -0.166   -0.1110   -9.907
+##  Used_CAM_ONLY effect      -0.2443 0.00203 Inf    -0.248   -0.2403 -120.591
+##  Used_conv_and_CAM effect  -0.1372 0.01445 Inf    -0.165   -0.1089   -9.495
+##  Used_conv_ONLY effect      0.5198 0.01817 Inf     0.484    0.5554   28.609
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## edu.f = 5. AV:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                 -0.1364 0.01427 Inf    -0.164   -0.1084   -9.558
+##  Used_CAM_ONLY effect      -0.2377 0.00364 Inf    -0.245   -0.2306  -65.309
+##  Used_conv_and_CAM effect  -0.1156 0.01639 Inf    -0.148   -0.0835   -7.054
+##  Used_conv_ONLY effect      0.4897 0.01994 Inf     0.451    0.5288   24.558
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## edu.f = 6. BA:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                 -0.1431 0.01382 Inf    -0.170   -0.1160  -10.357
+##  Used_CAM_ONLY effect      -0.2401 0.00320 Inf    -0.246   -0.2338  -75.081
+##  Used_conv_and_CAM effect  -0.1176 0.01682 Inf    -0.151   -0.0846   -6.989
+##  Used_conv_ONLY effect      0.5008 0.01996 Inf     0.462    0.5399   25.093
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## Results are averaged over the levels of: income.fr 
+## Confidence level used: 0.95
+```
+
+```r
+(mod1.edu.f.eff.CM<-
+    contrast(mod1.edu.f.trends,
+             method = 
+               list("Conv - No conv" = c(0,0,1,1)),
+             simple="DV.f",
+             infer=c(T,T)))
+```
+
+```
+## edu.f = 7. MA:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.882 0.0156 Inf     0.852     0.913  56.675  <.0001
+## 
+## edu.f = 1. <LS:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.880 0.0165 Inf     0.848     0.913  53.212  <.0001
+## 
+## edu.f = 2. LS:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.876 0.0156 Inf     0.845     0.906  56.288  <.0001
+## 
+## edu.f = 3. LUS:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.875 0.0154 Inf     0.845     0.905  56.816  <.0001
+## 
+## edu.f = 4. UUS:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.883 0.0148 Inf     0.854     0.912  59.694  <.0001
+## 
+## edu.f = 5. AV:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.874 0.0161 Inf     0.843     0.906  54.423  <.0001
+## 
+## edu.f = 6. BA:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.883 0.0153 Inf     0.853     0.913  57.805  <.0001
+## 
+## Results are averaged over the levels of: income.fr 
+## Confidence level used: 0.95
+```
+
+```r
+(mod1.edu.f.eff.CM_comp<-
+  contrast(mod1.edu.f.eff.CM,
+         simple="edu.f",method="eff",
+         infer=c(T,T),adjust="none"))
+```
+
+```
+## contrast = Conv - No conv:
+##  contrast1     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA effect   0.00328 0.00607 Inf  -0.00862   0.01518   0.540  0.5891
+##  1. <LS effect  0.00113 0.00877 Inf  -0.01606   0.01832   0.129  0.8974
+##  2. LS effect  -0.00327 0.00607 Inf  -0.01517   0.00862  -0.539  0.5898
+##  3. LUS effect -0.00420 0.00560 Inf  -0.01517   0.00678  -0.750  0.4534
+##  4. UUS effect  0.00367 0.00608 Inf  -0.00824   0.01559   0.604  0.5457
+##  5. AV effect  -0.00485 0.00631 Inf  -0.01722   0.00753  -0.768  0.4426
+##  6. BA effect   0.00423 0.00645 Inf  -0.00841   0.01688   0.656  0.5116
+## 
+## Results are averaged over the levels of: income.fr 
+## Confidence level used: 0.95
+```
+
+```r
+# No CAM versus CAM
+
+
+(mod1.edu.f.eff.CAM<-
+    contrast(mod1.edu.f.trends,
+             method = 
+               list("CAM - No CAM" = c(0,1,1,0)),
+             simple="DV.f",
+             infer=c(T,T)))
+```
+
+```
+## edu.f = 7. MA:
+##  contrast     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM   0.1767 0.01954 Inf    0.1384    0.2150   9.041  <.0001
+## 
+## edu.f = 1. <LS:
+##  contrast     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM   0.0628 0.00948 Inf    0.0443    0.0814   6.631  <.0001
+## 
+## edu.f = 2. LS:
+##  contrast     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM   0.1065 0.01324 Inf    0.0805    0.1324   8.042  <.0001
+## 
+## edu.f = 3. LUS:
+##  contrast     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM   0.1225 0.01453 Inf    0.0940    0.1510   8.431  <.0001
+## 
+## edu.f = 4. UUS:
+##  contrast     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM   0.1185 0.01473 Inf    0.0897    0.1474   8.048  <.0001
+## 
+## edu.f = 5. AV:
+##  contrast     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM   0.1466 0.01701 Inf    0.1133    0.1800   8.619  <.0001
+## 
+## edu.f = 6. BA:
+##  contrast     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM   0.1423 0.01732 Inf    0.1084    0.1763   8.219  <.0001
+## 
+## Results are averaged over the levels of: income.fr 
+## Confidence level used: 0.95
+```
+
+```r
+(mod1.edu.f.eff.CAM_comp<-
+    contrast(mod1.edu.f.eff.CAM,
+             simple="edu.f",method="eff",
+             infer=c(T,T),adjust="none"))
+```
+
+```
+## contrast = CAM - No CAM:
+##  contrast1     estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  7. MA effect   0.05153 0.00834 Inf   0.03519   0.06788   6.178  <.0001
+##  1. <LS effect -0.06229 0.00821 Inf  -0.07839  -0.04619  -7.584  <.0001
+##  2. LS effect  -0.01867 0.00573 Inf  -0.02989  -0.00744  -3.258  0.0011
+##  3. LUS effect -0.00265 0.00503 Inf  -0.01250   0.00721  -0.526  0.5989
+##  4. UUS effect -0.00662 0.00643 Inf  -0.01923   0.00599  -1.029  0.3036
+##  5. AV effect   0.02150 0.00656 Inf   0.00865   0.03436   3.278  0.0010
+##  6. BA effect   0.01718 0.00768 Inf   0.00214   0.03223   2.238  0.0252
+## 
+## Results are averaged over the levels of: income.fr 
+## Confidence level used: 0.95
+```
+
+```r
+# save to file
+export(data.frame(rbind(mod1.edu.f.eff.CM_comp,
+                        mod1.edu.f.eff.CAM_comp,adjust="none")),
+       "../../results/mod1.edu.f.eff.COMB_comp.xlsx",overwrite=T)
+
+# save to file
+export(data.frame(rbind(mod1.edu.f.eff.CM,
+                        mod1.edu.f.eff.CAM,adjust="none")),
+       "../../results/mod1.edu.f.eff.COMB.xlsx",overwrite=T)
+```
+
+
+### income main effects
+
+
+```r
+# first take probabilities for all categories
+mod1.income.fr.trends<-emmeans(mod1,by="DV.f",
+        specs="income.fr",
+        infer=T,mode="prob",
+        at=list(strain.on.health.c=0,gndr.c=0,age10.c=0))
+
+mod1.income.fr.trends
+```
+
+```
+## DV.f = NN:
+##  income.fr    prob      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5   0.10876 0.01335 Inf  0.082597   0.13493   8.147  <.0001
+##  missing   0.12615 0.01578 Inf  0.095213   0.15708   7.993  <.0001
+##  quint.1   0.10582 0.01390 Inf  0.078580   0.13307   7.613  <.0001
+##  quint.2   0.11056 0.01372 Inf  0.083665   0.13745   8.058  <.0001
+##  quint.3   0.11071 0.01355 Inf  0.084152   0.13727   8.169  <.0001
+##  quint.4   0.11030 0.01347 Inf  0.083898   0.13671   8.187  <.0001
+## 
+## DV.f = Used_CAM_ONLY:
+##  income.fr    prob      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5   0.01160 0.00316 Inf  0.005417   0.01778   3.677  0.0002
+##  missing   0.00451 0.00188 Inf  0.000823   0.00819   2.398  0.0165
+##  quint.1   0.00673 0.00273 Inf  0.001373   0.01209   2.462  0.0138
+##  quint.2   0.01094 0.00335 Inf  0.004370   0.01752   3.263  0.0011
+##  quint.3   0.01095 0.00317 Inf  0.004734   0.01717   3.452  0.0006
+##  quint.4   0.00923 0.00264 Inf  0.004046   0.01441   3.490  0.0005
+## 
+## DV.f = Used_conv_and_CAM:
+##  income.fr    prob      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5   0.12153 0.01465 Inf  0.092821   0.15024   8.296  <.0001
+##  missing   0.11156 0.01470 Inf  0.082760   0.14037   7.591  <.0001
+##  quint.1   0.10792 0.01390 Inf  0.080669   0.13517   7.762  <.0001
+##  quint.2   0.11369 0.01401 Inf  0.086238   0.14114   8.117  <.0001
+##  quint.3   0.11591 0.01413 Inf  0.088212   0.14360   8.202  <.0001
+##  quint.4   0.12626 0.01504 Inf  0.096780   0.15575   8.394  <.0001
+## 
+## DV.f = Used_conv_ONLY:
+##  income.fr    prob      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5   0.75810 0.01847 Inf  0.721910   0.79429  41.055  <.0001
+##  missing   0.75778 0.01920 Inf  0.720160   0.79541  39.476  <.0001
+##  quint.1   0.77953 0.01808 Inf  0.744088   0.81497  43.109  <.0001
+##  quint.2   0.76481 0.01832 Inf  0.728897   0.80072  41.740  <.0001
+##  quint.3   0.76243 0.01824 Inf  0.726667   0.79819  41.789  <.0001
+##  quint.4   0.75420 0.01840 Inf  0.718147   0.79026  40.996  <.0001
+## 
+## Results are averaged over the levels of: edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+export(data.frame(mod1.income.fr.trends),
+       "../../results/mod1.income.fr.eff.MN.xlsx",
+       overwrite=T)
+
+
+#effects for each DV-category
+(mod1.income.fr.eff<-
+    contrast(mod1.income.fr.trends,#simple="income.fr",
+             adjust="none","eff",infer=c(T,T)))
+```
+
+```
+## DV.f = NN:
+##  contrast        estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5 effect -0.003286 0.00493 Inf -0.012952  0.006380  -0.666  0.5052
+##  missing effect  0.014094 0.00643 Inf  0.001499  0.026689   2.193  0.0283
+##  quint.1 effect -0.006228 0.00641 Inf -0.018790  0.006334  -0.972  0.3312
+##  quint.2 effect -0.001495 0.00544 Inf -0.012154  0.009164  -0.275  0.7834
+##  quint.3 effect -0.001338 0.00501 Inf -0.011156  0.008480  -0.267  0.7894
+##  quint.4 effect -0.001747 0.00481 Inf -0.011171  0.007677  -0.363  0.7164
+## 
+## DV.f = Used_CAM_ONLY:
+##  contrast        estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5 effect  0.002607 0.00174 Inf -0.000811  0.006025   1.495  0.1349
+##  missing effect -0.004487 0.00180 Inf -0.008022 -0.000952  -2.488  0.0129
+##  quint.1 effect -0.002264 0.00208 Inf -0.006335  0.001807  -1.090  0.2758
+##  quint.2 effect  0.001949 0.00206 Inf -0.002082  0.005981   0.948  0.3433
+##  quint.3 effect  0.001959 0.00185 Inf -0.001664  0.005582   1.060  0.2891
+##  quint.4 effect  0.000235 0.00153 Inf -0.002768  0.003238   0.153  0.8783
+## 
+## DV.f = Used_conv_and_CAM:
+##  contrast        estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5 effect  0.005386 0.00508 Inf -0.004574  0.015347   1.060  0.2892
+##  missing effect -0.004582 0.00651 Inf -0.017340  0.008177  -0.704  0.4815
+##  quint.1 effect -0.008228 0.00579 Inf -0.019578  0.003121  -1.421  0.1553
+##  quint.2 effect -0.002455 0.00498 Inf -0.012222  0.007311  -0.493  0.6222
+##  quint.3 effect -0.000238 0.00491 Inf -0.009867  0.009390  -0.049  0.9613
+##  quint.4 effect  0.010117 0.00497 Inf  0.000384  0.019851   2.037  0.0416
+## 
+## DV.f = Used_conv_ONLY:
+##  contrast        estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5 effect -0.004707 0.00673 Inf -0.017896  0.008482  -0.700  0.4842
+##  missing effect -0.005026 0.00850 Inf -0.021678  0.011626  -0.592  0.5542
+##  quint.1 effect  0.016720 0.00812 Inf  0.000796  0.032645   2.058  0.0396
+##  quint.2 effect  0.002001 0.00697 Inf -0.011662  0.015664   0.287  0.7741
+##  quint.3 effect -0.000383 0.00664 Inf -0.013406  0.012639  -0.058  0.9540
+##  quint.4 effect -0.008605 0.00650 Inf -0.021350  0.004140  -1.323  0.1857
+## 
+## Results are averaged over the levels of: edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+#save to file
+export(data.frame(mod1.income.fr.eff),
+       "../../results/mod1.income.fr.eff.MN.xlsx",
+       overwrite=T)
+
+# No Conv versus Conv
+
+(mod1.income.fr.eff_DV<-
+    contrast(mod1.income.fr.trends,simple="DV.f",
+             adjust="none","eff",infer=c(T,T)))
+```
+
+```
+## income.fr = quint.5:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                  -0.141 0.01335 Inf    -0.167   -0.1151  -10.579
+##  Used_CAM_ONLY effect       -0.238 0.00316 Inf    -0.245   -0.2322  -75.558
+##  Used_conv_and_CAM effect   -0.128 0.01465 Inf    -0.157   -0.0998   -8.770
+##  Used_conv_ONLY effect       0.508 0.01847 Inf     0.472    0.5443   27.516
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## income.fr = missing:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                  -0.124 0.01578 Inf    -0.155   -0.0929   -7.848
+##  Used_CAM_ONLY effect       -0.245 0.00188 Inf    -0.249   -0.2418 -130.619
+##  Used_conv_and_CAM effect   -0.138 0.01470 Inf    -0.167   -0.1096   -9.420
+##  Used_conv_ONLY effect       0.508 0.01920 Inf     0.470    0.5454   26.452
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## income.fr = quint.1:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                  -0.144 0.01390 Inf    -0.171   -0.1169  -10.373
+##  Used_CAM_ONLY effect       -0.243 0.00273 Inf    -0.249   -0.2379  -89.013
+##  Used_conv_and_CAM effect   -0.142 0.01390 Inf    -0.169   -0.1148  -10.220
+##  Used_conv_ONLY effect       0.530 0.01808 Inf     0.494    0.5650   29.284
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## income.fr = quint.2:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                  -0.139 0.01372 Inf    -0.166   -0.1126  -10.164
+##  Used_CAM_ONLY effect       -0.239 0.00335 Inf    -0.246   -0.2325  -71.290
+##  Used_conv_and_CAM effect   -0.136 0.01401 Inf    -0.164   -0.1089   -9.732
+##  Used_conv_ONLY effect       0.515 0.01832 Inf     0.479    0.5507   28.096
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## income.fr = quint.3:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                  -0.139 0.01355 Inf    -0.166   -0.1127  -10.278
+##  Used_CAM_ONLY effect       -0.239 0.00317 Inf    -0.245   -0.2328  -75.337
+##  Used_conv_and_CAM effect   -0.134 0.01413 Inf    -0.162   -0.1064   -9.489
+##  Used_conv_ONLY effect       0.512 0.01824 Inf     0.477    0.5482   28.086
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## income.fr = quint.4:
+##  contrast                 estimate      SE  df asymp.LCL asymp.UCL  z.ratio
+##  NN effect                  -0.140 0.01347 Inf    -0.166   -0.1133  -10.369
+##  Used_CAM_ONLY effect       -0.241 0.00264 Inf    -0.246   -0.2356  -91.061
+##  Used_conv_and_CAM effect   -0.124 0.01504 Inf    -0.153   -0.0943   -8.226
+##  Used_conv_ONLY effect       0.504 0.01840 Inf     0.468    0.5403   27.407
+##  p.value
+##   <.0001
+##   <.0001
+##   <.0001
+##   <.0001
+## 
+## Results are averaged over the levels of: edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+(mod1.income.fr.eff.CM<-
+    contrast(mod1.income.fr.trends,
+             method = 
+               list("Conv - No conv" = c(0,0,1,1)),
+             simple="DV.f",
+             infer=c(T,T)))
+```
+
+```
+## income.fr = quint.5:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.880 0.0151 Inf     0.850     0.909  58.418  <.0001
+## 
+## income.fr = missing:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.869 0.0164 Inf     0.837     0.902  52.916  <.0001
+## 
+## income.fr = quint.1:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.887 0.0149 Inf     0.858     0.917  59.491  <.0001
+## 
+## income.fr = quint.2:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.879 0.0154 Inf     0.848     0.909  57.208  <.0001
+## 
+## income.fr = quint.3:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.878 0.0152 Inf     0.849     0.908  57.869  <.0001
+## 
+## income.fr = quint.4:
+##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  Conv - No conv    0.880 0.0148 Inf     0.851     0.910  59.406  <.0001
+## 
+## Results are averaged over the levels of: edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+(mod1.income.fr.eff.CM_comp<-
+  contrast(mod1.income.fr.eff.CM,
+         simple="income.fr",method="eff",
+         infer=c(T,T),adjust="none"))
+```
+
+```
+## contrast = Conv - No conv:
+##  contrast1       estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5 effect  0.000679 0.00519 Inf  -0.00949   0.01085   0.131  0.8959
+##  missing effect -0.009607 0.00652 Inf  -0.02238   0.00317  -1.474  0.1405
+##  quint.1 effect  0.008492 0.00672 Inf  -0.00469   0.02167   1.263  0.2066
+##  quint.2 effect -0.000454 0.00576 Inf  -0.01174   0.01084  -0.079  0.9371
+##  quint.3 effect -0.000622 0.00530 Inf  -0.01101   0.00976  -0.117  0.9066
+##  quint.4 effect  0.001512 0.00503 Inf  -0.00834   0.01136   0.301  0.7635
+## 
+## Results are averaged over the levels of: edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+# No CAM versus CAM
+
+
+(mod1.income.fr.eff.CAM<-
+    contrast(mod1.income.fr.trends,
+             method = 
+               list("CAM - No CAM" = c(0,1,1,0)),
+             simple="DV.f",
+             infer=c(T,T)))
+```
+
+```
+## income.fr = quint.5:
+##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM    0.133 0.0152 Inf    0.1033     0.163   8.746  <.0001
+## 
+## income.fr = missing:
+##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM    0.116 0.0149 Inf    0.0869     0.145   7.789  <.0001
+## 
+## income.fr = quint.1:
+##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM    0.115 0.0143 Inf    0.0866     0.143   8.016  <.0001
+## 
+## income.fr = quint.2:
+##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM    0.125 0.0146 Inf    0.0960     0.153   8.528  <.0001
+## 
+## income.fr = quint.3:
+##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM    0.127 0.0147 Inf    0.0980     0.156   8.628  <.0001
+## 
+## income.fr = quint.4:
+##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  CAM - No CAM    0.135 0.0155 Inf    0.1052     0.166   8.761  <.0001
+## 
+## Results are averaged over the levels of: edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+(mod1.income.fr.eff.CAM_comp<-
+    contrast(mod1.income.fr.eff.CAM,
+             simple="income.fr",method="eff",
+             infer=c(T,T),adjust="none"))
+```
+
+```
+## contrast = CAM - No CAM:
+##  contrast1       estimate      SE  df asymp.LCL asymp.UCL z.ratio p.value
+##  quint.5 effect  0.007993 0.00530 Inf -0.002404   0.01839   1.507  0.1319
+##  missing effect -0.009068 0.00671 Inf -0.022228   0.00409  -1.351  0.1768
+##  quint.1 effect -0.010492 0.00607 Inf -0.022380   0.00140  -1.730  0.0836
+##  quint.2 effect -0.000506 0.00529 Inf -0.010867   0.00986  -0.096  0.9237
+##  quint.3 effect  0.001721 0.00516 Inf -0.008395   0.01184   0.333  0.7388
+##  quint.4 effect  0.010352 0.00513 Inf  0.000292   0.02041   2.017  0.0437
+## 
+## Results are averaged over the levels of: edu.f 
+## Confidence level used: 0.95
+```
+
+```r
+# save to file
+export(data.frame(rbind(mod1.income.fr.eff.CM_comp,
+                        mod1.income.fr.eff.CAM_comp,adjust="none")),
+       "../../results/mod1.income.fr.eff.COMB_comp.xlsx",overwrite=T)
+
+# save to file
+export(data.frame(rbind(mod1.income.fr.eff.CM,
+                        mod1.income.fr.eff.CAM,adjust="none")),
+       "../../results/mod1.income.fr.eff.COMB.xlsx",overwrite=T)
+```
 
 ## Model for lrgen
 
@@ -1204,20 +2123,20 @@ pairs(mod2.galtan.eff,adjust="none",infer=c(T,T))
 ```
 
 ```
-##  contrast                                         estimate     SE  df
-##  NN effect - Used_CAM_ONLY effect                   0.2338 0.1021 Inf
-##  NN effect - Used_conv_and_CAM effect               0.1242 0.0374 Inf
-##  NN effect - Used_conv_ONLY effect                  0.0406 0.0286 Inf
-##  Used_CAM_ONLY effect - Used_conv_and_CAM effect   -0.1095 0.1021 Inf
-##  Used_CAM_ONLY effect - Used_conv_ONLY effect      -0.1931 0.0996 Inf
-##  Used_conv_and_CAM effect - Used_conv_ONLY effect  -0.0836 0.0275 Inf
-##  asymp.LCL asymp.UCL z.ratio p.value
-##     0.0337   0.43378   2.290  0.0220
-##     0.0509   0.19751   3.322  0.0009
-##    -0.0155   0.09672   1.419  0.1559
-##    -0.3097   0.09065  -1.072  0.2835
-##    -0.3883   0.00203  -1.940  0.0524
-##    -0.1375  -0.02967  -3.038  0.0024
+##  contrast                                         estimate     SE  df asymp.LCL
+##  NN effect - Used_CAM_ONLY effect                   0.2338 0.1021 Inf    0.0337
+##  NN effect - Used_conv_and_CAM effect               0.1242 0.0374 Inf    0.0509
+##  NN effect - Used_conv_ONLY effect                  0.0406 0.0286 Inf   -0.0155
+##  Used_CAM_ONLY effect - Used_conv_and_CAM effect   -0.1095 0.1021 Inf   -0.3097
+##  Used_CAM_ONLY effect - Used_conv_ONLY effect      -0.1931 0.0996 Inf   -0.3883
+##  Used_conv_and_CAM effect - Used_conv_ONLY effect  -0.0836 0.0275 Inf   -0.1375
+##  asymp.UCL z.ratio p.value
+##    0.43378   2.290  0.0220
+##    0.19751   3.322  0.0009
+##    0.09672   1.419  0.1559
+##    0.09065  -1.072  0.2835
+##    0.00203  -1.940  0.0524
+##   -0.02967  -3.038  0.0024
 ## 
 ## Results are averaged over the levels of: income.fr, edu.f 
 ## Confidence level used: 0.95
@@ -1521,20 +2440,20 @@ pairs(mod2.corrupt_salience.eff,
 ```
 
 ```
-##  contrast                                         estimate     SE  df
-##  NN effect - Used_CAM_ONLY effect                  -0.4112 0.1360 Inf
-##  NN effect - Used_conv_and_CAM effect               0.0176 0.0540 Inf
-##  NN effect - Used_conv_ONLY effect                  0.0523 0.0399 Inf
-##  Used_CAM_ONLY effect - Used_conv_and_CAM effect    0.4288 0.1369 Inf
-##  Used_CAM_ONLY effect - Used_conv_ONLY effect       0.4636 0.1325 Inf
-##  Used_conv_and_CAM effect - Used_conv_ONLY effect   0.0347 0.0413 Inf
-##  asymp.LCL asymp.UCL z.ratio p.value
-##    -0.6778    -0.145  -3.023  0.0025
-##    -0.0883     0.123   0.326  0.7446
-##    -0.0258     0.131   1.312  0.1894
-##     0.1605     0.697   3.132  0.0017
-##     0.2038     0.723   3.497  0.0005
-##    -0.0462     0.116   0.842  0.3999
+##  contrast                                         estimate     SE  df asymp.LCL
+##  NN effect - Used_CAM_ONLY effect                  -0.4112 0.1360 Inf   -0.6778
+##  NN effect - Used_conv_and_CAM effect               0.0176 0.0540 Inf   -0.0883
+##  NN effect - Used_conv_ONLY effect                  0.0523 0.0399 Inf   -0.0258
+##  Used_CAM_ONLY effect - Used_conv_and_CAM effect    0.4288 0.1369 Inf    0.1605
+##  Used_CAM_ONLY effect - Used_conv_ONLY effect       0.4636 0.1325 Inf    0.2038
+##  Used_conv_and_CAM effect - Used_conv_ONLY effect   0.0347 0.0413 Inf   -0.0462
+##  asymp.UCL z.ratio p.value
+##     -0.145  -3.023  0.0025
+##      0.123   0.326  0.7446
+##      0.131   1.312  0.1894
+##      0.697   3.132  0.0017
+##      0.723   3.497  0.0005
+##      0.116   0.842  0.3999
 ## 
 ## Results are averaged over the levels of: income.fr, edu.f 
 ## Confidence level used: 0.95
@@ -2762,7 +3681,20 @@ export(data.frame(rbind(
 
 ```r
 library(lme4)
+```
 
+```
+## 
+## Attaching package: 'lme4'
+```
+
+```
+## The following object is masked from 'package:rio':
+## 
+##     factorize
+```
+
+```r
 mod3.antielite_salience.bin.conv<-
   glmer(used.conv~gndr.c+age10.c+income.fr+
             edu.f+strain.on.health.c+
@@ -2776,8 +3708,8 @@ mod3.antielite_salience.bin.conv<-
 ```
 
 ```
-## Warning in eval(family$initialize, rho): non-integer #successes in a
-## binomial glm!
+## Warning in eval(family$initialize, rho): non-integer #successes in a binomial
+## glm!
 ```
 
 ```r
@@ -2794,8 +3726,7 @@ summary(mod3.antielite_salience.bin.conv)
 ##     (1 | cntry)
 ##    Data: fdat
 ## Weights: anweight
-## Control: 
-## glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
+## Control: glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
 ##  10338.4  10481.2  -5151.2  10302.4    20574 
@@ -2810,42 +3741,42 @@ summary(mod3.antielite_salience.bin.conv)
 ## Number of obs: 20592, groups:  cntry, 19
 ## 
 ## Fixed effects:
-##                                           Estimate Std. Error z value
-## (Intercept)                              2.0436714  0.1483891  13.772
-## gndr.c                                   0.6039560  0.0529580  11.404
-## age10.c                                  0.1808704  0.0168835  10.713
-## income.frmissing                        -0.1128504  0.0906583  -1.245
-## income.frquint.1                         0.1082306  0.1059187   1.022
-## income.frquint.2                        -0.0047968  0.0892787  -0.054
-## income.frquint.3                         0.0083563  0.0835907   0.100
-## income.frquint.4                         0.0156485  0.0782938   0.200
-## edu.f1. <LS                             -0.0004202  0.1216615  -0.003
-## edu.f2. LS                              -0.0472578  0.0924995  -0.511
-## edu.f3. LUS                             -0.0782230  0.0887004  -0.882
-## edu.f4. UUS                             -0.0255409  0.0971743  -0.263
-## edu.f5. AV                              -0.0913086  0.0954480  -0.957
-## edu.f6. BA                              -0.0400850  0.0987859  -0.406
-## strain.on.health.c                       0.4083541  0.0168113  24.290
-## antielite_salience.z                    -0.0055391  0.0394137  -0.141
-## strain.on.health.c:antielite_salience.z  0.0489249  0.0200131   2.445
-##                                         Pr(>|z|)    
-## (Intercept)                               <2e-16 ***
-## gndr.c                                    <2e-16 ***
-## age10.c                                   <2e-16 ***
-## income.frmissing                          0.2132    
-## income.frquint.1                          0.3069    
-## income.frquint.2                          0.9572    
-## income.frquint.3                          0.9204    
-## income.frquint.4                          0.8416    
-## edu.f1. <LS                               0.9972    
-## edu.f2. LS                                0.6094    
-## edu.f3. LUS                               0.3778    
-## edu.f4. UUS                               0.7927    
-## edu.f5. AV                                0.3388    
-## edu.f6. BA                                0.6849    
-## strain.on.health.c                        <2e-16 ***
-## antielite_salience.z                      0.8882    
-## strain.on.health.c:antielite_salience.z   0.0145 *  
+##                                           Estimate Std. Error z value Pr(>|z|)
+## (Intercept)                              2.0436714  0.1483891  13.772   <2e-16
+## gndr.c                                   0.6039560  0.0529580  11.404   <2e-16
+## age10.c                                  0.1808704  0.0168835  10.713   <2e-16
+## income.frmissing                        -0.1128504  0.0906583  -1.245   0.2132
+## income.frquint.1                         0.1082306  0.1059187   1.022   0.3069
+## income.frquint.2                        -0.0047968  0.0892787  -0.054   0.9572
+## income.frquint.3                         0.0083563  0.0835907   0.100   0.9204
+## income.frquint.4                         0.0156485  0.0782938   0.200   0.8416
+## edu.f1. <LS                             -0.0004202  0.1216615  -0.003   0.9972
+## edu.f2. LS                              -0.0472578  0.0924995  -0.511   0.6094
+## edu.f3. LUS                             -0.0782230  0.0887004  -0.882   0.3778
+## edu.f4. UUS                             -0.0255409  0.0971743  -0.263   0.7927
+## edu.f5. AV                              -0.0913086  0.0954480  -0.957   0.3388
+## edu.f6. BA                              -0.0400850  0.0987859  -0.406   0.6849
+## strain.on.health.c                       0.4083541  0.0168113  24.290   <2e-16
+## antielite_salience.z                    -0.0055391  0.0394137  -0.141   0.8882
+## strain.on.health.c:antielite_salience.z  0.0489249  0.0200131   2.445   0.0145
+##                                            
+## (Intercept)                             ***
+## gndr.c                                  ***
+## age10.c                                 ***
+## income.frmissing                           
+## income.frquint.1                           
+## income.frquint.2                           
+## income.frquint.3                           
+## income.frquint.4                           
+## edu.f1. <LS                                
+## edu.f2. LS                                 
+## edu.f3. LUS                                
+## edu.f4. UUS                                
+## edu.f5. AV                                 
+## edu.f6. BA                                 
+## strain.on.health.c                      ***
+## antielite_salience.z                       
+## strain.on.health.c:antielite_salience.z *  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -2921,7 +3852,7 @@ ggplot(data=mod3.antielite_salience.plot.dat,
   scale_color_discrete(labels = c("Low", "Average", "High"))
 ```
 
-![](Analysis_files/figure-html/unnamed-chunk-29-1.png)<!-- -->
+![](Analysis_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
 
 ## Model for corrupt_salience
 
@@ -3399,8 +4330,8 @@ mod3.corrupt_salience.bin.conv<-
 ```
 
 ```
-## Warning in eval(family$initialize, rho): non-integer #successes in a
-## binomial glm!
+## Warning in eval(family$initialize, rho): non-integer #successes in a binomial
+## glm!
 ```
 
 ```r
@@ -3417,8 +4348,7 @@ summary(mod3.corrupt_salience.bin.conv)
 ##     (1 | cntry)
 ##    Data: fdat
 ## Weights: anweight
-## Control: 
-## glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
+## Control: glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
 ##  10341.1  10483.9  -5152.6  10305.1    20574 
@@ -3433,42 +4363,42 @@ summary(mod3.corrupt_salience.bin.conv)
 ## Number of obs: 20592, groups:  cntry, 19
 ## 
 ## Fixed effects:
-##                                         Estimate Std. Error z value
-## (Intercept)                            2.0417120  0.1485029  13.749
-## gndr.c                                 0.6035150  0.0529338  11.401
-## age10.c                                0.1801060  0.0168759  10.672
-## income.frmissing                      -0.1122512  0.0906639  -1.238
-## income.frquint.1                       0.1108318  0.1057660   1.048
-## income.frquint.2                      -0.0004359  0.0892796  -0.005
-## income.frquint.3                       0.0102890  0.0835597   0.123
-## income.frquint.4                       0.0168730  0.0782759   0.216
-## edu.f1. <LS                           -0.0006706  0.1216019  -0.006
-## edu.f2. LS                            -0.0459006  0.0924537  -0.496
-## edu.f3. LUS                           -0.0791012  0.0885858  -0.893
-## edu.f4. UUS                           -0.0220444  0.0971867  -0.227
-## edu.f5. AV                            -0.0901368  0.0954380  -0.944
-## edu.f6. BA                            -0.0379560  0.0988003  -0.384
-## strain.on.health.c                     0.4080345  0.0168233  24.254
-## corrupt_salience.z                    -0.0703723  0.0534655  -1.316
-## strain.on.health.c:corrupt_salience.z  0.0311902  0.0276592   1.128
-##                                       Pr(>|z|)    
-## (Intercept)                             <2e-16 ***
-## gndr.c                                  <2e-16 ***
-## age10.c                                 <2e-16 ***
-## income.frmissing                         0.216    
-## income.frquint.1                         0.295    
-## income.frquint.2                         0.996    
-## income.frquint.3                         0.902    
-## income.frquint.4                         0.829    
-## edu.f1. <LS                              0.996    
-## edu.f2. LS                               0.620    
-## edu.f3. LUS                              0.372    
-## edu.f4. UUS                              0.821    
-## edu.f5. AV                               0.345    
-## edu.f6. BA                               0.701    
-## strain.on.health.c                      <2e-16 ***
-## corrupt_salience.z                       0.188    
-## strain.on.health.c:corrupt_salience.z    0.259    
+##                                         Estimate Std. Error z value Pr(>|z|)
+## (Intercept)                            2.0417120  0.1485029  13.749   <2e-16
+## gndr.c                                 0.6035150  0.0529338  11.401   <2e-16
+## age10.c                                0.1801060  0.0168759  10.672   <2e-16
+## income.frmissing                      -0.1122512  0.0906639  -1.238    0.216
+## income.frquint.1                       0.1108318  0.1057660   1.048    0.295
+## income.frquint.2                      -0.0004359  0.0892796  -0.005    0.996
+## income.frquint.3                       0.0102890  0.0835597   0.123    0.902
+## income.frquint.4                       0.0168730  0.0782759   0.216    0.829
+## edu.f1. <LS                           -0.0006706  0.1216019  -0.006    0.996
+## edu.f2. LS                            -0.0459006  0.0924537  -0.496    0.620
+## edu.f3. LUS                           -0.0791012  0.0885858  -0.893    0.372
+## edu.f4. UUS                           -0.0220444  0.0971867  -0.227    0.821
+## edu.f5. AV                            -0.0901368  0.0954380  -0.944    0.345
+## edu.f6. BA                            -0.0379560  0.0988003  -0.384    0.701
+## strain.on.health.c                     0.4080345  0.0168233  24.254   <2e-16
+## corrupt_salience.z                    -0.0703723  0.0534655  -1.316    0.188
+## strain.on.health.c:corrupt_salience.z  0.0311902  0.0276592   1.128    0.259
+##                                          
+## (Intercept)                           ***
+## gndr.c                                ***
+## age10.c                               ***
+## income.frmissing                         
+## income.frquint.1                         
+## income.frquint.2                         
+## income.frquint.3                         
+## income.frquint.4                         
+## edu.f1. <LS                              
+## edu.f2. LS                               
+## edu.f3. LUS                              
+## edu.f4. UUS                              
+## edu.f5. AV                               
+## edu.f6. BA                               
+## strain.on.health.c                    ***
+## corrupt_salience.z                       
+## strain.on.health.c:corrupt_salience.z    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -3544,7 +4474,7 @@ ggplot(data=mod3.corrupt_salience.plot.dat,
   scale_color_discrete(labels = c("Low", "Average", "High"))
 ```
 
-![](Analysis_files/figure-html/unnamed-chunk-33-1.png)<!-- -->
+![](Analysis_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
 
 # Exploratory analysis
 
@@ -3982,8 +4912,8 @@ mod2.galtan.bin.conv<-
 ```
 
 ```
-## Warning in eval(family$initialize, rho): non-integer #successes in a
-## binomial glm!
+## Warning in eval(family$initialize, rho): non-integer #successes in a binomial
+## glm!
 ```
 
 ```r
@@ -4000,8 +4930,8 @@ mod4.galtan.bin.conv<-
 ```
 
 ```
-## Warning in eval(family$initialize, rho): non-integer #successes in a
-## binomial glm!
+## Warning in eval(family$initialize, rho): non-integer #successes in a binomial
+## glm!
 ```
 
 ```r
@@ -4013,12 +4943,9 @@ anova(mod2.galtan.bin.conv,mod4.galtan.bin.conv)
 ## Models:
 ## mod2.galtan.bin.conv: used.conv ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + galtan.z + (1 | cntry)
 ## mod4.galtan.bin.conv: used.conv ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + galtan.z + I(galtan.z^2) + I(galtan.z^3) + (1 | cntry)
-##                      npar   AIC   BIC  logLik deviance Chisq Df Pr(>Chisq)
-## mod2.galtan.bin.conv   17 10346 10481 -5156.2    10312                    
-## mod4.galtan.bin.conv   19 10339 10490 -5150.6    10301 11.06  2   0.003965
-##                        
-## mod2.galtan.bin.conv   
-## mod4.galtan.bin.conv **
+##                      npar   AIC   BIC  logLik deviance Chisq Df Pr(>Chisq)   
+## mod2.galtan.bin.conv   17 10346 10481 -5156.2    10312                       
+## mod4.galtan.bin.conv   19 10339 10490 -5150.6    10301 11.06  2   0.003965 **
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -4036,8 +4963,7 @@ summary(mod4.galtan.bin.conv)
 ##     galtan.z + I(galtan.z^2) + I(galtan.z^3) + (1 | cntry)
 ##    Data: fdat
 ## Weights: anweight
-## Control: 
-## glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
+## Control: glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
 ##  10339.2  10490.0  -5150.6  10301.2    20573 
@@ -4097,8 +5023,8 @@ mod2.galtan.bin.CAM<-
 ```
 
 ```
-## Warning in eval(family$initialize, rho): non-integer #successes in a
-## binomial glm!
+## Warning in eval(family$initialize, rho): non-integer #successes in a binomial
+## glm!
 ```
 
 ```r
@@ -4115,8 +5041,8 @@ mod4.galtan.bin.CAM<-
 ```
 
 ```
-## Warning in eval(family$initialize, rho): non-integer #successes in a
-## binomial glm!
+## Warning in eval(family$initialize, rho): non-integer #successes in a binomial
+## glm!
 ```
 
 ```r
@@ -4128,12 +5054,9 @@ anova(mod2.galtan.bin.CAM,mod4.galtan.bin.CAM)
 ## Models:
 ## mod2.galtan.bin.CAM: used.CAM ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + galtan.z + (1 | cntry)
 ## mod4.galtan.bin.CAM: used.CAM ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + galtan.z + I(galtan.z^2) + I(galtan.z^3) + (1 | cntry)
-##                     npar   AIC   BIC  logLik deviance  Chisq Df Pr(>Chisq)
-## mod2.galtan.bin.CAM   17 12093 12228 -6029.4    12059                     
-## mod4.galtan.bin.CAM   19 12090 12241 -6026.0    12052 6.9261  2    0.03133
-##                      
-## mod2.galtan.bin.CAM  
-## mod4.galtan.bin.CAM *
+##                     npar   AIC   BIC  logLik deviance  Chisq Df Pr(>Chisq)  
+## mod2.galtan.bin.CAM   17 12093 12228 -6029.4    12059                       
+## mod4.galtan.bin.CAM   19 12090 12241 -6026.0    12052 6.9261  2    0.03133 *
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -4151,8 +5074,7 @@ summary(mod4.galtan.bin.CAM)
 ##     galtan.z + I(galtan.z^2) + I(galtan.z^3) + (1 | cntry)
 ##    Data: fdat
 ## Weights: anweight
-## Control: 
-## glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
+## Control: glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e+05))
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
 ##  12090.0  12240.7  -6026.0  12052.0    20573 
@@ -4207,7 +5129,7 @@ ggplot(data=fdat,aes(x=galtan.z,y=used.conv))+
     se = TRUE)
 ```
 
-![](Analysis_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
+![](Analysis_files/figure-html/unnamed-chunk-43-1.png)<!-- -->
 
 ```r
 ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
@@ -4216,7 +5138,7 @@ ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
     se = TRUE)
 ```
 
-![](Analysis_files/figure-html/unnamed-chunk-39-2.png)<!-- -->
+![](Analysis_files/figure-html/unnamed-chunk-43-2.png)<!-- -->
 
 
 ### antielite_salience
@@ -4423,41 +5345,29 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] lme4_1.1-27.1    ggplot2_3.3.5    psych_2.1.9      memisc_0.99.30.7
-##  [5] MASS_7.3-54      lattice_0.20-45  rio_0.5.29       dplyr_1.0.7     
-##  [9] emmeans_1.7.2    mclogit_0.8.7.3  Matrix_1.3-4     knitr_1.37      
-## [13] rmarkdown_2.11   devtools_2.4.3   usethis_2.0.1   
+##  [1] lme4_1.1-28      ggplot2_3.3.5    psych_2.1.9      memisc_0.99.30.7
+##  [5] MASS_7.3-54      lattice_0.20-45  rio_0.5.29       dplyr_1.0.8     
+##  [9] emmeans_1.7.2    mclogit_0.8.7.3  Matrix_1.3-4    
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] nlme_3.1-153      fs_1.5.0          rprojroot_2.0.2  
-##  [4] repr_1.1.3        tools_4.1.2       bslib_0.3.1      
-##  [7] utf8_1.2.2        R6_2.5.1          mgcv_1.8-38      
-## [10] DBI_1.1.2         colorspace_2.0-2  withr_2.4.3      
-## [13] tidyselect_1.1.1  prettyunits_1.1.1 mnormt_2.0.2     
-## [16] processx_3.5.2    curl_4.3.2        compiler_4.1.2   
-## [19] cli_3.1.0         desc_1.4.0        sandwich_3.0-1   
-## [22] labeling_0.4.2    sass_0.4.0        scales_1.1.1     
-## [25] mvtnorm_1.1-3     callr_3.7.0       stringr_1.4.0    
-## [28] digest_0.6.29     minqa_1.2.4       foreign_0.8-81   
-## [31] base64enc_0.1-3   pkgconfig_2.0.3   htmltools_0.5.2  
-## [34] sessioninfo_1.2.2 highr_0.9         fastmap_1.1.0    
-## [37] rlang_0.4.12      readxl_1.3.1      farver_2.1.0     
-## [40] jquerylib_0.1.4   generics_0.1.1    zoo_1.8-9        
-## [43] jsonlite_1.7.2    zip_2.2.0         car_3.0-12       
-## [46] magrittr_2.0.1    Rcpp_1.0.7        munsell_0.5.0    
-## [49] fansi_0.5.0       abind_1.4-5       lifecycle_1.0.1  
-## [52] stringi_1.7.6     multcomp_1.4-17   yaml_2.2.1       
-## [55] carData_3.0-4     pkgbuild_1.3.1    grid_4.1.2       
-## [58] parallel_4.1.2    forcats_0.5.1     crayon_1.4.2     
-## [61] haven_2.4.3       splines_4.1.2     hms_1.1.1        
-## [64] tmvnsim_1.0-2     ps_1.6.0          pillar_1.6.4     
-## [67] boot_1.3-28       estimability_1.3  codetools_0.2-18 
-## [70] pkgload_1.2.4     glue_1.6.0        evaluate_0.14    
-## [73] data.table_1.14.2 remotes_2.4.2     nloptr_1.2.2.3   
-## [76] vctrs_0.3.8       testthat_3.0.4    cellranger_1.1.0 
-## [79] gtable_0.3.0      purrr_0.3.4       assertthat_0.2.1 
-## [82] cachem_1.0.6      xfun_0.29         openxlsx_4.2.5   
-## [85] xtable_1.8-4      coda_0.19-4       survival_3.2-13  
-## [88] tibble_3.1.6      memoise_2.0.1     TH.data_1.1-0    
-## [91] ellipsis_0.3.2
+##  [1] sass_0.4.0        jsonlite_1.7.3    splines_4.1.2     carData_3.0-4    
+##  [5] tmvnsim_1.0-2     bslib_0.3.1       assertthat_0.2.1  highr_0.9        
+##  [9] cellranger_1.1.0  yaml_2.2.1        pillar_1.7.0      glue_1.6.1       
+## [13] digest_0.6.29     minqa_1.2.4       colorspace_2.0-2  sandwich_3.0-1   
+## [17] htmltools_0.5.2   pkgconfig_2.0.3   haven_2.4.3       purrr_0.3.4      
+## [21] xtable_1.8-4      mvtnorm_1.1-3     scales_1.1.1      openxlsx_4.2.5   
+## [25] tibble_3.1.6      mgcv_1.8-38       farver_2.1.0      generics_0.1.2   
+## [29] car_3.0-12        ellipsis_0.3.2    TH.data_1.1-0     withr_2.4.3      
+## [33] repr_1.1.3        cli_3.2.0         mnormt_2.0.2      survival_3.2-13  
+## [37] magrittr_2.0.2    crayon_1.5.0      readxl_1.3.1      estimability_1.3 
+## [41] evaluate_0.15     fansi_1.0.2       nlme_3.1-153      forcats_0.5.1    
+## [45] foreign_0.8-81    tools_4.1.2       data.table_1.14.2 hms_1.1.1        
+## [49] lifecycle_1.0.1   multcomp_1.4-17   stringr_1.4.0     munsell_0.5.0    
+## [53] zip_2.2.0         compiler_4.1.2    jquerylib_0.1.4   rlang_1.0.1      
+## [57] nloptr_2.0.0      grid_4.1.2        rstudioapi_0.13   labeling_0.4.2   
+## [61] base64enc_0.1-3   rmarkdown_2.11    boot_1.3-28       gtable_0.3.0     
+## [65] codetools_0.2-18  abind_1.4-5       DBI_1.1.2         curl_4.3.2       
+## [69] R6_2.5.1          zoo_1.8-9         knitr_1.37        fastmap_1.1.0    
+## [73] utf8_1.2.2        stringi_1.7.6     parallel_4.1.2    Rcpp_1.0.8       
+## [77] vctrs_0.3.8       tidyselect_1.1.2  xfun_0.29         coda_0.19-4
 ```

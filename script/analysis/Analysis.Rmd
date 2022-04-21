@@ -205,10 +205,11 @@ mtable(mod1,show.baselevel = T)
 ### Strain on health main effects
 
 ```{r}
-ref_grid(mod1)
+
 mod1.strain.trends<-
   emtrends(mod1,~1|DV.f,
-           var="strain.on.health.c",infer=T,mode="latent",
+           var="strain.on.health.c",
+           infer=T,mode="latent",
            at=list(gndr.c=0,age10.c=0))
 
 #effects for each DV-category
@@ -245,6 +246,242 @@ export(data.frame(rbind(mod1.strain.eff.CM,
 
 ```
 
+### gender main effects
+
+```{r}
+
+mod1.gndr.trends<-
+  emtrends(mod1,~1|DV.f,
+           var="gndr.c",
+           infer=T,mode="latent",
+           at=list(strain.on.health.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod1.gndr.eff<-
+  contrast(mod1.gndr.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.gndr.eff),
+       "../../results/mod1.gndr.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.gndr.eff.CM<-
+  contrast(mod1.gndr.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.gndr.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.f",
+           infer=c(T,T)))
+
+
+(mod1.gndr.eff.CAM<-
+    contrast(mod1.gndr.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.gndr.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f",
+           infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(mod1.gndr.eff.CM,
+      mod1.gndr.eff.CAM,adjust="none")),
+      "../../results/mod1.gndr.eff.COMB.xlsx")
+
+```
+
+
+### age main effects
+
+```{r}
+
+mod1.age10.trends<-
+  emtrends(mod1,~1|DV.f,
+           var="age10.c",
+           infer=T,mode="latent",
+           at=list(strain.on.health.c=0,gndr.c=0))
+
+#effects for each DV-category
+(mod1.age10.eff<-
+  contrast(mod1.age10.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.age10.eff),
+       "../../results/mod1.age10.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.age10.eff.CM<-
+  contrast(mod1.age10.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.age10.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.f",
+           infer=c(T,T)))
+
+
+(mod1.age10.eff.CAM<-
+    contrast(mod1.age10.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.age10.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f",
+           infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(mod1.age10.eff.CM,
+      mod1.age10.eff.CAM,adjust="none")),
+      "../../results/mod1.age10.eff.COMB.xlsx")
+
+```
+
+
+### education main effects
+
+```{r}
+# first take probabilities for all categories
+mod1.edu.f.trends<-emmeans(mod1,by="DV.f",
+        specs="edu.f",
+        infer=T,mode="prob",
+        at=list(strain.on.health.c=0,gndr.c=0,age10.c=0))
+
+mod1.edu.f.trends
+
+
+export(data.frame(mod1.edu.f.trends),
+       "../../results/mod1.edu.f.eff.MN.xlsx",
+       overwrite=T)
+
+
+#effects for each DV-category
+(mod1.edu.f.eff<-
+    contrast(mod1.edu.f.trends,#simple="edu.f",
+             adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.edu.f.eff),
+       "../../results/mod1.edu.f.eff.MN.xlsx",
+       overwrite=T)
+
+# No Conv versus Conv
+
+(mod1.edu.f.eff_DV<-
+    contrast(mod1.edu.f.trends,simple="DV.f",
+             adjust="none","eff",infer=c(T,T)))
+
+
+(mod1.edu.f.eff.CM<-
+    contrast(mod1.edu.f.trends,
+             method = 
+               list("Conv - No conv" = c(0,0,1,1)),
+             simple="DV.f",
+             infer=c(T,T)))
+
+(mod1.edu.f.eff.CM_comp<-
+  contrast(mod1.edu.f.eff.CM,
+         simple="edu.f",method="eff",
+         infer=c(T,T),adjust="none"))
+
+# No CAM versus CAM
+
+
+(mod1.edu.f.eff.CAM<-
+    contrast(mod1.edu.f.trends,
+             method = 
+               list("CAM - No CAM" = c(0,1,1,0)),
+             simple="DV.f",
+             infer=c(T,T)))
+
+(mod1.edu.f.eff.CAM_comp<-
+    contrast(mod1.edu.f.eff.CAM,
+             simple="edu.f",method="eff",
+             infer=c(T,T),adjust="none"))
+
+
+# save to file
+export(data.frame(rbind(mod1.edu.f.eff.CM_comp,
+                        mod1.edu.f.eff.CAM_comp,adjust="none")),
+       "../../results/mod1.edu.f.eff.COMB_comp.xlsx",overwrite=T)
+
+# save to file
+export(data.frame(rbind(mod1.edu.f.eff.CM,
+                        mod1.edu.f.eff.CAM,adjust="none")),
+       "../../results/mod1.edu.f.eff.COMB.xlsx",overwrite=T)
+```
+
+
+### income main effects
+
+```{r}
+# first take probabilities for all categories
+mod1.income.fr.trends<-emmeans(mod1,by="DV.f",
+        specs="income.fr",
+        infer=T,mode="prob",
+        at=list(strain.on.health.c=0,gndr.c=0,age10.c=0))
+
+mod1.income.fr.trends
+
+
+export(data.frame(mod1.income.fr.trends),
+       "../../results/mod1.income.fr.eff.MN.xlsx",
+       overwrite=T)
+
+
+#effects for each DV-category
+(mod1.income.fr.eff<-
+    contrast(mod1.income.fr.trends,#simple="income.fr",
+             adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.income.fr.eff),
+       "../../results/mod1.income.fr.eff.MN.xlsx",
+       overwrite=T)
+
+# No Conv versus Conv
+
+(mod1.income.fr.eff_DV<-
+    contrast(mod1.income.fr.trends,simple="DV.f",
+             adjust="none","eff",infer=c(T,T)))
+
+
+(mod1.income.fr.eff.CM<-
+    contrast(mod1.income.fr.trends,
+             method = 
+               list("Conv - No conv" = c(0,0,1,1)),
+             simple="DV.f",
+             infer=c(T,T)))
+
+(mod1.income.fr.eff.CM_comp<-
+  contrast(mod1.income.fr.eff.CM,
+         simple="income.fr",method="eff",
+         infer=c(T,T),adjust="none"))
+
+# No CAM versus CAM
+
+
+(mod1.income.fr.eff.CAM<-
+    contrast(mod1.income.fr.trends,
+             method = 
+               list("CAM - No CAM" = c(0,1,1,0)),
+             simple="DV.f",
+             infer=c(T,T)))
+
+(mod1.income.fr.eff.CAM_comp<-
+    contrast(mod1.income.fr.eff.CAM,
+             simple="income.fr",method="eff",
+             infer=c(T,T),adjust="none"))
+
+
+# save to file
+export(data.frame(rbind(mod1.income.fr.eff.CM_comp,
+                        mod1.income.fr.eff.CAM_comp,adjust="none")),
+       "../../results/mod1.income.fr.eff.COMB_comp.xlsx",overwrite=T)
+
+# save to file
+export(data.frame(rbind(mod1.income.fr.eff.CM,
+                        mod1.income.fr.eff.CAM,adjust="none")),
+       "../../results/mod1.income.fr.eff.COMB.xlsx",overwrite=T)
+```
 
 ## Model for lrgen
 
