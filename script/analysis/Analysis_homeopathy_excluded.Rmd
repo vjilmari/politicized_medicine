@@ -25,6 +25,8 @@ library(rio)
 library(memisc)
 library(psych)
 library(ggplot2)
+library(lme4)
+library(MetBrewer)
 source("../custom_functions.R")
 ```
 ## Dataset
@@ -205,13 +207,14 @@ mtable(mod1,show.baselevel = T)
 ### Strain on health main effects
 
 ```{r}
-ref_grid(mod1)
+
 mod1.strain.trends<-
   emtrends(mod1,~1|DV.no.home.f,
-           var="strain.on.health.c",infer=T,mode="latent",
+           var="strain.on.health.c",
+           infer=T,mode="latent",
            at=list(gndr.c=0,age10.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod1.strain.eff<-
   contrast(mod1.strain.trends,simple="DV.no.home.f",
          adjust="none","eff",infer=c(T,T)))
@@ -245,6 +248,242 @@ export(data.frame(rbind(mod1.strain.eff.CM,
 
 ```
 
+### gender main effects
+
+```{r}
+
+mod1.gndr.trends<-
+  emtrends(mod1,~1|DV.no.home.f,
+           var="gndr.c",
+           infer=T,mode="latent",
+           at=list(strain.on.health.c=0,age10.c=0))
+
+#effects for each DV.no.home-category
+(mod1.gndr.eff<-
+  contrast(mod1.gndr.trends,simple="DV.no.home.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.gndr.eff),
+       "../../results/Homeopathy_excluded/mod1.gndr.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.gndr.eff.CM<-
+  contrast(mod1.gndr.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.gndr.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.no.home.f",
+           infer=c(T,T)))
+
+
+(mod1.gndr.eff.CAM<-
+    contrast(mod1.gndr.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.gndr.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.no.home.f",
+           infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(mod1.gndr.eff.CM,
+      mod1.gndr.eff.CAM,adjust="none")),
+      "../../results/Homeopathy_excluded/mod1.gndr.eff.COMB.xlsx")
+
+```
+
+
+### age main effects
+
+```{r}
+
+mod1.age10.trends<-
+  emtrends(mod1,~1|DV.no.home.f,
+           var="age10.c",
+           infer=T,mode="latent",
+           at=list(strain.on.health.c=0,gndr.c=0))
+
+#effects for each DV.no.home-category
+(mod1.age10.eff<-
+  contrast(mod1.age10.trends,simple="DV.no.home.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.age10.eff),
+       "../../results/Homeopathy_excluded/mod1.age10.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.age10.eff.CM<-
+  contrast(mod1.age10.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.age10.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.no.home.f",
+           infer=c(T,T)))
+
+
+(mod1.age10.eff.CAM<-
+    contrast(mod1.age10.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.age10.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.no.home.f",
+           infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(mod1.age10.eff.CM,
+      mod1.age10.eff.CAM,adjust="none")),
+      "../../results/Homeopathy_excluded/mod1.age10.eff.COMB.xlsx")
+
+```
+
+
+### education main effects
+
+```{r}
+# first take probabilities for all categories
+mod1.edu.f.trends<-emmeans(mod1,by="DV.no.home.f",
+        specs="edu.f",
+        infer=T,mode="prob",
+        at=list(strain.on.health.c=0,gndr.c=0,age10.c=0))
+
+mod1.edu.f.trends
+
+
+export(data.frame(mod1.edu.f.trends),
+       "../../results/Homeopathy_excluded/mod1.edu.f.eff.MN.xlsx",
+       overwrite=T)
+
+
+#effects for each DV.no.home-category
+(mod1.edu.f.eff<-
+    contrast(mod1.edu.f.trends,#simple="edu.f",
+             adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.edu.f.eff),
+       "../../results/Homeopathy_excluded/mod1.edu.f.eff.MN.xlsx",
+       overwrite=T)
+
+# No Conv versus Conv
+
+(mod1.edu.f.eff_DV.no.home<-
+    contrast(mod1.edu.f.trends,simple="DV.no.home.f",
+             adjust="none","eff",infer=c(T,T)))
+
+
+(mod1.edu.f.eff.CM<-
+    contrast(mod1.edu.f.trends,
+             method = 
+               list("Conv - No conv" = c(0,0,1,1)),
+             simple="DV.no.home.f",
+             infer=c(T,T)))
+
+(mod1.edu.f.eff.CM_comp<-
+  contrast(mod1.edu.f.eff.CM,
+         simple="edu.f",method="eff",
+         infer=c(T,T),adjust="none"))
+
+# No CAM versus CAM
+
+
+(mod1.edu.f.eff.CAM<-
+    contrast(mod1.edu.f.trends,
+             method = 
+               list("CAM - No CAM" = c(0,1,1,0)),
+             simple="DV.no.home.f",
+             infer=c(T,T)))
+
+(mod1.edu.f.eff.CAM_comp<-
+    contrast(mod1.edu.f.eff.CAM,
+             simple="edu.f",method="eff",
+             infer=c(T,T),adjust="none"))
+
+
+# save to file
+export(data.frame(rbind(mod1.edu.f.eff.CM_comp,
+                        mod1.edu.f.eff.CAM_comp,adjust="none")),
+       "../../results/Homeopathy_excluded/mod1.edu.f.eff.COMB_comp.xlsx",overwrite=T)
+
+# save to file
+export(data.frame(rbind(mod1.edu.f.eff.CM,
+                        mod1.edu.f.eff.CAM,adjust="none")),
+       "../../results/Homeopathy_excluded/mod1.edu.f.eff.COMB.xlsx",overwrite=T)
+```
+
+
+### income main effects
+
+```{r}
+# first take probabilities for all categories
+mod1.income.fr.trends<-emmeans(mod1,by="DV.no.home.f",
+        specs="income.fr",
+        infer=T,mode="prob",
+        at=list(strain.on.health.c=0,gndr.c=0,age10.c=0))
+
+mod1.income.fr.trends
+
+
+export(data.frame(mod1.income.fr.trends),
+       "../../results/Homeopathy_excluded/mod1.income.fr.eff.MN.xlsx",
+       overwrite=T)
+
+
+#effects for each DV.no.home-category
+(mod1.income.fr.eff<-
+    contrast(mod1.income.fr.trends,#simple="income.fr",
+             adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.income.fr.eff),
+       "../../results/Homeopathy_excluded/mod1.income.fr.eff.MN.xlsx",
+       overwrite=T)
+
+# No Conv versus Conv
+
+(mod1.income.fr.eff_DV.no.home<-
+    contrast(mod1.income.fr.trends,simple="DV.no.home.f",
+             adjust="none","eff",infer=c(T,T)))
+
+
+(mod1.income.fr.eff.CM<-
+    contrast(mod1.income.fr.trends,
+             method = 
+               list("Conv - No conv" = c(0,0,1,1)),
+             simple="DV.no.home.f",
+             infer=c(T,T)))
+
+(mod1.income.fr.eff.CM_comp<-
+  contrast(mod1.income.fr.eff.CM,
+         simple="income.fr",method="eff",
+         infer=c(T,T),adjust="none"))
+
+# No CAM versus CAM
+
+
+(mod1.income.fr.eff.CAM<-
+    contrast(mod1.income.fr.trends,
+             method = 
+               list("CAM - No CAM" = c(0,1,1,0)),
+             simple="DV.no.home.f",
+             infer=c(T,T)))
+
+(mod1.income.fr.eff.CAM_comp<-
+    contrast(mod1.income.fr.eff.CAM,
+             simple="income.fr",method="eff",
+             infer=c(T,T),adjust="none"))
+
+
+# save to file
+export(data.frame(rbind(mod1.income.fr.eff.CM_comp,
+                        mod1.income.fr.eff.CAM_comp,adjust="none")),
+       "../../results/Homeopathy_excluded/mod1.income.fr.eff.COMB_comp.xlsx",overwrite=T)
+
+# save to file
+export(data.frame(rbind(mod1.income.fr.eff.CM,
+                        mod1.income.fr.eff.CAM,adjust="none")),
+       "../../results/Homeopathy_excluded/mod1.income.fr.eff.COMB.xlsx",overwrite=T)
+```
 
 ## Model for lrgen
 
@@ -270,7 +509,7 @@ mod2.lrgen.trends<-
            at=list(gndr.c=0,age10.c=0,
                    strain.on.health.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod2.lrgen.eff<-
   contrast(mod2.lrgen.trends,simple="DV.no.home.f",
          adjust="none","eff", infer=c(T,T)))
@@ -328,7 +567,7 @@ mod2.lrecon.trends<-
            at=list(gndr.c=0,age10.c=0,
                    strain.on.health.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod2.lrecon.eff<-
   contrast(mod2.lrecon.trends,simple="DV.no.home.f",
          adjust="none","eff", infer=c(T,T)))
@@ -386,7 +625,7 @@ mod2.galtan.trends<-
            at=list(gndr.c=0,age10.c=0,
                    strain.on.health.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod2.galtan.eff<-
   contrast(mod2.galtan.trends,simple="DV.no.home.f",
          adjust="none","eff", infer=c(T,T)))
@@ -459,7 +698,7 @@ mod2.antielite_salience.trends<-
            at=list(gndr.c=0,age10.c=0,
                    strain.on.health.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod2.antielite_salience.eff<-
   contrast(mod2.antielite_salience.trends,simple="DV.no.home.f",
          adjust="none","eff", infer=c(T,T)))
@@ -517,7 +756,7 @@ mod2.corrupt_salience.trends<-
            at=list(gndr.c=0,age10.c=0,
                    strain.on.health.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod2.corrupt_salience.eff<-
   contrast(mod2.corrupt_salience.trends,simple="DV.no.home.f",
          adjust="none","eff", infer=c(T,T)))
@@ -599,7 +838,7 @@ mod2.galtan_corrupt.galtan.trends<-
            at=list(gndr.c=0,age10.c=0,
                    strain.on.health.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod2.galtan_corrupt.galtan.eff<-
   contrast(mod2.galtan_corrupt.galtan.trends,simple="DV.no.home.f",
          adjust="none","eff", infer=c(T,T)))
@@ -645,7 +884,7 @@ mod2.galtan_corrupt.corrupt.trends<-
            at=list(gndr.c=0,age10.c=0,
                    strain.on.health.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod2.galtan_corrupt.corrupt.eff<-
   contrast(mod2.galtan_corrupt.corrupt.trends,simple="DV.no.home.f",
          adjust="none","eff", infer=c(T,T)))
@@ -720,7 +959,7 @@ mod3.lrgen.alt.trends<-
            infer=c(T,T),mode="latent",
            at=list(gndr.c=0,age10.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod3.lrgen.alt.eff<-
   contrast(mod3.lrgen.alt.trends,simple="DV.no.home.f",
          adjust="none","eff",infer=c(T,T)))
@@ -793,7 +1032,7 @@ mod3.lrecon.alt.trends<-
            infer=c(T,T),mode="latent",
            at=list(gndr.c=0,age10.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod3.lrecon.alt.eff<-
   contrast(mod3.lrecon.alt.trends,simple="DV.no.home.f",
          adjust="none","eff",infer=c(T,T)))
@@ -870,7 +1109,7 @@ mod3.galtan.alt.trends<-
            infer=c(T,T),mode="latent",
            at=list(gndr.c=0,age10.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod3.galtan.alt.eff<-
   contrast(mod3.galtan.alt.trends,simple="DV.no.home.f",
          adjust="none","eff",infer=c(T,T)))
@@ -943,7 +1182,7 @@ mod3.antielite_salience.alt.trends<-
            infer=c(T,T),mode="latent",
            at=list(gndr.c=0,age10.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod3.antielite_salience.alt.eff<-
   contrast(mod3.antielite_salience.alt.trends,simple="DV.no.home.f",
          adjust="none","eff",infer=c(T,T)))
@@ -1152,76 +1391,6 @@ export(data.frame(rbind(
   "../../results/Homeopathy_excluded/mod3.antielite_salience.slopes.eff.COMB.xlsx")
 ```
 
-### Plot association by strain on health
-
-#### Run logistic binomial model to confirm the effect
-
-```{r}
-library(lme4)
-
-mod3.antielite_salience.bin.conv<-
-  glmer(used.conv~gndr.c+age10.c+income.fr+
-            edu.f+strain.on.health.c+
-            antielite_salience.z+
-            strain.on.health.c:antielite_salience.z+
-          (1|cntry),family=binomial(link="logit"),
-        control=
-          glmerControl(optimizer="bobyqa",
-                       optCtrl=list(maxfun=100000)),
-          data=fdat,weights=anweight)
-
-summary(mod3.antielite_salience.bin.conv)
-
-(mod3.antielite_salience.bin.conv.trends<-
-  emtrends(mod3.antielite_salience.bin.conv,
-         var="antielite_salience.z",
-         specs="strain.on.health.c",
-         at=list(age10.c=0,
-                 gndr.c=0,
-                 strain.on.health.c=strain.on.health.c.points),
-         infer=c(F,T)))
-
-
-```
-
-#### Plot predicted values for the certain points
-
-```{r}
-
-mod3.antielite_salience.pred.dat<-
-  data.frame(antielite_salience.z=
-               rep(seq(from=-2.5,to=2.5,by=0.01),3),
-             strain.on.health.c=
-               rep(strain.on.health.c.points,each=501),
-             gndr.c=0,
-             age10.c=0,
-             income.fr="quint.3",
-             edu.f="4. UUS")
-
-
-
-
-mod3.antielite_salience.plot.dat<-
-  cbind(mod3.antielite_salience.pred.dat,
-        P.CONV.USE=predict(mod3.antielite_salience.bin.conv,
-        newdata=
-          mod3.antielite_salience.pred.dat,
-        type = "response",re.form=NA))
-
-names(mod3.antielite_salience.plot.dat)
-
-ggplot(data=mod3.antielite_salience.plot.dat,
-       aes(y=P.CONV.USE,x=antielite_salience.z,
-           color=as.factor(strain.on.health.c)))+
-  geom_line(size=1.75)+
-  xlab("Anti-elite salience")+
-  ylab("P(Use of Conventional Medicine)")+
-  guides(color=guide_legend(title="Strain on health"))+
-  scale_color_discrete(labels = c("Low", "Average", "High"))
-
-
-```
-
 ## Model for corrupt_salience
 
 ```{r}
@@ -1240,7 +1409,8 @@ anova(mod2.corrupt_salience,
       mod3.corrupt_salience,test="Chisq")
 
 #Alternative model with manually defined interaction
-fdat$corrupt_salience.zXstrain.on.health.c<-fdat$corrupt_salience.z*fdat$strain.on.health.c
+fdat$corrupt_salience.zXstrain.on.health.c<-
+  fdat$corrupt_salience.z*fdat$strain.on.health.c
 
 mod3.corrupt_salience.alt<-
   mblogit(DV.no.home.f~gndr.c+age10.c+income.fr+
@@ -1260,7 +1430,7 @@ mod3.corrupt_salience.alt.trends<-
            infer=c(T,T),mode="latent",
            at=list(gndr.c=0,age10.c=0))
 
-#effects for each DV-category
+#effects for each DV.no.home-category
 (mod3.corrupt_salience.alt.eff<-
   contrast(mod3.corrupt_salience.alt.trends,simple="DV.no.home.f",
          adjust="none","eff",infer=c(T,T)))
@@ -1471,69 +1641,102 @@ export(data.frame(rbind(
 
 ### Plot association by strain on health
 
-#### Run logistic binomial model to confirm the effect
-
 ```{r}
 
-mod3.corrupt_salience.bin.conv<-
-  glmer(used.conv~gndr.c+age10.c+income.fr+
-            edu.f+strain.on.health.c+
+# First fit model without the categorical predictors
+mod3.corrupt_salience.red<-
+  mblogit(DV.no.home.f~gndr.c+age10.c+strain.on.health.c+
             corrupt_salience.z+
-            strain.on.health.c:corrupt_salience.z+
-          (1|cntry),family=binomial(link="logit"),
-        control=
-          glmerControl(optimizer="bobyqa",
-                       optCtrl=list(maxfun=100000)),
+            strain.on.health.c:corrupt_salience.z,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             trace=TRUE),
           data=fdat,weights=anweight)
 
-summary(mod3.corrupt_salience.bin.conv)
 
-(mod3.corrupt_salience.bin.conv.trends<-
-  emtrends(mod3.corrupt_salience.bin.conv,
-         var="corrupt_salience.z",
-         specs="strain.on.health.c",
-         at=list(age10.c=0,
-                 gndr.c=0,
-                 strain.on.health.c=strain.on.health.c.points),
-         infer=c(F,T)))
+strain.on.health.c.points<-
+  c(mean(fdat$strain.on.health.c)-
+      sd(fdat$strain.on.health.c),
+    mean(fdat$strain.on.health.c)-
+      0*sd(fdat$strain.on.health.c),
+    mean(fdat$strain.on.health.c)+
+      sd(fdat$strain.on.health.c))
 
+range(fdat$corrupt_salience.z)
 
-```
+# Make new data for plotting
 
-#### Plot predicted values for the certain points
-
-```{r}
-
-mod3.corrupt_salience.pred.dat<-
+nd<-
   data.frame(corrupt_salience.z=
                rep(seq(from=-2.5,to=2.5,by=0.01),3),
              strain.on.health.c=
                rep(strain.on.health.c.points,each=501),
              gndr.c=0,
              age10.c=0,
-             income.fr="quint.3",
-             edu.f="4. UUS")
+             #income.fr="quint.3",
+             #edu.f="4. UUS",
+             cntry="DK")
 
+# remove data-points outside of corrupt-salience range
 
+nd<-nd[nd$corrupt_salience.z>=min(fdat$corrupt_salience.z) &
+         nd$corrupt_salience.z<=max(fdat$corrupt_salience.z),]
 
+# obtain data for plot
 
-mod3.corrupt_salience.plot.dat<-
-  cbind(mod3.corrupt_salience.pred.dat,
-        P.CONV.USE=predict(mod3.corrupt_salience.bin.conv,
-        newdata=
-          mod3.corrupt_salience.pred.dat,
-        type = "response",re.form=NA))
+plot.dat<-
+  cbind(nd,
+        predict(mod3.corrupt_salience.red,
+                newdata=nd,conditional = F,
+                type = "response"))
 
-names(mod3.corrupt_salience.plot.dat)
+# calculate use of conventional probability
 
-ggplot(data=mod3.corrupt_salience.plot.dat,
-       aes(y=P.CONV.USE,x=corrupt_salience.z,
-           color=as.factor(strain.on.health.c)))+
-  geom_line(size=1.75)+
-  xlab("Anti-elite salience")+
+plot.dat$P.CONV.USE<-
+  plot.dat$Used_conv_and_CAM+plot.dat$Used_conv_ONLY
+
+# recode Health Status variable
+
+plot.dat$'Health Status'<-
+  case_when(plot.dat$strain.on.health.c==
+              strain.on.health.c.points[1]~"Good",
+            plot.dat$strain.on.health.c==
+              strain.on.health.c.points[2]~"Average",
+            plot.dat$strain.on.health.c==
+              strain.on.health.c.points[3]~"Poor")
+
+# relevel 
+
+plot.dat$'Health Status'<-
+  factor(plot.dat$'Health Status',
+         levels=c("Poor","Average","Good"))
+
+met.brewer("Johnson")
+met.brewer("Kandinsky")
+
+Fig1<-
+  ggplot(data=plot.dat,
+         aes(y=P.CONV.USE,x=corrupt_salience.z,
+             color=`Health Status`))+
+  geom_line(size=2.75)+
+  scale_color_manual(values=
+                       met.brewer("Johnson",
+                                  type = "continuous")
+                     [c(2,3,4)])+
+  xlab("Corrupt Salience")+
   ylab("P(Use of Conventional Medicine)")+
-  guides(color=guide_legend(title="Strain on health"))+
-  scale_color_discrete(labels = c("Low", "Average", "High"))
+  theme(text=element_text(size=16,  family="sans"))
+Fig1
+
+
+png(filename = 
+      "../../results/Homeopathy_excluded/figures/Fig1.png",
+    units = "cm",
+    width = 21.0,height=29.7/2,res = 600)
+Fig1
+dev.off()
 
 
 ```
@@ -1599,6 +1802,15 @@ mod4.galtan<-mblogit(DV.no.home.f~gndr.c+age10.c+income.fr+edu.f+
                      data=fdat,weights=anweight)
 
 anova(mod2.galtan,mod4.galtan,test="Chisq")
+
+mod5.galtan<-mblogit(DV.no.home.f~gndr.c+age10.c+income.fr+edu.f+
+                       strain.on.health.c+
+                       galtan.z+I(galtan.z^2),
+                     random= ~1|cntry,
+                     estimator="ML",
+                     data=fdat,weights=anweight)
+
+anova(mod5.galtan,mod4.galtan,test="Chisq")
 
 
 ```
@@ -1763,77 +1975,30 @@ export(data.frame(rbind(mod4.galtan.slopes.low.eff.CM,
 
 #### Plot predicted probabilities
 
-First fit binary logistic models
-
 ```{r}
-#conv
-#first without any polynomials
-mod2.galtan.bin.conv<-
-  glmer(used.conv~gndr.c+age10.c+income.fr+
-            edu.f+strain.on.health.c+
-            galtan.z+
-          (1|cntry),family=binomial(link="logit"),
-        control=
-          glmerControl(optimizer="bobyqa",
-                       optCtrl=list(maxfun=100000)),
-          data=fdat,weights=anweight)
 
-#include polynomials
-mod4.galtan.bin.conv<-
-  glmer(used.conv~gndr.c+age10.c+income.fr+
-            edu.f+strain.on.health.c+
-            galtan.z+I(galtan.z^2)+I(galtan.z^3)+
-          (1|cntry),family=binomial(link="logit"),
-        control=
-          glmerControl(optimizer="bobyqa",
-                       optCtrl=list(maxfun=100000)),
-          data=fdat,weights=anweight)
+Fig2<-
+  ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
+  geom_smooth(method = "glm", formula=y~poly(x,1),
+              method.args = list(family = "binomial"), 
+              se = TRUE,color=met.brewer("Johnson")[2],size=2.75)+
+  geom_smooth(method = "glm", formula=y~poly(x,2),
+              method.args = list(family = "binomial"), 
+              se = TRUE,color=met.brewer("Johnson")[4],size=2.75)+
+  xlab("GAL-TAN")+
+  ylab("P(Use of Complementary/Alternative Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))
+Fig2
 
-anova(mod2.galtan.bin.conv,mod4.galtan.bin.conv)
-summary(mod4.galtan.bin.conv)
 
-#CAM
-#first without any polynomials
-mod2.galtan.bin.CAM<-
-  glmer(used.CAM.no.home~gndr.c+age10.c+income.fr+
-            edu.f+strain.on.health.c+
-            galtan.z+
-          (1|cntry),family=binomial(link="logit"),
-        control=
-          glmerControl(optimizer="bobyqa",
-                       optCtrl=list(maxfun=100000)),
-          data=fdat,weights=anweight)
-
-#include polynomials
-mod4.galtan.bin.CAM<-
-  glmer(used.CAM.no.home~gndr.c+age10.c+income.fr+
-            edu.f+strain.on.health.c+
-            galtan.z+I(galtan.z^2)+I(galtan.z^3)+
-          (1|cntry),family=binomial(link="logit"),
-        control=
-          glmerControl(optimizer="bobyqa",
-                       optCtrl=list(maxfun=100000)),
-          data=fdat,weights=anweight)
-
-anova(mod2.galtan.bin.CAM,mod4.galtan.bin.CAM)
-
-summary(mod4.galtan.bin.CAM)
+png(filename = 
+      "../../results/Homeopathy_excluded/figures/Fig2.png",
+    units = "cm",
+    width = 21.0,height=29.7/2,res = 600)
+Fig2
+dev.off()
 ```
 
-#### Plot predicted probabilities
-
-```{r}
-ggplot(data=fdat,aes(x=galtan.z,y=used.conv))+
-  geom_smooth(method = "glm", formula=y~poly(x,3),
-    method.args = list(family = "binomial"), 
-    se = TRUE)
-
-ggplot(data=fdat,aes(x=galtan.z,y=used.CAM.no.home))+
-  geom_smooth(method = "glm", formula=y~poly(x,3),
-    method.args = list(family = "binomial"), 
-    se = TRUE)
-
-```
 
 
 ### antielite_salience

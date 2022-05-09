@@ -1,7 +1,12 @@
+# MetBrewer colors: https://github.com/BlakeRMills/MetBrewer
+
 library(ggplot2)
 library(rio)
 library(dplyr)
 library(ggrepel)
+library(MetBrewer)
+
+display_all(colorblind_only = T)
 
 CHES<-import("data/processed/CHES_2014.vote.keys.combined.xlsx")
 CHES.raw<-import("data/processed/CHES_2014.vote.keys.xlsx")
