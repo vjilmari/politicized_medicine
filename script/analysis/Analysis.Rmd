@@ -1641,21 +1641,13 @@ export(data.frame(rbind(
 
 ### Plot association by strain on health
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+# obtain range of predictor values
+range(fdat$corrupt_salience.z)
 
-# First fit model without the categorical predictors
-mod3.corrupt_salience.red<-
-  mblogit(DV.f~gndr.c+age10.c+strain.on.health.c+
-            corrupt_salience.z+
-            strain.on.health.c:corrupt_salience.z,
-          random= ~1|cntry,
-          estimator="ML",
-          control = 
-            mmclogit.control(maxit = 250,
-                             trace=TRUE),
-          data=fdat,weights=anweight)
+focal.points<-seq(from=-1.25,to=1.75,by=0.01)
 
-
+# obtain moderator points
 strain.on.health.c.points<-
   c(mean(fdat$strain.on.health.c)-
       sd(fdat$strain.on.health.c),
@@ -1664,63 +1656,156 @@ strain.on.health.c.points<-
     mean(fdat$strain.on.health.c)+
       sd(fdat$strain.on.health.c))
 
-range(fdat$corrupt_salience.z)
+preds.low<-list()
+preds.mid<-list()
+preds.high<-list()
 
-# Make new data for plotting
+# Loop through each point and obtain prediction
 
-nd<-
-  data.frame(corrupt_salience.z=
-               rep(seq(from=-2.5,to=2.5,by=0.01),3),
-             strain.on.health.c=
-               rep(strain.on.health.c.points,each=501),
-             gndr.c=0,
-             age10.c=0,
-             #income.fr="quint.3",
-             #edu.f="4. UUS",
-             cntry="DK")
+for (i in 1:length(focal.points)){
+  
+  # low
+  
+  temp.point.low<-
+      emmeans(mod3.corrupt_salience,~corrupt_salience.z|DV.f,
+            at=list(corrupt_salience.z=
+                      focal.points[i],
+                    strain.on.health.c=
+                      strain.on.health.c.points[1],
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  temp.point.low.eff<-
+      contrast(temp.point.low,
+               simple="DV.f",
+               adjust="none","eff",
+               infer=c(T,T))
 
-# remove data-points outside of corrupt-salience range
+  # combined CM for low
+  
+  preds.low[[i]]<-
+      data.frame(contrast(temp.point.low,
+               method = list("Conv - No conv" = 
+                               contrast.weights.total(
+                                 effects=
+                                   temp.point.low.eff,
+                                 signs=c(-2,-2,2,2))),
+               simple="DV.f", infer=c(T,T)))
+  
+  # mid
+  
+  temp.point.mid<-
+    emmeans(mod3.corrupt_salience,~corrupt_salience.z|DV.f,
+            at=list(corrupt_salience.z=
+                      focal.points[i],
+                    strain.on.health.c=
+                      strain.on.health.c.points[2],
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  temp.point.mid.eff<-
+    contrast(temp.point.mid,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # combined CM for mid
+  
+  preds.mid[[i]]<-
+    data.frame(contrast(temp.point.mid,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.mid.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  
+  # high
+  
+  temp.point.high<-
+    emmeans(mod3.corrupt_salience,~corrupt_salience.z|DV.f,
+            at=list(corrupt_salience.z=
+                      focal.points[i],
+                    strain.on.health.c=
+                      strain.on.health.c.points[3],
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  temp.point.high.eff<-
+    contrast(temp.point.high,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # combined CM for high
+  
+  preds.high[[i]]<-
+    data.frame(contrast(temp.point.high,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.high.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  
+  
+}
 
-nd<-nd[nd$corrupt_salience.z>=min(fdat$corrupt_salience.z) &
-         nd$corrupt_salience.z<=max(fdat$corrupt_salience.z),]
+preds.low.df<-do.call(rbind,preds.low)
+preds.low.df$'Health Status'<-"Good"
 
-# obtain data for plot
+preds.mid.df<-do.call(rbind,preds.mid)
+preds.mid.df$'Health Status'<-"Average"
 
-plot.dat<-
-  cbind(nd,
-        predict(mod3.corrupt_salience.red,
-                newdata=nd,conditional = F,
-                type = "response"))
+preds.high.df<-do.call(rbind,preds.high)
+preds.high.df$'Health Status'<-"Poor"
 
-# calculate use of conventional probability
+preds.all<-rbind(preds.low.df,
+                 preds.mid.df,
+                 preds.high.df)
 
-plot.dat$P.CONV.USE<-
-  plot.dat$Used_conv_and_CAM+plot.dat$Used_conv_ONLY
+# transform to probabilities
 
-# recode Health Status variable
+preds.all$P.CONV.USE<-
+  exp(preds.all$estimate)/(1+exp(preds.all$estimate))
 
-plot.dat$'Health Status'<-
-  case_when(plot.dat$strain.on.health.c==
-              strain.on.health.c.points[1]~"Good",
-            plot.dat$strain.on.health.c==
-              strain.on.health.c.points[2]~"Average",
-            plot.dat$strain.on.health.c==
-              strain.on.health.c.points[3]~"Poor")
+preds.all$P.CONV.USE.LL<-
+  exp(preds.all$asymp.LCL)/(1+exp(preds.all$asymp.LCL))
+
+preds.all$P.CONV.USE.UL<-
+  exp(preds.all$asymp.UCL)/(1+exp(preds.all$asymp.UCL))
 
 # relevel 
 
-plot.dat$'Health Status'<-
-  factor(plot.dat$'Health Status',
+preds.all$'Health Status'<-
+  factor(preds.all$'Health Status',
          levels=c("Poor","Average","Good"))
 
-met.brewer("Johnson")
-met.brewer("Kandinsky")
+# export Figure 1 data
 
-Fig1<-
-  ggplot(data=plot.dat,
-         aes(y=P.CONV.USE,x=corrupt_salience.z,
-             color=`Health Status`))+
+export(preds.all,
+  "../../results/figures/Fig1data.xlsx")
+
+# produce the figure
+
+Fig1<-ggplot(data=preds.all,
+       aes(y=P.CONV.USE,x=corrupt_salience.z,
+           color=`Health Status`))+
   geom_line(size=2.75)+
+  geom_line(size=1,
+            linetype=2,
+            aes(x=corrupt_salience.z,y=P.CONV.USE.LL))+
+  geom_line(size=1,
+            linetype=2,
+            aes(x=corrupt_salience.z,y=P.CONV.USE.UL))+
   scale_color_manual(values=
                        met.brewer("Johnson",
                                   type = "continuous")
@@ -1728,11 +1813,49 @@ Fig1<-
   xlab("Corrupt Salience")+
   ylab("P(Use of Conventional Medicine)")+
   theme(text=element_text(size=16,  family="sans"))
+
 Fig1
 
 
 png(filename = 
       "../../results/figures/Fig1.png",
+    units = "cm",
+    width = 21.0,height=29.7/2,res = 600)
+Fig1
+dev.off()
+
+
+```
+
+### Plot association by strain on health without confidence band
+
+```{r message=FALSE, warning=FALSE}
+
+# produce the figure
+
+Fig1<-ggplot(data=preds.all,
+       aes(y=P.CONV.USE,x=corrupt_salience.z,
+           color=`Health Status`))+
+  geom_line(size=2.75)+
+  #geom_line(size=1,
+  #          linetype=2,
+  #          aes(x=corrupt_salience.z,y=P.CONV.USE.LL))+
+  #geom_line(size=1,
+  #          linetype=2,
+  #          aes(x=corrupt_salience.z,y=P.CONV.USE.UL))+
+  scale_color_manual(values=
+                       met.brewer("Johnson",
+                                  type = "continuous")
+                     [c(2,3,4)])+
+  xlab("Corrupt Salience")+
+  ylab("P(Use of Conventional Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))
+
+Fig1
+
+
+png(filename = 
+      "../../results/figures/Fig1_alt.png",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig1
@@ -1975,7 +2098,7 @@ export(data.frame(rbind(mod4.galtan.slopes.low.eff.CM,
 
 #### Plot predicted probabilities
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
 Fig2<-
   ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
@@ -1993,6 +2116,32 @@ Fig2
 
 png(filename = 
       "../../results/figures/Fig2.png",
+    units = "cm",
+    width = 21.0,height=29.7/2,res = 600)
+Fig2
+dev.off()
+```
+
+#### Plot predicted probabilities without confidence band
+
+```{r message=FALSE, warning=FALSE}
+
+Fig2<-
+  ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
+  geom_smooth(method = "glm", formula=y~poly(x,1),
+              method.args = list(family = "binomial"), 
+              se = FALSE,color=met.brewer("Johnson")[2],size=2.75)+
+  geom_smooth(method = "glm", formula=y~poly(x,2),
+              method.args = list(family = "binomial"), 
+              se = FALSE,color=met.brewer("Johnson")[4],size=2.75)+
+  xlab("GAL-TAN")+
+  ylab("P(Use of Complementary/Alternative Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))
+Fig2
+
+
+png(filename = 
+      "../../results/figures/Fig2_alt.png",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig2

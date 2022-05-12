@@ -47,6 +47,14 @@ library(dplyr)
 
 ```r
 library(rio)
+```
+
+```
+## The following rio suggested packages are not installed: 'arrow', 'feather', 'fst', 'hexView', 'pzfx', 'readODS', 'rmatio'
+## Use 'install_formats()' to install them
+```
+
+```r
 library(memisc)
 ```
 
@@ -4250,42 +4258,7 @@ export(data.frame(rbind(
 
 
 ```r
-# First fit model without the categorical predictors
-mod3.corrupt_salience.red<-
-  mblogit(DV.f~gndr.c+age10.c+strain.on.health.c+
-            corrupt_salience.z+
-            strain.on.health.c:corrupt_salience.z,
-          random= ~1|cntry,
-          estimator="ML",
-          control = 
-            mmclogit.control(maxit = 250,
-                             trace=TRUE),
-          data=fdat,weights=anweight)
-```
-
-```
-## 
-## Iteration 1 - deviance = 28926.91 - criterion = 0.7762838
-## Iteration 2 - deviance = 27666.22 - criterion = 0.1524165
-## Iteration 3 - deviance = 27517.82 - criterion = 0.02209426
-## Iteration 4 - deviance = 27491.42 - criterion = 0.008639291
-## Iteration 5 - deviance = 27487.3 - criterion = 0.0008547213
-## Iteration 6 - deviance = 27486.44 - criterion = 2.224691e-05
-## Iteration 7 - deviance = 27486.37 - criterion = 4.934578e-07
-## Iteration 8 - deviance = 27486.37 - criterion = 1.619277e-08
-## Iteration 9 - deviance = 27486.37 - criterion = 9.41999e-10
-## converged
-```
-
-```r
-strain.on.health.c.points<-
-  c(mean(fdat$strain.on.health.c)-
-      sd(fdat$strain.on.health.c),
-    mean(fdat$strain.on.health.c)-
-      0*sd(fdat$strain.on.health.c),
-    mean(fdat$strain.on.health.c)+
-      sd(fdat$strain.on.health.c))
-
+# obtain range of predictor values
 range(fdat$corrupt_salience.z)
 ```
 
@@ -4294,70 +4267,167 @@ range(fdat$corrupt_salience.z)
 ```
 
 ```r
-# Make new data for plotting
+focal.points<-seq(from=-1.25,to=1.75,by=0.01)
 
-nd<-
-  data.frame(corrupt_salience.z=
-               rep(seq(from=-2.5,to=2.5,by=0.01),3),
-             strain.on.health.c=
-               rep(strain.on.health.c.points,each=501),
-             gndr.c=0,
-             age10.c=0,
-             #income.fr="quint.3",
-             #edu.f="4. UUS",
-             cntry="DK")
+# obtain moderator points
+strain.on.health.c.points<-
+  c(mean(fdat$strain.on.health.c)-
+      sd(fdat$strain.on.health.c),
+    mean(fdat$strain.on.health.c)-
+      0*sd(fdat$strain.on.health.c),
+    mean(fdat$strain.on.health.c)+
+      sd(fdat$strain.on.health.c))
 
-# remove data-points outside of corrupt-salience range
+preds.low<-list()
+preds.mid<-list()
+preds.high<-list()
 
-nd<-nd[nd$corrupt_salience.z>=min(fdat$corrupt_salience.z) &
-         nd$corrupt_salience.z<=max(fdat$corrupt_salience.z),]
+# Loop through each point and obtain prediction
 
-# obtain data for plot
+for (i in 1:length(focal.points)){
+  
+  # low
+  
+  temp.point.low<-
+      emmeans(mod3.corrupt_salience,~corrupt_salience.z|DV.f,
+            at=list(corrupt_salience.z=
+                      focal.points[i],
+                    strain.on.health.c=
+                      strain.on.health.c.points[1],
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  temp.point.low.eff<-
+      contrast(temp.point.low,
+               simple="DV.f",
+               adjust="none","eff",
+               infer=c(T,T))
 
-plot.dat<-
-  cbind(nd,
-        predict(mod3.corrupt_salience.red,
-                newdata=nd,conditional = F,
-                type = "response"))
+  # combined CM for low
+  
+  preds.low[[i]]<-
+      data.frame(contrast(temp.point.low,
+               method = list("Conv - No conv" = 
+                               contrast.weights.total(
+                                 effects=
+                                   temp.point.low.eff,
+                                 signs=c(-2,-2,2,2))),
+               simple="DV.f", infer=c(T,T)))
+  
+  # mid
+  
+  temp.point.mid<-
+    emmeans(mod3.corrupt_salience,~corrupt_salience.z|DV.f,
+            at=list(corrupt_salience.z=
+                      focal.points[i],
+                    strain.on.health.c=
+                      strain.on.health.c.points[2],
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  temp.point.mid.eff<-
+    contrast(temp.point.mid,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # combined CM for mid
+  
+  preds.mid[[i]]<-
+    data.frame(contrast(temp.point.mid,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.mid.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  
+  # high
+  
+  temp.point.high<-
+    emmeans(mod3.corrupt_salience,~corrupt_salience.z|DV.f,
+            at=list(corrupt_salience.z=
+                      focal.points[i],
+                    strain.on.health.c=
+                      strain.on.health.c.points[3],
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  temp.point.high.eff<-
+    contrast(temp.point.high,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # combined CM for high
+  
+  preds.high[[i]]<-
+    data.frame(contrast(temp.point.high,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.high.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  
+  
+}
 
-# calculate use of conventional probability
+preds.low.df<-do.call(rbind,preds.low)
+preds.low.df$'Health Status'<-"Good"
 
-plot.dat$P.CONV.USE<-
-  plot.dat$Used_conv_and_CAM+plot.dat$Used_conv_ONLY
+preds.mid.df<-do.call(rbind,preds.mid)
+preds.mid.df$'Health Status'<-"Average"
 
-# recode Health Status variable
+preds.high.df<-do.call(rbind,preds.high)
+preds.high.df$'Health Status'<-"Poor"
 
-plot.dat$'Health Status'<-
-  case_when(plot.dat$strain.on.health.c==
-              strain.on.health.c.points[1]~"Good",
-            plot.dat$strain.on.health.c==
-              strain.on.health.c.points[2]~"Average",
-            plot.dat$strain.on.health.c==
-              strain.on.health.c.points[3]~"Poor")
+preds.all<-rbind(preds.low.df,
+                 preds.mid.df,
+                 preds.high.df)
+
+# transform to probabilities
+
+preds.all$P.CONV.USE<-
+  exp(preds.all$estimate)/(1+exp(preds.all$estimate))
+
+preds.all$P.CONV.USE.LL<-
+  exp(preds.all$asymp.LCL)/(1+exp(preds.all$asymp.LCL))
+
+preds.all$P.CONV.USE.UL<-
+  exp(preds.all$asymp.UCL)/(1+exp(preds.all$asymp.UCL))
 
 # relevel 
 
-plot.dat$'Health Status'<-
-  factor(plot.dat$'Health Status',
+preds.all$'Health Status'<-
+  factor(preds.all$'Health Status',
          levels=c("Poor","Average","Good"))
 
-met.brewer("Johnson")
-```
+# export Figure 1 data
 
-![](Analysis_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
+export(preds.all,
+  "../../results/figures/Fig1data.xlsx")
 
-```r
-met.brewer("Kandinsky")
-```
+# produce the figure
 
-![](Analysis_files/figure-html/unnamed-chunk-34-2.png)<!-- -->
-
-```r
-Fig1<-
-  ggplot(data=plot.dat,
-         aes(y=P.CONV.USE,x=corrupt_salience.z,
-             color=`Health Status`))+
+Fig1<-ggplot(data=preds.all,
+       aes(y=P.CONV.USE,x=corrupt_salience.z,
+           color=`Health Status`))+
   geom_line(size=2.75)+
+  geom_line(size=1,
+            linetype=2,
+            aes(x=corrupt_salience.z,y=P.CONV.USE.LL))+
+  geom_line(size=1,
+            linetype=2,
+            aes(x=corrupt_salience.z,y=P.CONV.USE.UL))+
   scale_color_manual(values=
                        met.brewer("Johnson",
                                   type = "continuous")
@@ -4365,14 +4435,58 @@ Fig1<-
   xlab("Corrupt Salience")+
   ylab("P(Use of Conventional Medicine)")+
   theme(text=element_text(size=16,  family="sans"))
+
 Fig1
 ```
 
-![](Analysis_files/figure-html/unnamed-chunk-34-3.png)<!-- -->
+![](Analysis_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
 
 ```r
 png(filename = 
       "../../results/figures/Fig1.png",
+    units = "cm",
+    width = 21.0,height=29.7/2,res = 600)
+Fig1
+dev.off()
+```
+
+```
+## png 
+##   2
+```
+
+### Plot association by strain on health without confidence band
+
+
+```r
+# produce the figure
+
+Fig1<-ggplot(data=preds.all,
+       aes(y=P.CONV.USE,x=corrupt_salience.z,
+           color=`Health Status`))+
+  geom_line(size=2.75)+
+  #geom_line(size=1,
+  #          linetype=2,
+  #          aes(x=corrupt_salience.z,y=P.CONV.USE.LL))+
+  #geom_line(size=1,
+  #          linetype=2,
+  #          aes(x=corrupt_salience.z,y=P.CONV.USE.UL))+
+  scale_color_manual(values=
+                       met.brewer("Johnson",
+                                  type = "continuous")
+                     [c(2,3,4)])+
+  xlab("Corrupt Salience")+
+  ylab("P(Use of Conventional Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))
+
+Fig1
+```
+
+![](Analysis_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
+
+```r
+png(filename = 
+      "../../results/figures/Fig1_alt.png",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig1
@@ -4884,11 +4998,45 @@ Fig2<-
 Fig2
 ```
 
-![](Analysis_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
+![](Analysis_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
 
 ```r
 png(filename = 
       "../../results/figures/Fig2.png",
+    units = "cm",
+    width = 21.0,height=29.7/2,res = 600)
+Fig2
+dev.off()
+```
+
+```
+## png 
+##   2
+```
+
+#### Plot predicted probabilities without confidence band
+
+
+```r
+Fig2<-
+  ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
+  geom_smooth(method = "glm", formula=y~poly(x,1),
+              method.args = list(family = "binomial"), 
+              se = FALSE,color=met.brewer("Johnson")[2],size=2.75)+
+  geom_smooth(method = "glm", formula=y~poly(x,2),
+              method.args = list(family = "binomial"), 
+              se = FALSE,color=met.brewer("Johnson")[4],size=2.75)+
+  xlab("GAL-TAN")+
+  ylab("P(Use of Complementary/Alternative Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))
+Fig2
+```
+
+![](Analysis_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
+
+```r
+png(filename = 
+      "../../results/figures/Fig2_alt.png",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig2
@@ -5123,24 +5271,25 @@ print(s,locale=F)
 ##  [1] MetBrewer_0.2.0  lme4_1.1-29      ggplot2_3.3.5    psych_2.2.3     
 ##  [5] memisc_0.99.30.7 MASS_7.3-56      lattice_0.20-45  rio_0.5.29      
 ##  [9] dplyr_1.0.9      emmeans_1.7.3    mclogit_0.9.4.2  Matrix_1.4-1    
+## [13] knitr_1.39       rmarkdown_2.14  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] sass_0.4.1        jsonlite_1.8.0    splines_4.2.0     carData_3.0-5    
-##  [5] tmvnsim_1.0-2     bslib_0.3.1       highr_0.9         cellranger_1.1.0 
-##  [9] yaml_2.3.5        pillar_1.7.0      glue_1.6.2        digest_0.6.29    
-## [13] minqa_1.2.4       colorspace_2.0-3  htmltools_0.5.2   pkgconfig_2.0.3  
-## [17] haven_2.5.0       purrr_0.3.4       xtable_1.8-4      mvtnorm_1.1-3    
-## [21] scales_1.2.0      openxlsx_4.2.5    tibble_3.1.6      mgcv_1.8-40      
-## [25] generics_0.1.2    farver_2.1.0      car_3.0-12        ellipsis_0.3.2   
-## [29] withr_2.5.0       repr_1.1.4        cli_3.3.0         mnormt_2.0.2     
-## [33] magrittr_2.0.3    crayon_1.5.1      readxl_1.4.0      estimability_1.3 
-## [37] evaluate_0.15     fansi_1.0.3       nlme_3.1-157      forcats_0.5.1    
-## [41] foreign_0.8-82    tools_4.2.0       data.table_1.14.2 hms_1.1.1        
-## [45] lifecycle_1.0.1   stringr_1.4.0     munsell_0.5.0     zip_2.2.0        
-## [49] compiler_4.2.0    jquerylib_0.1.4   rlang_1.0.2       grid_4.2.0       
-## [53] nloptr_2.0.0      rstudioapi_0.13   base64enc_0.1-3   labeling_0.4.2   
-## [57] rmarkdown_2.14    boot_1.3-28       gtable_0.3.0      abind_1.4-5      
-## [61] curl_4.3.2        R6_2.5.1          knitr_1.39        fastmap_1.1.0    
-## [65] utf8_1.2.2        stringi_1.7.6     parallel_4.2.0    Rcpp_1.0.8.3     
-## [69] vctrs_0.4.1       tidyselect_1.1.2  xfun_0.30         coda_0.19-4
+##  [1] Rcpp_1.0.8.3      mvtnorm_1.1-3     digest_0.6.29     utf8_1.2.2       
+##  [5] R6_2.5.1          cellranger_1.1.0  repr_1.1.4        evaluate_0.15    
+##  [9] coda_0.19-4       highr_0.9         pillar_1.7.0      rlang_1.0.2      
+## [13] curl_4.3.2        readxl_1.4.0      minqa_1.2.4       data.table_1.14.2
+## [17] nloptr_2.0.0      car_3.0-12        jquerylib_0.1.4   labeling_0.4.2   
+## [21] splines_4.2.0     stringr_1.4.0     foreign_0.8-82    munsell_0.5.0    
+## [25] compiler_4.2.0    xfun_0.30         pkgconfig_2.0.3   base64enc_0.1-3  
+## [29] mnormt_2.0.2      tmvnsim_1.0-2     mgcv_1.8-40       htmltools_0.5.2  
+## [33] tidyselect_1.1.2  tibble_3.1.6      fansi_1.0.3       withr_2.5.0      
+## [37] crayon_1.5.1      grid_4.2.0        nlme_3.1-157      jsonlite_1.8.0   
+## [41] xtable_1.8-4      gtable_0.3.0      lifecycle_1.0.1   magrittr_2.0.3   
+## [45] scales_1.2.0      zip_2.2.0         estimability_1.3  cli_3.3.0        
+## [49] stringi_1.7.6     carData_3.0-5     farver_2.1.0      bslib_0.3.1      
+## [53] ellipsis_0.3.2    generics_0.1.2    vctrs_0.4.1       boot_1.3-28      
+## [57] openxlsx_4.2.5    tools_4.2.0       forcats_0.5.1     glue_1.6.2       
+## [61] purrr_0.3.4       hms_1.1.1         abind_1.4-5       parallel_4.2.0   
+## [65] fastmap_1.1.0     yaml_2.3.5        colorspace_2.0-3  haven_2.5.0      
+## [69] sass_0.4.1
 ```
