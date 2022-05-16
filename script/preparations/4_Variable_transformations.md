@@ -16,7 +16,32 @@ output:
 
 ```r
 library(rio)
+```
+
+```
+## The following rio suggested packages are not installed: 'arrow', 'feather', 'fst', 'hexView', 'pzfx', 'readODS', 'rmatio'
+## Use 'install_formats()' to install them
+```
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
 ```
 
 ## Load data
@@ -556,7 +581,7 @@ dat$corrupt_salience.scaling<-
 ```r
 analysis.vars<-
   c("idno","cntry","dweight","pspwght","pweight",
-    "pt.nmbr","pt.name",
+    "pt.nmbr","pt.name","vote",
     "gndr.f","gndr.c","agea","age10.c",
     "income","income.f","income.fr",
     "edu","edu.f","strain.on.health",
@@ -572,9 +597,9 @@ analysis.vars %in% names(dat)
 ```
 
 ```
-##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [29] TRUE TRUE TRUE TRUE
+##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [14] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [27] TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 ```
 
 ```r
@@ -584,7 +609,7 @@ str(fdat)
 ```
 
 ```
-## 'data.frame':	40185 obs. of  32 variables:
+## 'data.frame':	40185 obs. of  33 variables:
 ##  $ idno                      : num  1 2 3 4 5 6 7 13 14 21 ...
 ##  $ cntry                     : chr  "AT" "AT" "AT" "AT" ...
 ##  $ dweight                   : num  0.938 0.938 0.938 0.938 0.938 ...
@@ -592,6 +617,7 @@ str(fdat)
 ##  $ pweight                   : num  0.406 0.406 0.406 0.406 0.406 ...
 ##  $ pt.nmbr                   : num  NA 6 2 3 NA 1 1 1 7 2 ...
 ##  $ pt.name                   : chr  NA NA "ÖVP" "FPÖ" ...
+##  $ vote                      : num  1 1 1 1 1 1 1 1 1 1 ...
 ##  $ gndr.f                    : chr  "Male" "Male" "Female" "Male" ...
 ##  $ gndr.c                    : num  -0.5 -0.5 0.5 -0.5 0.5 0.5 -0.5 0.5 0.5 0.5 ...
 ##  $ agea                      : num  51 67 89 32 56 67 66 67 34 66 ...
@@ -633,7 +659,7 @@ print(s,locale=F)
 ```
 
 ```
-## R version 4.1.2 (2021-11-01)
+## R version 4.2.0 (2022-04-22 ucrt)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
 ## Running under: Windows 10 x64 (build 19043)
 ## 
@@ -643,29 +669,22 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_1.0.7      sjlabelled_1.1.8 rio_0.5.29       rmarkdown_2.11  
-## [5] devtools_2.4.3   usethis_2.0.1   
+## [1] dplyr_1.0.9    rio_0.5.29     knitr_1.39     rmarkdown_2.14
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.7        prettyunits_1.1.1 ps_1.6.0         
-##  [4] assertthat_0.2.1  rprojroot_2.0.2   digest_0.6.29    
-##  [7] utf8_1.2.2        R6_2.5.1          cellranger_1.1.0 
-## [10] evaluate_0.14     pillar_1.6.4      rlang_0.4.12     
-## [13] curl_4.3.2        readxl_1.3.1      data.table_1.14.2
-## [16] callr_3.7.0       jquerylib_0.1.4   desc_1.4.0       
-## [19] readr_2.1.1       stringr_1.4.0     foreign_0.8-81   
-## [22] compiler_4.1.2    xfun_0.29         pkgconfig_2.0.3  
-## [25] pkgbuild_1.3.1    htmltools_0.5.2   insight_0.14.5   
-## [28] tidyselect_1.1.1  tibble_3.1.6      fansi_0.5.0      
-## [31] crayon_1.4.2      tzdb_0.2.0        withr_2.4.3      
-## [34] jsonlite_1.7.2    lifecycle_1.0.1   DBI_1.1.2        
-## [37] magrittr_2.0.1    zip_2.2.0         cli_3.1.0        
-## [40] stringi_1.7.6     cachem_1.0.6      fs_1.5.0         
-## [43] remotes_2.4.2     testthat_3.0.4    bslib_0.3.1      
-## [46] ellipsis_0.3.2    vctrs_0.3.8       generics_0.1.1   
-## [49] openxlsx_4.2.5    tools_4.1.2       forcats_0.5.1    
-## [52] glue_1.6.0        purrr_0.3.4       hms_1.1.1        
-## [55] processx_3.5.2    pkgload_1.2.4     fastmap_1.1.0    
-## [58] yaml_2.2.1        sessioninfo_1.2.2 memoise_2.0.1    
-## [61] knitr_1.37        haven_2.4.3       sass_0.4.0
+##  [1] zip_2.2.0         Rcpp_1.0.8.3      cellranger_1.1.0 
+##  [4] bslib_0.3.1       compiler_4.2.0    pillar_1.7.0     
+##  [7] jquerylib_0.1.4   forcats_0.5.1     tools_4.2.0      
+## [10] digest_0.6.29     jsonlite_1.8.0    evaluate_0.15    
+## [13] lifecycle_1.0.1   tibble_3.1.6      pkgconfig_2.0.3  
+## [16] rlang_1.0.2       openxlsx_4.2.5    cli_3.3.0        
+## [19] curl_4.3.2        yaml_2.3.5        haven_2.5.0      
+## [22] xfun_0.30         fastmap_1.1.0     stringr_1.4.0    
+## [25] generics_0.1.2    vctrs_0.4.1       sass_0.4.1       
+## [28] hms_1.1.1         tidyselect_1.1.2  glue_1.6.2       
+## [31] data.table_1.14.2 R6_2.5.1          fansi_1.0.3      
+## [34] readxl_1.4.0      foreign_0.8-82    tzdb_0.3.0       
+## [37] readr_2.1.2       purrr_0.3.4       magrittr_2.0.3   
+## [40] ellipsis_0.3.2    htmltools_0.5.2   utf8_1.2.2       
+## [43] stringi_1.7.6     crayon_1.5.1
 ```

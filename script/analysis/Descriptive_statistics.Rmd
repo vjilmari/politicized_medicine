@@ -161,6 +161,23 @@ dat$has.covariates<-
 table(dat[dat$has.PO.and.cntry==1,"has.covariates"])
 
 table(is.na(dat[dat$has.PO.and.cntry==1,"income"]))
+
+names(dat)
+table(dat$vote)
+
+table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("has.PO","vote")],useNA="always")
+nrow(dat[dat$cntry!="EE" & dat$cntry!="IL",])
+
+prop.table(table(dat[dat$cntry!="EE" & dat$cntry!="IL",c("has.PO","vote")],useNA="always"))
+
+table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("vote")],useNA="always")
+
+prop.table(table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("vote")]))
+
+20720/24586
 ```
 
 # Calculate a frame of missingness that is general or specific for each variable

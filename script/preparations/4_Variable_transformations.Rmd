@@ -296,7 +296,7 @@ dat$corrupt_salience.scaling<-
 ```{r}
 analysis.vars<-
   c("idno","cntry","dweight","pspwght","pweight",
-    "pt.nmbr","pt.name",
+    "pt.nmbr","pt.name","vote",
     "gndr.f","gndr.c","agea","age10.c",
     "income","income.f","income.fr",
     "edu","edu.f","strain.on.health",

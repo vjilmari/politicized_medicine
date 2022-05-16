@@ -8,7 +8,7 @@
 #'     number_sections: yes
 #' ---
 #' 
-## ----setup, include=FALSE----------------------------------------------------
+## ----setup, include=FALSE----------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 #' 
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #' 
 #' ## Packages
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 library(dplyr)
 library(rio)
 library(psych)
@@ -24,7 +24,7 @@ library(Hmisc)
 
 #' ## Dataset
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 dat<-import("../../data/processed/fdat.xlsx")
 str(dat)
 
@@ -36,7 +36,7 @@ str(dat)
 #' 
 #' (reference group needs to be redefined)
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 dat$income.f<-case_when(
   is.na(dat$income) ~ "missing",
   TRUE ~ dat$income
@@ -52,7 +52,7 @@ table(dat$income.fr,useNA="always")
 #' 
 #' (reference group needs to be redefined)
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 table(dat$edu,useNA="always")
 dat$edu.f<-relevel(as.factor(dat$edu),ref="7. MA")
 table(dat$edu.f,useNA="always")
@@ -60,7 +60,7 @@ table(dat$edu.f,useNA="always")
 #' 
 #' ### DV
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 table(dat$DV,useNA="always")
 dat$DV.f<-relevel(as.factor(dat$DV),ref="NN")
 table(dat$DV.f,useNA="always")
@@ -74,7 +74,7 @@ table(dat$DV.no.home.f,useNA="always")
 #' 
 #' 
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 # Calculate country means for centering
 
 cntry.means<-dat %>%
@@ -133,7 +133,7 @@ dat$corrupt_salience.z<-
 #' 
 #' # Calculations as they appear in text
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 table(dat$cntry!="EE" & dat$cntry!="IL")
 
 dat$has.PO<-
@@ -162,10 +162,27 @@ table(dat[dat$has.PO.and.cntry==1,"has.covariates"])
 
 table(is.na(dat[dat$has.PO.and.cntry==1,"income"]))
 
+names(dat)
+table(dat$vote)
+
+table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("has.PO","vote")],useNA="always")
+nrow(dat[dat$cntry!="EE" & dat$cntry!="IL",])
+
+prop.table(table(dat[dat$cntry!="EE" & dat$cntry!="IL",c("has.PO","vote")],useNA="always"))
+
+table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("vote")],useNA="always")
+
+prop.table(table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("vote")]))
+
+20720/24586
+
 #' 
 #' # Calculate a frame of missingness that is general or specific for each variable
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 table(is.na(dat$cntry))
 table(is.na(dat$gndr.c))
 table(is.na(dat$age10.c))
@@ -184,7 +201,7 @@ table(is.na(dat$lrgen) &
 #' 
 #' ## Exclude missing variable
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 fdat<-dat %>%
   filter(cntry!="IL" & cntry!="EE") %>%
@@ -204,7 +221,7 @@ fdat<-dat %>%
 #' 
 #' ## Construct anweight variable for weighting
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 fdat$anweight=fdat$pspwght*fdat$pweight
 
 #' 
@@ -212,7 +229,7 @@ fdat$anweight=fdat$pspwght*fdat$pweight
 #' 
 #' Calculations with (a) and without (b) weights
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 table(fdat$DV,useNA="always")
 prop.table(100*table(fdat$DV,useNA="always"))
@@ -252,7 +269,7 @@ fdat %>%
 #' 
 #' ## Cross-tabs of DV categories
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 (ct.use<-table(fdat$used.conv,fdat$used.CAM,dnn = c("CM","CAM")))
 (pt.use<-round(100*prop.table(ct.use),1))
@@ -271,7 +288,7 @@ round(100*prop.table(ct.use,margin = c(2)),1)
 #' 
 #' # Correlations between variables
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 #recode categorical variables to numeric
 
 #education
@@ -345,7 +362,7 @@ export(corr_matrix.p,
 #' 
 #' # Weighted descriptive statistics
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 #gender
 (round(weighted.mean(fdat$gndr.c,w=fdat$anweight),2)->gndr.mean.wt)
 (round(sqrt(wtd.var(fdat$gndr.c,w=fdat$anweight)),2)->gndr.sd.wt)
@@ -451,7 +468,7 @@ export(desc.tbl.wt,"../../results/desc.tbl.wt.xlsx",
 #' 
 #' # Party count 
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 
 CHES<-import("../../data/processed/CHES_2014.vote.keys.combined.xlsx")
 
@@ -476,7 +493,7 @@ nrow(party.count)
 #' 
 #' # Descriptives of PO-variables in CHES
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 PO.CHES.desc<-
   psych::describe(CHES[,c("lrgen","lrecon",
                     "galtan","antielite_salience",
@@ -491,7 +508,7 @@ export(cbind(PO=rownames(PO.CHES.desc),
 #' 
 #' # Correlations between PO-variables in CHES
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 CHES.PO.corrs<-
   corr.test(CHES[,c("lrgen","lrecon",
                     "galtan","antielite_salience",
@@ -510,7 +527,7 @@ export(CHES.PO.corrs$p,
 #' 
 #' # Session information
 #' 
-## ----------------------------------------------------------------------------
+## ----------------------------------------------------------------------
 s<-sessionInfo()
 print(s,locale=F)
 

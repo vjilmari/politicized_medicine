@@ -21,6 +21,56 @@ library(rio)
 library(psych)
 library(Hmisc)
 ```
+
+```
+## Loading required package: lattice
+```
+
+```
+## Loading required package: survival
+```
+
+```
+## Loading required package: Formula
+```
+
+```
+## Loading required package: ggplot2
+```
+
+```
+## 
+## Attaching package: 'ggplot2'
+```
+
+```
+## The following objects are masked from 'package:psych':
+## 
+##     %+%, alpha
+```
+
+```
+## 
+## Attaching package: 'Hmisc'
+```
+
+```
+## The following object is masked from 'package:psych':
+## 
+##     describe
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     src, summarize
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     format.pval, units
+```
 ## Dataset
 
 
@@ -30,7 +80,7 @@ str(dat)
 ```
 
 ```
-## 'data.frame':	40185 obs. of  32 variables:
+## 'data.frame':	40185 obs. of  33 variables:
 ##  $ idno                      : num  1 2 3 4 5 6 7 13 14 21 ...
 ##  $ cntry                     : chr  "AT" "AT" "AT" "AT" ...
 ##  $ dweight                   : num  0.938 0.938 0.938 0.938 0.938 ...
@@ -38,6 +88,7 @@ str(dat)
 ##  $ pweight                   : num  0.406 0.406 0.406 0.406 0.406 ...
 ##  $ pt.nmbr                   : num  NA 6 2 3 NA 1 1 1 7 2 ...
 ##  $ pt.name                   : chr  NA NA "ÖVP" "FPÖ" ...
+##  $ vote                      : num  1 1 1 1 1 1 1 1 1 1 ...
 ##  $ gndr.f                    : chr  "Male" "Male" "Female" "Male" ...
 ##  $ gndr.c                    : num  -0.5 -0.5 0.5 -0.5 0.5 0.5 -0.5 0.5 0.5 0.5 ...
 ##  $ agea                      : num  51 67 89 32 56 67 66 67 34 66 ...
@@ -313,6 +364,114 @@ table(is.na(dat[dat$has.PO.and.cntry==1,"income"]))
 ## 18558  2162
 ```
 
+```r
+names(dat)
+```
+
+```
+##  [1] "idno"                          "cntry"                        
+##  [3] "dweight"                       "pspwght"                      
+##  [5] "pweight"                       "pt.nmbr"                      
+##  [7] "pt.name"                       "vote"                         
+##  [9] "gndr.f"                        "gndr.c"                       
+## [11] "agea"                          "age10.c"                      
+## [13] "income"                        "income.f"                     
+## [15] "income.fr"                     "edu"                          
+## [17] "edu.f"                         "strain.on.health"             
+## [19] "used.conv"                     "used.CAM"                     
+## [21] "DV"                            "used.CAM.no.home"             
+## [23] "DV.no.home"                    "lrgen"                        
+## [25] "lrecon"                        "galtan"                       
+## [27] "antielite_salience"            "corrupt_salience"             
+## [29] "lrgen.scaling"                 "lrecon.scaling"               
+## [31] "galtan.scaling"                "antielite_salience.scaling"   
+## [33] "corrupt_salience.scaling"      "DV.f"                         
+## [35] "DV.no.home.f"                  "strain.on.health.cntry.mean"  
+## [37] "lrgen.cntry.mean"              "lrecon.cntry.mean"            
+## [39] "galtan.cntry.mean"             "antielite_salience.cntry.mean"
+## [41] "corrupt_salience.cntry.mean"   "strain.on.health.c"           
+## [43] "lrgen.c"                       "lrecon.c"                     
+## [45] "galtan.c"                      "antielite_salience.c"         
+## [47] "corrupt_salience.c"            "lrgen.z"                      
+## [49] "lrecon.z"                      "galtan.z"                     
+## [51] "antielite_salience.z"          "corrupt_salience.z"           
+## [53] "has.PO"                        "has.PO.and.cntry"             
+## [55] "has.covariates"
+```
+
+```r
+table(dat$vote)
+```
+
+```
+## 
+##     1     2     3 
+## 27867  8492  3498
+```
+
+```r
+table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("has.PO","vote")],useNA="always")
+```
+
+```
+##       vote
+## has.PO     1     2     3  <NA>
+##   0     3866  7687  3023   276
+##   1    20720     0     0     0
+##   <NA>     0     0     0     0
+```
+
+```r
+nrow(dat[dat$cntry!="EE" & dat$cntry!="IL",])
+```
+
+```
+## [1] 35572
+```
+
+```r
+prop.table(table(dat[dat$cntry!="EE" & dat$cntry!="IL",c("has.PO","vote")],useNA="always"))
+```
+
+```
+##       vote
+## has.PO           1           2           3        <NA>
+##   0    0.108680985 0.216096930 0.084982571 0.007758912
+##   1    0.582480603 0.000000000 0.000000000 0.000000000
+##   <NA> 0.000000000 0.000000000 0.000000000 0.000000000
+```
+
+```r
+table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("vote")],useNA="always")
+```
+
+```
+## 
+##     1     2     3  <NA> 
+## 24586  7687  3023   276
+```
+
+```r
+prop.table(table(dat[dat$cntry!="EE" & dat$cntry!="IL",
+          c("vote")]))
+```
+
+```
+## 
+##         1         2         3 
+## 0.6965662 0.2177867 0.0856471
+```
+
+```r
+20720/24586
+```
+
+```
+## [1] 0.842756
+```
+
 # Calculate a frame of missingness that is general or specific for each variable
 
 
@@ -566,7 +725,8 @@ fdat %>%
 ```
 
 ```
-## `summarise()` has grouped output by 'gndr.c'. You can override using the `.groups` argument.
+## `summarise()` has grouped output by 'gndr.c'. You can override using the
+## `.groups` argument.
 ```
 
 ```
@@ -586,7 +746,8 @@ fdat %>%
 ```
 
 ```
-## `summarise()` has grouped output by 'gndr.c'. You can override using the `.groups` argument.
+## `summarise()` has grouped output by 'gndr.c'. You can override using the
+## `.groups` argument.
 ```
 
 ```
@@ -788,7 +949,8 @@ pearson<-
 ```
 
 ```
-## Warning in cor(x, use = use, method = method): the standard deviation is zero
+## Warning in cor(x, use = use, method = method): the standard deviation is
+## zero
 ```
 
 ```r
@@ -803,7 +965,8 @@ spearman<-
 ```
 
 ```
-## Warning in cor(x, use = use, method = method): the standard deviation is zero
+## Warning in cor(x, use = use, method = method): the standard deviation is
+## zero
 ```
 
 ```r
@@ -1256,12 +1419,18 @@ round(CHES.PO.corrs$r,2)
 ```
 
 ```
-##                    lrgen lrecon galtan antielite_salience corrupt_salience
-## lrgen               1.00   0.86   0.72               0.00            -0.01
-## lrecon              0.86   1.00   0.45              -0.27            -0.08
-## galtan              0.72   0.45   1.00               0.22             0.02
-## antielite_salience  0.00  -0.27   0.22               1.00             0.43
-## corrupt_salience   -0.01  -0.08   0.02               0.43             1.00
+##                    lrgen lrecon galtan antielite_salience
+## lrgen               1.00   0.86   0.72               0.00
+## lrecon              0.86   1.00   0.45              -0.27
+## galtan              0.72   0.45   1.00               0.22
+## antielite_salience  0.00  -0.27   0.22               1.00
+## corrupt_salience   -0.01  -0.08   0.02               0.43
+##                    corrupt_salience
+## lrgen                         -0.01
+## lrecon                        -0.08
+## galtan                         0.02
+## antielite_salience             0.43
+## corrupt_salience               1.00
 ```
 
 ```r
@@ -1283,7 +1452,7 @@ print(s,locale=F)
 ```
 
 ```
-## R version 4.1.2 (2021-11-01)
+## R version 4.2.0 (2022-04-22 ucrt)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
 ## Running under: Windows 10 x64 (build 19043)
 ## 
@@ -1293,37 +1462,33 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] Hmisc_4.6-0     ggplot2_3.3.5   Formula_1.2-4   survival_3.2-13
-##  [5] lattice_0.20-45 psych_2.1.9     rio_0.5.29      dplyr_1.0.7    
-##  [9] knitr_1.37      rmarkdown_2.11  devtools_2.4.3  usethis_2.0.1  
+##  [1] Hmisc_4.7-0     ggplot2_3.3.5   Formula_1.2-4   survival_3.3-1 
+##  [5] lattice_0.20-45 psych_2.2.3     dplyr_1.0.9     rio_0.5.29     
+##  [9] knitr_1.39      rmarkdown_2.14 
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] nlme_3.1-153        fs_1.5.0            RColorBrewer_1.1-2 
-##  [4] rprojroot_2.0.2     tools_4.1.2         backports_1.4.1    
-##  [7] bslib_0.3.1         utf8_1.2.2          R6_2.5.1           
-## [10] rpart_4.1-15        DBI_1.1.2           colorspace_2.0-2   
-## [13] nnet_7.3-16         withr_2.4.3         tidyselect_1.1.1   
-## [16] gridExtra_2.3       prettyunits_1.1.1   mnormt_2.0.2       
-## [19] processx_3.5.2      curl_4.3.2          compiler_4.1.2     
-## [22] cli_3.1.0           htmlTable_2.3.0     desc_1.4.0         
-## [25] sass_0.4.0          scales_1.1.1        checkmate_2.0.0    
-## [28] callr_3.7.0         stringr_1.4.0       digest_0.6.29      
-## [31] foreign_0.8-81      base64enc_0.1-3     jpeg_0.1-9         
-## [34] pkgconfig_2.0.3     htmltools_0.5.2     sessioninfo_1.2.2  
-## [37] fastmap_1.1.0       htmlwidgets_1.5.4   rlang_0.4.12       
-## [40] readxl_1.3.1        rstudioapi_0.13     jquerylib_0.1.4    
-## [43] generics_0.1.1      jsonlite_1.7.2      zip_2.2.0          
-## [46] magrittr_2.0.1      Matrix_1.3-4        Rcpp_1.0.7         
-## [49] munsell_0.5.0       fansi_0.5.0         lifecycle_1.0.1    
-## [52] stringi_1.7.6       yaml_2.2.1          pkgbuild_1.3.1     
-## [55] grid_4.1.2          parallel_4.1.2      forcats_0.5.1      
-## [58] crayon_1.4.2        haven_2.4.3         splines_4.1.2      
-## [61] hms_1.1.1           tmvnsim_1.0-2       ps_1.6.0           
-## [64] pillar_1.6.4        pkgload_1.2.4       glue_1.6.0         
-## [67] evaluate_0.14       latticeExtra_0.6-29 data.table_1.14.2  
-## [70] remotes_2.4.2       vctrs_0.3.8         png_0.1-7          
-## [73] testthat_3.0.4      cellranger_1.1.0    gtable_0.3.0       
-## [76] purrr_0.3.4         assertthat_0.2.1    cachem_1.0.6       
-## [79] xfun_0.29           openxlsx_4.2.5      tibble_3.1.6       
-## [82] memoise_2.0.1       cluster_2.1.2       ellipsis_0.3.2
+##  [1] Rcpp_1.0.8.3        png_0.1-7           digest_0.6.29      
+##  [4] utf8_1.2.2          R6_2.5.1            cellranger_1.1.0   
+##  [7] backports_1.4.1     evaluate_0.15       pillar_1.7.0       
+## [10] rlang_1.0.2         curl_4.3.2          readxl_1.4.0       
+## [13] rstudioapi_0.13     data.table_1.14.2   jquerylib_0.1.4    
+## [16] rpart_4.1.16        Matrix_1.4-1        checkmate_2.1.0    
+## [19] splines_4.2.0       readr_2.1.2         stringr_1.4.0      
+## [22] foreign_0.8-82      htmlwidgets_1.5.4   munsell_0.5.0      
+## [25] compiler_4.2.0      xfun_0.30           pkgconfig_2.0.3    
+## [28] base64enc_0.1-3     mnormt_2.0.2        tmvnsim_1.0-2      
+## [31] htmltools_0.5.2     nnet_7.3-17         tidyselect_1.1.2   
+## [34] htmlTable_2.4.0     gridExtra_2.3       tibble_3.1.6       
+## [37] fansi_1.0.3         crayon_1.5.1        tzdb_0.3.0         
+## [40] withr_2.5.0         grid_4.2.0          nlme_3.1-157       
+## [43] jsonlite_1.8.0      gtable_0.3.0        lifecycle_1.0.1    
+## [46] magrittr_2.0.3      scales_1.2.0        zip_2.2.0          
+## [49] cli_3.3.0           stringi_1.7.6       latticeExtra_0.6-29
+## [52] bslib_0.3.1         ellipsis_0.3.2      generics_0.1.2     
+## [55] vctrs_0.4.1         openxlsx_4.2.5      RColorBrewer_1.1-3 
+## [58] tools_4.2.0         forcats_0.5.1       glue_1.6.2         
+## [61] purrr_0.3.4         jpeg_0.1-9          hms_1.1.1          
+## [64] parallel_4.2.0      fastmap_1.1.0       yaml_2.3.5         
+## [67] colorspace_2.0-3    cluster_2.1.3       haven_2.5.0        
+## [70] sass_0.4.1
 ```
