@@ -1810,7 +1810,7 @@ Fig1<-ggplot(data=preds.all,
                        met.brewer("Johnson",
                                   type = "continuous")
                      [c(2,3,4)])+
-  xlab("Corrupt Salience")+
+  xlab("Anti-corruption")+
   ylab("P(Use of Conventional Medicine)")+
   theme(text=element_text(size=16,  family="sans"))
 

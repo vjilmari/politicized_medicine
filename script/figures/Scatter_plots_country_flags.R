@@ -305,7 +305,7 @@ lrgen_corrupt_salience_sp <-
   scale_size(range = c(4,12))+
   xlim(0,10)+
   ylim(0,10)+
-  ylab("Corrupt Salience")+
+  ylab("Anti-corruption")+
   xlab("Left-Right General")+
   guides(size="none")+
   geom_label_repel(aes(label= 
@@ -340,7 +340,7 @@ lrgen_antielite_salience_sp <-
   scale_size(range = c(4,12))+
   xlim(0,10)+
   ylim(0,10)+
-  ylab("Antielite Salience")+
+  ylab("Anti-elite")+
   xlab("Left-Right General")+
   guides(size="none")+
   geom_label_repel(aes(label= 
@@ -411,7 +411,7 @@ lrecon_corrupt_salience_sp <-
   scale_size(range = c(4,12))+
   xlim(0,10)+
   ylim(0,10)+
-  ylab("Corrupt Salience")+
+  ylab("Anti-corruption")+
   xlab("Left-Right Economic")+
   guides(size="none")+
   geom_label_repel(aes(label= 
@@ -446,7 +446,7 @@ lrecon_antielite_salience_sp <-
   scale_size(range = c(4,12))+
   xlim(0,10)+
   ylim(0,10)+
-  ylab("Antielite Salience")+
+  ylab("Anti-elite")+
   xlab("Left-Right Economic")+
   guides(size="none")+
   geom_label_repel(aes(label= 
@@ -482,7 +482,7 @@ galtan_corrupt_salience_sp <-
   scale_size(range = c(4,12))+
   xlim(0,10)+
   ylim(0,10)+
-  xlab("Corrupt Salience")+
+  xlab("Anti-corruption")+
   ylab("GAL-TAN")+
   guides(size="none")+
   geom_label_repel(aes(label= 
@@ -517,7 +517,7 @@ galtan_antielite_salience_sp <-
   scale_size(range = c(4,12))+
   xlim(0,10)+
   ylim(0,10)+
-  xlab("Antielite Salience")+
+  xlab("Anti-elite")+
   ylab("GAL-TAN")+
   guides(size="none")+
   geom_label_repel(aes(label= 
@@ -556,8 +556,8 @@ corrupt_salience_antielite_salience_sp <-
   scale_size(range = c(4,12))+
   xlim(0,10)+
   ylim(0,10)+
-  xlab("Antielite Salience")+
-  ylab("Corrupt Salience")+
+  xlab("Anti-elite")+
+  ylab("Anti-corruption")+
   guides(size="none")+
   geom_label_repel(aes(label= 
                          as.character(party_name_alpha)),size = 4.0,
