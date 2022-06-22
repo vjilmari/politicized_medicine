@@ -1817,8 +1817,8 @@ Fig1<-ggplot(data=preds.all,
 Fig1
 
 
-png(filename = 
-      "../../results/figures/Fig1.png",
+jpeg(filename = 
+      "../../results/figures/Figure 2 corrupt health status.jpg",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig1
@@ -1854,8 +1854,8 @@ Fig1<-ggplot(data=preds.all,
 Fig1
 
 
-png(filename = 
-      "../../results/figures/Fig1_alt.png",
+jpeg(filename = 
+      "../../results/figures/Fig1_alt.jpg",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig1
@@ -2114,8 +2114,8 @@ Fig2<-
 Fig2
 
 
-png(filename = 
-      "../../results/figures/Fig2.png",
+jpeg(filename = 
+      "../../results/figures/Figure 3 GALTAN CAM.jpg",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig2
@@ -2140,8 +2140,8 @@ Fig2<-
 Fig2
 
 
-png(filename = 
-      "../../results/figures/Fig2_alt.png",
+jpeg(filename = 
+      "../../results/figures/Fig2_alt.jpg",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig2

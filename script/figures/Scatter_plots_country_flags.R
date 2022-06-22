@@ -240,7 +240,7 @@ lrgen_lrecon_sp <-
 
 lrgen_lrecon_sp
 
-png(filename = "results/scatterplots/lrgen_lrecon_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/lrgen_lrecon_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 lrgen_lrecon_sp
 dev.off()
@@ -286,7 +286,7 @@ lrgen_galtan_sp <-
 
 lrgen_galtan_sp
 
-png(filename = "results/scatterplots/lrgen_galtan_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/lrgen_galtan_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 lrgen_galtan_sp
 dev.off()
@@ -321,7 +321,7 @@ lrgen_corrupt_salience_sp <-
 
 lrgen_corrupt_salience_sp
 
-png(filename = "results/scatterplots/lrgen_corrupt_salience_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/lrgen_corrupt_salience_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 lrgen_corrupt_salience_sp
 dev.off()
@@ -356,7 +356,7 @@ lrgen_antielite_salience_sp <-
 
 lrgen_antielite_salience_sp
 
-png(filename = "results/scatterplots/lrgen_antielite_salience_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/lrgen_antielite_salience_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 lrgen_antielite_salience_sp
 dev.off()
@@ -392,7 +392,7 @@ lrecon_galtan_sp <-
 
 lrecon_galtan_sp
 
-png(filename = "results/scatterplots/lrecon_galtan_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/lrecon_galtan_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 lrecon_galtan_sp
 dev.off()
@@ -427,7 +427,7 @@ lrecon_corrupt_salience_sp <-
 
 lrecon_corrupt_salience_sp
 
-png(filename = "results/scatterplots/lrecon_corrupt_salience_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/lrecon_corrupt_salience_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 lrecon_corrupt_salience_sp
 dev.off()
@@ -462,7 +462,7 @@ lrecon_antielite_salience_sp <-
 
 lrecon_antielite_salience_sp
 
-png(filename = "results/scatterplots/lrecon_antielite_salience_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/lrecon_antielite_salience_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 lrecon_antielite_salience_sp
 dev.off()
@@ -498,7 +498,7 @@ galtan_corrupt_salience_sp <-
 
 galtan_corrupt_salience_sp
 
-png(filename = "results/scatterplots/galtan_corrupt_salience_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/galtan_corrupt_salience_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 galtan_corrupt_salience_sp
 dev.off()
@@ -533,7 +533,7 @@ galtan_antielite_salience_sp <-
 
 galtan_antielite_salience_sp
 
-png(filename = "results/scatterplots/galtan_antielite_salience_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/galtan_antielite_salience_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 galtan_antielite_salience_sp
 dev.off()
@@ -572,7 +572,7 @@ corrupt_salience_antielite_salience_sp <-
 
 corrupt_salience_antielite_salience_sp
 
-png(filename = "results/scatterplots/corrupt_salience_antielite_salience_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/corrupt_salience_antielite_salience_sp_cntry_flag.jpg",units = "cm",
     width = 20.0,height=20.0,res = 600)
 corrupt_salience_antielite_salience_sp
 dev.off()
@@ -588,7 +588,24 @@ plot_comb<-
             ncol=2, nrow=1)
 plot_comb
 
-png(filename = "results/scatterplots/plot_comb_sp_cntry_flag.png",units = "cm",
+jpeg(filename = "results/scatterplots/plot_comb_sp_cntry_flag.jpg",units = "cm",
     width = 40.0,height=20.0,res = 600)
+plot_comb
+dev.off()
+
+jpeg(filename = "results/scatterplots/Figure 1.jpg",units = "cm",
+     width = 40.0,height=20.0,res = 600)
+plot_comb
+dev.off()
+
+# make also stacked version
+
+plot_comb<-
+  ggarrange(lrecon_corrupt_salience_sp,
+            galtan_antielite_salience_sp,
+            ncol=1, nrow=2)
+
+jpeg(filename = "results/scatterplots/Figure 1 stacked.jpg",units = "cm",
+     width = 20,height=40,res = 600)
 plot_comb
 dev.off()
