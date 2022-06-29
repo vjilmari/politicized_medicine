@@ -609,3 +609,16 @@ jpeg(filename = "results/scatterplots/Figure 1 stacked.jpg",units = "cm",
      width = 20,height=40,res = 600)
 plot_comb
 dev.off()
+
+# make also three figures stacked version
+
+plot_comb<-
+  ggarrange(lrgen_lrecon_sp,
+            lrecon_corrupt_salience_sp,
+            galtan_antielite_salience_sp,
+            ncol=1, nrow=3)
+
+jpeg(filename = "results/scatterplots/Figure 1 stacked 3.jpg",units = "cm",
+     width = 20,height=60,res = 600)
+plot_comb
+dev.off()
