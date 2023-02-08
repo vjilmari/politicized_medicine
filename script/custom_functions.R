@@ -1,8 +1,9 @@
+# for obtaining variables labels from ESS .sav files
 get.ESS.label<-function(var){
   attr(var,which = "label")
 }
 
-#for combining weights to analogous inference to logistic regression
+# for combining weights to analogous inference to logistic regression
 contrast.weights<-function(effects,group1,group2){
   
   d.eff<-data.frame(effects)
@@ -34,7 +35,7 @@ contrast.weights.total<-function(effects,signs){
   
 }
 
-
+# variance inflation factor of predictors in multilevel models
 vif.mer <- function (fit) {
   ## adapted from rms::vif
   

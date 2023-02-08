@@ -10,9 +10,9 @@ output:
 
 # Preparations
 
-## Load packages
+## Load packages and custom functions
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(rio)
 library(sjlabelled)
 source("../custom_functions.R")
@@ -38,6 +38,8 @@ cbind(sapply(dat[,vote.vars],get.ESS.label))
 ```
 
 # Save a vector of countries with vote variables
+
+Double-entry for Germany (DE), Triple entry for Lithuania (LT).
 
 ```{r}
 table(dat$cntry)
