@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load packages
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
 library(rio)
 library(dplyr)

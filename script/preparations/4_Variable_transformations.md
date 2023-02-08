@@ -16,32 +16,7 @@ output:
 
 ```r
 library(rio)
-```
-
-```
-## The following rio suggested packages are not installed: 'arrow', 'feather', 'fst', 'hexView', 'pzfx', 'readODS', 'rmatio'
-## Use 'install_formats()' to install them
-```
-
-```r
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
 ```
 
 ## Load data
@@ -574,6 +549,47 @@ dat$corrupt_salience.scaling<-
   sd(CHES_2014$corrupt_salience,na.rm=T)
 ```
 
+## Belonging to minority ethnic group
+
+
+```r
+attr(ESS.dat$blgetmg,"labels")
+```
+
+```
+##        Yes         No    Refusal Don't know  No answer 
+##          1          2          7          8          9
+```
+
+```r
+# Factorial blgetmg
+
+dat$blgetmg.f<-case_when(dat$blgetmg==1~"Yes",
+                         TRUE~"No")
+
+table(dat$blgetmg.f,useNA="always")
+```
+
+```
+## 
+##    No   Yes  <NA> 
+## 37617  2568     0
+```
+
+```r
+# Numerical blgetmg
+
+dat$blgetmg.c<-case_when(dat$blgetmg==1~0.5,
+                         TRUE~(-0.5))
+
+table(dat$blgetmg.c,useNA="always")
+```
+
+```
+## 
+##  -0.5   0.5  <NA> 
+## 37617  2568     0
+```
 
 # Final set of variables needed for the analysis
 
@@ -587,6 +603,7 @@ analysis.vars<-
     "edu","edu.f","strain.on.health",
     "used.conv","used.CAM","DV",
     "used.CAM.no.home","DV.no.home",
+    "blgetmg","blgetmg.f","blgetmg.c",
     "lrgen","lrecon","galtan",
     "antielite_salience","corrupt_salience",
     "lrgen.scaling","lrecon.scaling","galtan.scaling",
@@ -597,9 +614,9 @@ analysis.vars %in% names(dat)
 ```
 
 ```
-##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [14] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [27] TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [29] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 ```
 
 ```r
@@ -609,7 +626,7 @@ str(fdat)
 ```
 
 ```
-## 'data.frame':	40185 obs. of  33 variables:
+## 'data.frame':	40185 obs. of  36 variables:
 ##  $ idno                      : num  1 2 3 4 5 6 7 13 14 21 ...
 ##  $ cntry                     : chr  "AT" "AT" "AT" "AT" ...
 ##  $ dweight                   : num  0.938 0.938 0.938 0.938 0.938 ...
@@ -633,6 +650,9 @@ str(fdat)
 ##  $ DV                        : chr  "NN" "Used_conv_ONLY" "Used_conv_ONLY" "Used_conv_ONLY" ...
 ##  $ used.CAM.no.home          : num  0 0 0 0 0 0 0 1 0 1 ...
 ##  $ DV.no.home                : chr  "NN" "Used_conv_ONLY" "Used_conv_ONLY" "Used_conv_ONLY" ...
+##  $ blgetmg                   : num  2 2 2 2 2 2 2 1 2 2 ...
+##  $ blgetmg.f                 : chr  "No" "No" "No" "No" ...
+##  $ blgetmg.c                 : num  -0.5 -0.5 -0.5 -0.5 -0.5 -0.5 -0.5 0.5 -0.5 -0.5 ...
 ##  $ lrgen                     : num  NA NA 6.1 8.7 NA ...
 ##  $ lrecon                    : num  NA NA 6.4 5.5 NA ...
 ##  $ galtan                    : num  NA NA 7.2 8.8 NA ...
@@ -659,9 +679,9 @@ print(s,locale=F)
 ```
 
 ```
-## R version 4.2.0 (2022-04-22 ucrt)
+## R version 4.2.2 (2022-10-31 ucrt)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 19043)
+## Running under: Windows 10 x64 (build 19045)
 ## 
 ## Matrix products: default
 ## 
@@ -669,22 +689,35 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_1.0.9    rio_0.5.29     knitr_1.39     rmarkdown_2.14
+##  [1] MetBrewer_0.2.0  lme4_1.1-31      ggplot2_3.4.0    psych_2.2.3     
+##  [5] memisc_0.99.30.7 MASS_7.3-58.1    lattice_0.20-45  rio_0.5.29      
+##  [9] dplyr_1.0.10     emmeans_1.8.4-1  mclogit_0.9.4.2  Matrix_1.5-0    
+## [13] knitr_1.39       rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] zip_2.2.0         Rcpp_1.0.8.3      cellranger_1.1.0 
-##  [4] bslib_0.3.1       compiler_4.2.0    pillar_1.7.0     
-##  [7] jquerylib_0.1.4   forcats_0.5.1     tools_4.2.0      
-## [10] digest_0.6.29     jsonlite_1.8.0    evaluate_0.15    
-## [13] lifecycle_1.0.1   tibble_3.1.6      pkgconfig_2.0.3  
-## [16] rlang_1.0.2       openxlsx_4.2.5    cli_3.3.0        
-## [19] curl_4.3.2        yaml_2.3.5        haven_2.5.0      
-## [22] xfun_0.30         fastmap_1.1.0     stringr_1.4.0    
-## [25] generics_0.1.2    vctrs_0.4.1       sass_0.4.1       
-## [28] hms_1.1.1         tidyselect_1.1.2  glue_1.6.2       
-## [31] data.table_1.14.2 R6_2.5.1          fansi_1.0.3      
-## [34] readxl_1.4.0      foreign_0.8-82    tzdb_0.3.0       
-## [37] readr_2.1.2       purrr_0.3.4       magrittr_2.0.3   
-## [40] ellipsis_0.3.2    htmltools_0.5.2   utf8_1.2.2       
-## [43] stringi_1.7.6     crayon_1.5.1
+##  [1] sass_0.4.1         jsonlite_1.8.4     splines_4.2.2     
+##  [4] carData_3.0-5      bslib_0.3.1        assertthat_0.2.1  
+##  [7] cellranger_1.1.0   yaml_2.3.5         pillar_1.8.1      
+## [10] glue_1.6.2         digest_0.6.31      minqa_1.2.5       
+## [13] colorspace_2.0-3   sandwich_3.0-1     htmltools_0.5.2   
+## [16] pkgconfig_2.0.3    haven_2.5.0        xtable_1.8-4      
+## [19] mvtnorm_1.1-3      scales_1.2.1       openxlsx_4.2.5    
+## [22] tzdb_0.3.0         tibble_3.1.8       generics_0.1.3    
+## [25] car_3.0-12         ellipsis_0.3.2     TH.data_1.1-1     
+## [28] withr_2.5.0        repr_1.1.4         cli_3.6.0         
+## [31] mnormt_2.1.1       survival_3.4-0     magrittr_2.0.3    
+## [34] readxl_1.4.0       estimability_1.4.1 evaluate_0.20     
+## [37] fansi_1.0.3        nlme_3.1-160       forcats_0.5.1     
+## [40] foreign_0.8-83     tools_4.2.2        data.table_1.14.2 
+## [43] hms_1.1.1          lifecycle_1.0.3    multcomp_1.4-20   
+## [46] stringr_1.5.0      munsell_0.5.0      zip_2.2.0         
+## [49] compiler_4.2.2     jquerylib_0.1.4    rlang_1.0.6       
+## [52] grid_4.2.2         nloptr_2.0.3       rstudioapi_0.13   
+## [55] base64enc_0.1-3    boot_1.3-28        gtable_0.3.1      
+## [58] codetools_0.2-18   abind_1.4-5        DBI_1.1.2         
+## [61] curl_4.3.2         R6_2.5.1           zoo_1.8-10        
+## [64] fastmap_1.1.0      utf8_1.2.2         readr_2.1.2       
+## [67] stringi_1.7.12     parallel_4.2.2     Rcpp_1.0.9        
+## [70] vctrs_0.5.1        tidyselect_1.2.0   xfun_0.30         
+## [73] coda_0.19-4
 ```

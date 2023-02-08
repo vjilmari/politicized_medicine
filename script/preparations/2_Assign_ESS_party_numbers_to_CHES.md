@@ -17,32 +17,6 @@ output:
 ```r
 library(rio)
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following object is masked from 'package:sjlabelled':
-## 
-##     as_label
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 source("../custom_functions.R")
 ```
 
@@ -272,8 +246,8 @@ CHES_2014[CHES_2014$cntry=="BE","party_name"]
 ```
 
 ```
-##  [1] "PS"    "SPA"   "ECOLO" "Groen" "MR"    "VLD"   "cdH"   "CD&V" 
-##  [9] "N-VA"  "FDF"   "VB"    "PVDA"  "PP"
+##  [1] "PS"    "SPA"   "ECOLO" "Groen" "MR"    "VLD"   "cdH"   "CD&V"  "N-VA" 
+## [10] "FDF"   "VB"    "PVDA"  "PP"
 ```
 
 ```r
@@ -311,56 +285,31 @@ vote.dat[vote.dat$cntry=="CH",c("pt.nmbr","pt.name")]
 ```
 
 ```
-##    pt.nmbr
-## 37       1
-## 38       2
-## 39       3
-## 40       4
-## 41       5
-## 42       6
-## 43       7
-## 44       8
-## 45       9
-## 46      10
-## 47      11
-## 48      12
-## 49      13
-## 50      14
-## 51      15
-## 52      16
-## 53      17
-## 54      18
-## 55      19
-## 56      20
-## 57      21
-## 58      22
-## 59      23
-## 60      24
-##                                                              pt.name
-## 37                                              Swiss People's Party
-## 38                                                   Socialist Party
-## 39                                                  Radical Liberals
-## 40                                               Christian Democrats
-## 41                                                       Green Party
-## 42                                               Green Liberal Party
-## 43                                         Bourgois-democratic Party
-## 44                                        Evangelical People's Party
-## 45                                          Federal Democratic Union
-## 46                                                     Ticino League
-## 47                                                Swiss Labour Party
-## 48 Movement of the Citizens belonging to French-speaking Switzerland
-## 49                                            Christian Social Party
-## 50                                                  Alternative Left
-## 51                                           Political women's group
-## 52                                          Pirate Party Switzerland
-## 53                                                              Left
-## 54                                                       Other party
-## 55                                                       Blank paper
-## 56                                                        Mixed vote
-## 57                                                    Not applicable
-## 58                                                           Refusal
-## 59                                                        Don't know
-## 60                                                         No answer
+##    pt.nmbr                                                           pt.name
+## 37       1                                              Swiss People's Party
+## 38       2                                                   Socialist Party
+## 39       3                                                  Radical Liberals
+## 40       4                                               Christian Democrats
+## 41       5                                                       Green Party
+## 42       6                                               Green Liberal Party
+## 43       7                                         Bourgois-democratic Party
+## 44       8                                        Evangelical People's Party
+## 45       9                                          Federal Democratic Union
+## 46      10                                                     Ticino League
+## 47      11                                                Swiss Labour Party
+## 48      12 Movement of the Citizens belonging to French-speaking Switzerland
+## 49      13                                            Christian Social Party
+## 50      14                                                  Alternative Left
+## 51      15                                           Political women's group
+## 52      16                                          Pirate Party Switzerland
+## 53      17                                                              Left
+## 54      18                                                       Other party
+## 55      19                                                       Blank paper
+## 56      20                                                        Mixed vote
+## 57      21                                                    Not applicable
+## 58      22                                                           Refusal
+## 59      23                                                        Don't know
+## 60      24                                                         No answer
 ```
 
 ```r
@@ -405,13 +354,13 @@ vote.dat[vote.dat$cntry=="CZ",c("pt.nmbr","pt.name")]
 
 ```
 ##    pt.nmbr                              pt.name
-## 61       1                                 KSCM
-## 62       2                                 CSSD
+## 61       1                                 KSČM
+## 62       2                                 ČSSD
 ## 63       3                               TOP 09
 ## 64       4                             ANO 2011
 ## 65       5                                  ODS
-## 66       6                              KDU-CSL
-## 67       7 Úsvit prímé demokracie Tomia Okamury
+## 66       6                              KDU-ČSL
+## 67       7 Úsvit přímé demokracie Tomia Okamury
 ## 68       8                                Other
 ## 69       9                       Not applicable
 ## 70      10                              Refusal
@@ -781,8 +730,8 @@ CHES_2014[CHES_2014$cntry=="FR","party_name"]
 ```
 
 ```
-##  [1] "PCF"   "PS"    "PRG"   "EELV"  "UMP"   "FN"    "MPF"   "MODEM"
-##  [9] "NC"    "PRV"   "AC"    "PG"    "Ens"
+##  [1] "PCF"   "PS"    "PRG"   "EELV"  "UMP"   "FN"    "MPF"   "MODEM" "NC"   
+## [10] "PRV"   "AC"    "PG"    "Ens"
 ```
 
 ```r
@@ -1076,8 +1025,8 @@ CHES_2014[CHES_2014$cntry=="NL","party_name"]
 ```
 
 ```
-##  [1] "CDA"    "PvdA"   "VVD"    "D66"    "GL"     "SGP"    "SP"    
-##  [8] "CU"     "PVV"    "PvdD"   "50PLUS"
+##  [1] "CDA"    "PvdA"   "VVD"    "D66"    "GL"     "SGP"    "SP"     "CU"    
+##  [9] "PVV"    "PvdD"   "50PLUS"
 ```
 
 ```r
@@ -1373,8 +1322,8 @@ CHES_2014[CHES_2014$cntry=="SE","party_name"]
 ```
 
 ```
-##  [1] "V"     "SAP"   "C"     "FP"    "M"     "KD"    "MP"    "SD"   
-##  [9] "PIRAT" "FI"
+##  [1] "V"     "SAP"   "C"     "FP"    "M"     "KD"    "MP"    "SD"    "PIRAT"
+## [10] "FI"
 ```
 
 ```r
@@ -1528,9 +1477,9 @@ print(s,locale=F)
 ```
 
 ```
-## R version 4.1.2 (2021-11-01)
+## R version 4.2.2 (2022-10-31 ucrt)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 19043)
+## Running under: Windows 10 x64 (build 19045)
 ## 
 ## Matrix products: default
 ## 
@@ -1538,31 +1487,22 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_1.0.7      sjlabelled_1.1.8 rio_0.5.29       rmarkdown_2.11  
-## [5] devtools_2.4.3   usethis_2.0.1   
+## [1] dplyr_1.0.10     sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
+## [5] rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.7        prettyunits_1.1.1 ps_1.6.0         
-##  [4] assertthat_0.2.1  rprojroot_2.0.2   digest_0.6.29    
-##  [7] utf8_1.2.2        R6_2.5.1          cellranger_1.1.0 
-## [10] evaluate_0.14     pillar_1.6.4      rlang_0.4.12     
-## [13] curl_4.3.2        readxl_1.3.1      data.table_1.14.2
-## [16] callr_3.7.0       jquerylib_0.1.4   desc_1.4.0       
-## [19] readr_2.1.1       stringr_1.4.0     foreign_0.8-81   
-## [22] compiler_4.1.2    xfun_0.29         pkgconfig_2.0.3  
-## [25] pkgbuild_1.3.1    htmltools_0.5.2   insight_0.14.5   
-## [28] tidyselect_1.1.1  tibble_3.1.6      fansi_0.5.0      
-## [31] crayon_1.4.2      tzdb_0.2.0        withr_2.4.3      
-## [34] jsonlite_1.7.2    lifecycle_1.0.1   DBI_1.1.2        
-## [37] magrittr_2.0.1    zip_2.2.0         cli_3.1.0        
-## [40] stringi_1.7.6     cachem_1.0.6      fs_1.5.0         
-## [43] remotes_2.4.2     testthat_3.0.4    bslib_0.3.1      
-## [46] ellipsis_0.3.2    vctrs_0.3.8       generics_0.1.1   
-## [49] openxlsx_4.2.5    tools_4.1.2       forcats_0.5.1    
-## [52] glue_1.6.0        purrr_0.3.4       hms_1.1.1        
-## [55] processx_3.5.2    pkgload_1.2.4     fastmap_1.1.0    
-## [58] yaml_2.2.1        sessioninfo_1.2.2 memoise_2.0.1    
-## [61] knitr_1.37        haven_2.4.3       sass_0.4.0
+##  [1] zip_2.2.0         Rcpp_1.0.9        cellranger_1.1.0  bslib_0.3.1      
+##  [5] compiler_4.2.2    pillar_1.8.1      jquerylib_0.1.4   forcats_0.5.1    
+##  [9] tools_4.2.2       digest_0.6.31     jsonlite_1.8.4    evaluate_0.20    
+## [13] lifecycle_1.0.3   tibble_3.1.8      pkgconfig_2.0.3   rlang_1.0.6      
+## [17] openxlsx_4.2.5    DBI_1.1.2         cli_3.6.0         rstudioapi_0.13  
+## [21] curl_4.3.2        yaml_2.3.5        haven_2.5.0       xfun_0.30        
+## [25] fastmap_1.1.0     stringr_1.5.0     generics_0.1.3    vctrs_0.5.1      
+## [29] sass_0.4.1        hms_1.1.1         tidyselect_1.2.0  glue_1.6.2       
+## [33] data.table_1.14.2 R6_2.5.1          fansi_1.0.3       readxl_1.4.0     
+## [37] foreign_0.8-83    tzdb_0.3.0        readr_2.1.2       magrittr_2.0.3   
+## [41] htmltools_0.5.2   ellipsis_0.3.2    assertthat_0.2.1  insight_0.18.8   
+## [45] utf8_1.2.2        stringi_1.7.12
 ```
 
 

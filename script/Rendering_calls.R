@@ -28,6 +28,9 @@ render(input = "script/analysis/Analysis.Rmd",
 render(input = "script/analysis/Analysis_homeopathy_excluded.Rmd",
        envir = new.env())
 
+render(input = "script/analysis/Analysis_with_minority_covariate.Rmd",
+       envir = new.env())
+
 # Convert RMD to R
 
 purl(input="script/preparations/1_Extract_parties_voted_in_ESS.Rmd",

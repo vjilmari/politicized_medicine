@@ -7,7 +7,7 @@
 #'     keep_md: yes
 #' ---
 #' 
-## ---- include=FALSE----------------------------------------------------
+## ---- include=FALSE--------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 #' 
@@ -15,14 +15,14 @@ knitr::opts_chunk$set(echo = TRUE)
 #' 
 #' ## Load packages
 #' 
-## ----------------------------------------------------------------------
+## ----message=FALSE, warning=FALSE------------------------------------------
 library(rio)
 library(dplyr)
 
 #' 
 #' ## Load data
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 # Long format data with ESS and CHES merged
 dat<-import("../../data/processed/dat.xlsx")
 
@@ -34,7 +34,7 @@ ESS.dat<-import("../../data/raw/ESS7e02_2.sav")
 #' 
 #' ## Gender
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 attr(ESS.dat$gndr,"labels")
 
 # Factorial gndr
@@ -57,7 +57,7 @@ table(dat$gndr.c,useNA="always")
 #' 
 #' ## Age
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 attr(ESS.dat$agea,"labels")
 
 table(dat$agea==999)
@@ -69,7 +69,7 @@ dat$age10.c<-(dat$agea-mean(dat$agea,na.rm=T))/10
 #' 
 #' ## Income
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 attr(ESS.dat$hinctnta,"labels")
 
 # recode deciles to quintiles
@@ -101,7 +101,7 @@ table(dat$income.fr,useNA="always")
 #' 
 #' ## Education
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 attr(ESS.dat$eisced,"labels")
 
 # recode education variable
@@ -127,7 +127,7 @@ table(dat$edu.f)
 #' 
 #' ## Health problems
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 
 # hampered health problems (example)
 attr(ESS.dat$hltphhc,"labels")
@@ -200,7 +200,7 @@ table(dat$strain.on.health,useNA="always")
 #' 
 #' ## Dependent variable
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 # visited general practitioner
 attr(ESS.dat$dshltgp,"labels")
 # visited medical specialist
@@ -275,7 +275,7 @@ table(dat$DV.no.home,useNA="always")
 #' 
 #' ## Political orientation
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 #add scaling SDs to the data.frame from CHES dataset
 CHES_2014<-
   import("../../data/raw/2014_CHES_dataset_means.csv")
@@ -290,10 +290,31 @@ dat$corrupt_salience.scaling<-
   sd(CHES_2014$corrupt_salience,na.rm=T)
 
 #' 
+#' ## Belonging to minority ethnic group
+#' 
+## --------------------------------------------------------------------------
+
+attr(ESS.dat$blgetmg,"labels")
+
+# Factorial blgetmg
+
+dat$blgetmg.f<-case_when(dat$blgetmg==1~"Yes",
+                         TRUE~"No")
+
+table(dat$blgetmg.f,useNA="always")
+
+# Numerical blgetmg
+
+dat$blgetmg.c<-case_when(dat$blgetmg==1~0.5,
+                         TRUE~(-0.5))
+
+table(dat$blgetmg.c,useNA="always")
+
+
 #' 
 #' # Final set of variables needed for the analysis
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 analysis.vars<-
   c("idno","cntry","dweight","pspwght","pweight",
     "pt.nmbr","pt.name","vote",
@@ -320,7 +341,7 @@ export(fdat,
 
 #' # Session information
 #' 
-## ----------------------------------------------------------------------
+## --------------------------------------------------------------------------
 s<-sessionInfo()
 print(s,locale=F)
 

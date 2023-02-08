@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load packages
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(rio)
 library(dplyr)
 ```
@@ -290,6 +290,27 @@ dat$corrupt_salience.scaling<-
   sd(CHES_2014$corrupt_salience,na.rm=T)
 ```
 
+## Belonging to minority ethnic group
+
+```{r}
+
+attr(ESS.dat$blgetmg,"labels")
+
+# Factorial blgetmg
+
+dat$blgetmg.f<-case_when(dat$blgetmg==1~"Yes",
+                         TRUE~"No")
+
+table(dat$blgetmg.f,useNA="always")
+
+# Numerical blgetmg
+
+dat$blgetmg.c<-case_when(dat$blgetmg==1~0.5,
+                         TRUE~(-0.5))
+
+table(dat$blgetmg.c,useNA="always")
+
+```
 
 # Final set of variables needed for the analysis
 
@@ -302,6 +323,7 @@ analysis.vars<-
     "edu","edu.f","strain.on.health",
     "used.conv","used.CAM","DV",
     "used.CAM.no.home","DV.no.home",
+    "blgetmg","blgetmg.f","blgetmg.c",
     "lrgen","lrecon","galtan",
     "antielite_salience","corrupt_salience",
     "lrgen.scaling","lrecon.scaling","galtan.scaling",

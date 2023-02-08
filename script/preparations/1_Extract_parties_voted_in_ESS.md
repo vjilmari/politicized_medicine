@@ -10,34 +10,12 @@ output:
 
 # Preparations
 
-## Load packages
+## Load packages and custom functions
 
 
 ```r
 library(rio)
-```
-
-```
-## The following rio suggested packages are not installed: 'arrow', 'feather', 'fst', 'hexView', 'pzfx', 'readODS', 'rmatio'
-## Use 'install_formats()' to install them
-```
-
-```r
 library(sjlabelled)
-```
-
-```
-## 
-## Attaching package: 'sjlabelled'
-```
-
-```
-## The following object is masked from 'package:usethis':
-## 
-##     tidy_labels
-```
-
-```r
 source("../custom_functions.R")
 ```
 
@@ -172,6 +150,8 @@ cbind(sapply(dat[,vote.vars],get.ESS.label))
 
 # Save a vector of countries with vote variables
 
+Double-entry for Germany (DE), Triple entry for Lithuania (LT).
+
 
 ```r
 table(dat$cntry)
@@ -257,9 +237,9 @@ print(s,locale=F)
 ```
 
 ```
-## R version 4.1.2 (2021-11-01)
+## R version 4.2.2 (2022-10-31 ucrt)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 19043)
+## Running under: Windows 10 x64 (build 19045)
 ## 
 ## Matrix products: default
 ## 
@@ -267,28 +247,18 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] sjlabelled_1.1.8 rio_0.5.29       rmarkdown_2.11   devtools_2.4.3  
-## [5] usethis_2.0.1   
+## [1] sjlabelled_1.2.0 rio_0.5.29       knitr_1.39       rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] xfun_0.29         bslib_0.3.1       remotes_2.4.2    
-##  [4] purrr_0.3.4       haven_2.4.3       vctrs_0.3.8      
-##  [7] testthat_3.0.4    htmltools_0.5.2   yaml_2.2.1       
-## [10] utf8_1.2.2        rlang_0.4.12      pkgbuild_1.3.1   
-## [13] jquerylib_0.1.4   pillar_1.6.4      foreign_0.8-81   
-## [16] glue_1.6.0        withr_2.4.3       sessioninfo_1.2.2
-## [19] readxl_1.3.1      lifecycle_1.0.1   stringr_1.4.0    
-## [22] cellranger_1.1.0  zip_2.2.0         evaluate_0.14    
-## [25] memoise_2.0.1     knitr_1.37        forcats_0.5.1    
-## [28] tzdb_0.2.0        callr_3.7.0       fastmap_1.1.0    
-## [31] ps_1.6.0          curl_4.3.2        fansi_0.5.0      
-## [34] Rcpp_1.0.7        readr_2.1.1       cachem_1.0.6     
-## [37] desc_1.4.0        pkgload_1.2.4     jsonlite_1.7.2   
-## [40] fs_1.5.0          hms_1.1.1         digest_0.6.29    
-## [43] stringi_1.7.6     openxlsx_4.2.5    insight_0.14.5   
-## [46] processx_3.5.2    rprojroot_2.0.2   cli_3.1.0        
-## [49] tools_4.1.2       magrittr_2.0.1    sass_0.4.0       
-## [52] tibble_3.1.6      crayon_1.4.2      pkgconfig_2.0.3  
-## [55] ellipsis_0.3.2    data.table_1.14.2 prettyunits_1.1.1
-## [58] R6_2.5.1          compiler_4.1.2
+##  [1] zip_2.2.0         Rcpp_1.0.9        cellranger_1.1.0  bslib_0.3.1      
+##  [5] compiler_4.2.2    pillar_1.8.1      jquerylib_0.1.4   forcats_0.5.1    
+##  [9] tools_4.2.2       digest_0.6.31     jsonlite_1.8.4    evaluate_0.20    
+## [13] lifecycle_1.0.3   tibble_3.1.8      pkgconfig_2.0.3   rlang_1.0.6      
+## [17] openxlsx_4.2.5    cli_3.6.0         rstudioapi_0.13   curl_4.3.2       
+## [21] yaml_2.3.5        haven_2.5.0       xfun_0.30         fastmap_1.1.0    
+## [25] stringr_1.5.0     vctrs_0.5.1       sass_0.4.1        hms_1.1.1        
+## [29] glue_1.6.2        data.table_1.14.2 R6_2.5.1          fansi_1.0.3      
+## [33] readxl_1.4.0      foreign_0.8-83    tzdb_0.3.0        readr_2.1.2      
+## [37] magrittr_2.0.3    htmltools_0.5.2   ellipsis_0.3.2    insight_0.18.8   
+## [41] utf8_1.2.2        stringi_1.7.12
 ```
