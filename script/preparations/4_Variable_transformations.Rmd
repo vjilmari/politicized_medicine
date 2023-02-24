@@ -312,6 +312,36 @@ table(dat$blgetmg.c,useNA="always")
 
 ```
 
+## Marital status
+
+```{r}
+# does live with husband/wife/partner?
+
+attributes(ESS.dat$icpart1)
+table(ESS.dat$icpart1,useNA="always")
+
+
+# "Relationship with husband/wife/partner currently living with"
+
+attributes(ESS.dat$rshpsts)
+table(ESS.dat$rshpsts,useNA="always")
+
+table(ESS.dat$icpart1,ESS.dat$rshpsts,useNA="always")
+
+# factorial marital status
+dat$mstatus.f<-case_when(
+  dat$icpart1==1 & dat$rshpsts<5~"Married",
+  TRUE~"Non-married"
+)
+
+table(dat$mstatus.f,useNA="always")
+
+# numeric marital status
+dat$mstatus.c<-case_when(
+  dat$mstatus.f=="Married"~0.5,
+  TRUE~(-0.5))
+```
+
 # Final set of variables needed for the analysis
 
 ```{r}
@@ -321,9 +351,10 @@ analysis.vars<-
     "gndr.f","gndr.c","agea","age10.c",
     "income","income.f","income.fr",
     "edu","edu.f","strain.on.health",
+    "blgetmg.f","blgetmg.c",
+    "mstatus.f","mstatus.c",
     "used.conv","used.CAM","DV",
     "used.CAM.no.home","DV.no.home",
-    "blgetmg","blgetmg.f","blgetmg.c",
     "lrgen","lrecon","galtan",
     "antielite_salience","corrupt_salience",
     "lrgen.scaling","lrecon.scaling","galtan.scaling",

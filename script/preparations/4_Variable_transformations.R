@@ -7,7 +7,7 @@
 #'     keep_md: yes
 #' ---
 #' 
-## ---- include=FALSE--------------------------------------------------------
+## ---- include=FALSE----------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 #' 
@@ -15,14 +15,14 @@ knitr::opts_chunk$set(echo = TRUE)
 #' 
 #' ## Load packages
 #' 
-## ----message=FALSE, warning=FALSE------------------------------------------
+## ----message=FALSE, warning=FALSE--------------------------------------------
 library(rio)
 library(dplyr)
 
 #' 
 #' ## Load data
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # Long format data with ESS and CHES merged
 dat<-import("../../data/processed/dat.xlsx")
 
@@ -34,7 +34,7 @@ ESS.dat<-import("../../data/raw/ESS7e02_2.sav")
 #' 
 #' ## Gender
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 attr(ESS.dat$gndr,"labels")
 
 # Factorial gndr
@@ -57,7 +57,7 @@ table(dat$gndr.c,useNA="always")
 #' 
 #' ## Age
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 attr(ESS.dat$agea,"labels")
 
 table(dat$agea==999)
@@ -69,7 +69,7 @@ dat$age10.c<-(dat$agea-mean(dat$agea,na.rm=T))/10
 #' 
 #' ## Income
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 attr(ESS.dat$hinctnta,"labels")
 
 # recode deciles to quintiles
@@ -101,7 +101,7 @@ table(dat$income.fr,useNA="always")
 #' 
 #' ## Education
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 attr(ESS.dat$eisced,"labels")
 
 # recode education variable
@@ -127,7 +127,7 @@ table(dat$edu.f)
 #' 
 #' ## Health problems
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 # hampered health problems (example)
 attr(ESS.dat$hltphhc,"labels")
@@ -200,7 +200,7 @@ table(dat$strain.on.health,useNA="always")
 #' 
 #' ## Dependent variable
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # visited general practitioner
 attr(ESS.dat$dshltgp,"labels")
 # visited medical specialist
@@ -275,7 +275,7 @@ table(dat$DV.no.home,useNA="always")
 #' 
 #' ## Political orientation
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 #add scaling SDs to the data.frame from CHES dataset
 CHES_2014<-
   import("../../data/raw/2014_CHES_dataset_means.csv")
@@ -292,7 +292,7 @@ dat$corrupt_salience.scaling<-
 #' 
 #' ## Belonging to minority ethnic group
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 attr(ESS.dat$blgetmg,"labels")
 
@@ -312,15 +312,47 @@ table(dat$blgetmg.c,useNA="always")
 
 
 #' 
+#' ## Marital status
+#' 
+## ----------------------------------------------------------------------------
+# does live with husband/wife/partner?
+
+attributes(ESS.dat$icpart1)
+table(ESS.dat$icpart1,useNA="always")
+
+
+# "Relationship with husband/wife/partner currently living with"
+
+attributes(ESS.dat$rshpsts)
+table(ESS.dat$rshpsts,useNA="always")
+
+table(ESS.dat$icpart1,ESS.dat$rshpsts,useNA="always")
+
+# factorial marital status
+dat$mstatus.f<-case_when(
+  dat$icpart1==1 & dat$rshpsts<5~"Married",
+  TRUE~"Non-married"
+)
+
+table(dat$mstatus.f,useNA="always")
+
+# numeric marital status
+dat$mstatus.c<-case_when(
+  dat$mstatus.f=="Married"~0.5,
+  TRUE~(-0.5))
+
+#' 
 #' # Final set of variables needed for the analysis
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 analysis.vars<-
   c("idno","cntry","dweight","pspwght","pweight",
     "pt.nmbr","pt.name","vote",
     "gndr.f","gndr.c","agea","age10.c",
     "income","income.f","income.fr",
     "edu","edu.f","strain.on.health",
+    "blgetmg.f","blgetmg.c",
+    "mstatus.f","mstatus.c",
     "used.conv","used.CAM","DV",
     "used.CAM.no.home","DV.no.home",
     "lrgen","lrecon","galtan",
@@ -341,7 +373,7 @@ export(fdat,
 
 #' # Session information
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 s<-sessionInfo()
 print(s,locale=F)
 

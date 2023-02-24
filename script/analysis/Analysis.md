@@ -1,5 +1,5 @@
 ---
-title: "Analysis (homeopathy included in CAMs)"
+title: "Analysis"
 output: 
   html_document: 
     toc: yes
@@ -17,133 +17,14 @@ output:
 
 ```r
 library(mclogit)
-```
-
-```
-## Loading required package: Matrix
-```
-
-```r
 library(emmeans)
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 library(rio)
-```
-
-```
-## The following rio suggested packages are not installed: 'arrow', 'feather', 'fst', 'hexView', 'pzfx', 'readODS', 'rmatio'
-## Use 'install_formats()' to install them
-```
-
-```r
 library(memisc)
-```
-
-```
-## Loading required package: lattice
-```
-
-```
-## Loading required package: MASS
-```
-
-```
-## 
-## Attaching package: 'MASS'
-```
-
-```
-## The following object is masked from 'package:dplyr':
-## 
-##     select
-```
-
-```
-## 
-## Attaching package: 'memisc'
-```
-
-```
-## The following objects are masked from 'package:dplyr':
-## 
-##     collect, recode, rename, syms
-```
-
-```
-## The following object is masked from 'package:Matrix':
-## 
-##     as.array
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     contr.sum, contr.treatment, contrasts
-```
-
-```
-## The following object is masked from 'package:base':
-## 
-##     as.array
-```
-
-```r
 library(psych)
 library(ggplot2)
-```
-
-```
-## 
-## Attaching package: 'ggplot2'
-```
-
-```
-## The following objects are masked from 'package:psych':
-## 
-##     %+%, alpha
-```
-
-```
-## The following object is masked from 'package:memisc':
-## 
-##     syms
-```
-
-```r
+library(ggpubr)
 library(lme4)
-```
-
-```
-## 
-## Attaching package: 'lme4'
-```
-
-```
-## The following object is masked from 'package:rio':
-## 
-##     factorize
-```
-
-```r
 library(MetBrewer)
 source("../custom_functions.R")
 ```
@@ -151,45 +32,7 @@ source("../custom_functions.R")
 
 
 ```r
-dat<-import("../../data/processed/fdat.xlsx")
-
-str(dat)
-```
-
-```
-## 'data.frame':	40185 obs. of  32 variables:
-##  $ idno                      : num  1 2 3 4 5 6 7 13 14 21 ...
-##  $ cntry                     : chr  "AT" "AT" "AT" "AT" ...
-##  $ dweight                   : num  0.938 0.938 0.938 0.938 0.938 ...
-##  $ pspwght                   : num  0.871 0.864 1.419 1.026 0.739 ...
-##  $ pweight                   : num  0.406 0.406 0.406 0.406 0.406 ...
-##  $ pt.nmbr                   : num  NA 6 2 3 NA 1 1 1 7 2 ...
-##  $ pt.name                   : chr  NA NA "ÖVP" "FPÖ" ...
-##  $ gndr.f                    : chr  "Male" "Male" "Female" "Male" ...
-##  $ gndr.c                    : num  -0.5 -0.5 0.5 -0.5 0.5 0.5 -0.5 0.5 0.5 0.5 ...
-##  $ agea                      : num  51 67 89 32 56 67 66 67 34 66 ...
-##  $ age10.c                   : num  0.172 1.772 3.972 -1.728 0.672 ...
-##  $ income                    : chr  "quint.2" "quint.2" "quint.1" "quint.2" ...
-##  $ income.f                  : chr  "quint.2" "quint.2" "quint.1" "quint.2" ...
-##  $ income.fr                 : chr  "quint.2" "quint.2" "quint.1" "quint.2" ...
-##  $ edu                       : chr  "3. LUS" "1. <LS" "1. <LS" "3. LUS" ...
-##  $ edu.f                     : chr  "3. LUS" "1. <LS" "1. <LS" "3. LUS" ...
-##  $ strain.on.health          : num  1 7 2 4 2 2 5 6 6 3 ...
-##  $ used.conv                 : num  0 1 1 1 1 1 1 1 1 1 ...
-##  $ used.CAM                  : num  0 0 0 0 0 0 0 1 0 1 ...
-##  $ DV                        : chr  "NN" "Used_conv_ONLY" "Used_conv_ONLY" "Used_conv_ONLY" ...
-##  $ used.CAM.no.home          : num  0 0 0 0 0 0 0 1 0 1 ...
-##  $ DV.no.home                : chr  "NN" "Used_conv_ONLY" "Used_conv_ONLY" "Used_conv_ONLY" ...
-##  $ lrgen                     : num  NA NA 6.1 8.7 NA ...
-##  $ lrecon                    : num  NA NA 6.4 5.5 NA ...
-##  $ galtan                    : num  NA NA 7.2 8.8 NA ...
-##  $ antielite_salience        : num  NA NA 1.6 8 NA ...
-##  $ corrupt_salience          : num  NA NA 2.4 5.1 NA ...
-##  $ lrgen.scaling             : num  2.3 2.3 2.3 2.3 2.3 ...
-##  $ lrecon.scaling            : num  2.21 2.21 2.21 2.21 2.21 ...
-##  $ galtan.scaling            : num  2.63 2.63 2.63 2.63 2.63 ...
-##  $ antielite_salience.scaling: num  2.59 2.59 2.59 2.59 2.59 ...
-##  $ corrupt_salience.scaling  : num  2.32 2.32 2.32 2.32 2.32 ...
+fdat<-import("../../data/processed/fdat.xlsx")
 ```
 
 ## Data transformations
@@ -200,13 +43,13 @@ The reference levels for factorial variables need to be redefined, .xlsx format 
 
 
 ```r
-dat$income.f<-case_when(
-  is.na(dat$income) ~ "missing",
-  TRUE ~ dat$income
+fdat$income.f<-case_when(
+  is.na(fdat$income) ~ "missing",
+  TRUE ~ fdat$income
 )
 
 #define reference level (top quintile)
-table(dat$income.f,useNA="always")
+table(fdat$income.f,useNA="always")
 ```
 
 ```
@@ -216,8 +59,8 @@ table(dat$income.f,useNA="always")
 ```
 
 ```r
-dat$income.fr = relevel(as.factor(dat$income.f), ref="quint.5")
-table(dat$income.fr,useNA="always")
+fdat$income.fr = relevel(as.factor(fdat$income.f), ref="quint.5")
+table(fdat$income.fr,useNA="always")
 ```
 
 ```
@@ -230,7 +73,7 @@ table(dat$income.fr,useNA="always")
 
 
 ```r
-table(dat$edu,useNA="always")
+table(fdat$edu,useNA="always")
 ```
 
 ```
@@ -240,8 +83,8 @@ table(dat$edu,useNA="always")
 ```
 
 ```r
-dat$edu.f<-relevel(as.factor(dat$edu),ref="7. MA")
-table(dat$edu.f,useNA="always")
+fdat$edu.f<-relevel(as.factor(fdat$edu),ref="7. MA")
+table(fdat$edu.f,useNA="always")
 ```
 
 ```
@@ -254,7 +97,7 @@ table(dat$edu.f,useNA="always")
 
 
 ```r
-table(dat$DV,useNA="always")
+table(fdat$DV,useNA="always")
 ```
 
 ```
@@ -266,39 +109,14 @@ table(dat$DV,useNA="always")
 ```
 
 ```r
-dat$DV.f<-relevel(as.factor(dat$DV),ref="NN")
-table(dat$DV.f,useNA="always")
+fdat$DV.f<-relevel(as.factor(fdat$DV),ref="NN")
+table(fdat$DV.f,useNA="always")
 ```
 
 ```
 ## 
 ##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
 ##              6877               503              5100             27705 
-##              <NA> 
-##                 0
-```
-
-```r
-table(dat$DV.no.home,useNA="always")
-```
-
-```
-## 
-##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
-##              6957               423              4155             28650 
-##              <NA> 
-##                 0
-```
-
-```r
-dat$DV.no.home.f<-relevel(as.factor(dat$DV.no.home),ref="NN")
-table(dat$DV.no.home.f,useNA="always")
-```
-
-```
-## 
-##                NN     Used_CAM_ONLY Used_conv_and_CAM    Used_conv_ONLY 
-##              6957               423              4155             28650 
 ##              <NA> 
 ##                 0
 ```
@@ -311,7 +129,7 @@ Calculate country means for centering
 ```r
 # Calculate country means for centering
 
-cntry.means<-dat %>%
+cntry.means<-fdat %>%
   group_by(cntry) %>%
   summarise(strain.on.health.cntry.mean=
               mean(strain.on.health,na.rm=T),
@@ -328,48 +146,48 @@ cntry.means<-dat %>%
 
 #combine data frames
 
-dat<-left_join(
-  x=dat,
+fdat<-left_join(
+  x=fdat,
   y=cntry.means,
   by="cntry"
 )
 
 #country-mean center strain on health
 
-dat$strain.on.health.c<-
-  dat$strain.on.health-dat$strain.on.health.cntry.mean
+fdat$strain.on.health.c<-
+  fdat$strain.on.health-fdat$strain.on.health.cntry.mean
 
 #country-mean center political orientation
 
-dat$lrgen.c<-
-  dat$lrgen-dat$lrgen.cntry.mean
-dat$lrecon.c<-
-  dat$lrecon-dat$lrecon.cntry.mean
-dat$galtan.c<-
-  dat$galtan-dat$galtan.cntry.mean
-dat$antielite_salience.c<-
-  dat$antielite_salience-dat$antielite_salience.cntry.mean
-dat$corrupt_salience.c<-
-  dat$corrupt_salience-dat$corrupt_salience.cntry.mean
+fdat$lrgen.c<-
+  fdat$lrgen-fdat$lrgen.cntry.mean
+fdat$lrecon.c<-
+  fdat$lrecon-fdat$lrecon.cntry.mean
+fdat$galtan.c<-
+  fdat$galtan-fdat$galtan.cntry.mean
+fdat$antielite_salience.c<-
+  fdat$antielite_salience-fdat$antielite_salience.cntry.mean
+fdat$corrupt_salience.c<-
+  fdat$corrupt_salience-fdat$corrupt_salience.cntry.mean
 
 #scale with CHES grand SD
-dat$lrgen.z<-
-  dat$lrgen.c/dat$lrgen.scaling
-dat$lrecon.z<-
-  dat$lrecon.c/dat$lrecon.scaling
-dat$galtan.z<-
-  dat$galtan.c/dat$galtan.scaling
-dat$antielite_salience.z<-
-  dat$antielite_salience.c/dat$antielite_salience.scaling
-dat$corrupt_salience.z<-
-  dat$corrupt_salience.c/dat$corrupt_salience.scaling
+fdat$lrgen.z<-
+  fdat$lrgen.c/fdat$lrgen.scaling
+fdat$lrecon.z<-
+  fdat$lrecon.c/fdat$lrecon.scaling
+fdat$galtan.z<-
+  fdat$galtan.c/fdat$galtan.scaling
+fdat$antielite_salience.z<-
+  fdat$antielite_salience.c/fdat$antielite_salience.scaling
+fdat$corrupt_salience.z<-
+  fdat$corrupt_salience.c/fdat$corrupt_salience.scaling
 ```
 
 ## Exclude missing variable
 
 
 ```r
-fdat<-dat %>%
+fdat<-fdat %>%
   filter(cntry!="IL" & cntry!="EE") %>%
   filter(!is.na(cntry) & 
          !is.na(gndr.c) &
@@ -711,10 +529,15 @@ mod1
 ##   Used_conv_and_CAM/NN   0.024108         -1.127770    -0.635589   -0.493906  
 ##   Used_conv_ONLY/NN     -0.019218         -0.066607    -0.108945   -0.139951  
 ##                       Predictors
-## Response categories     edu.f4. UUS  edu.f5. AV  edu.f6. BA  strain.on.health.c
-##   Used_CAM_ONLY/NN      -1.365832    -0.615212   -0.766124    0.266865         
-##   Used_conv_and_CAM/NN  -0.460161    -0.302483   -0.256202    0.543996         
-##   Used_conv_ONLY/NN     -0.069058    -0.126224   -0.050234    0.412605         
+## Response categories     edu.f4. UUS  edu.f5. AV  edu.f6. BA
+##   Used_CAM_ONLY/NN      -1.365832    -0.615212   -0.766124 
+##   Used_conv_and_CAM/NN  -0.460161    -0.302483   -0.256202 
+##   Used_conv_ONLY/NN     -0.069058    -0.126224   -0.050234 
+##                       Predictors
+## Response categories     strain.on.health.c
+##   Used_CAM_ONLY/NN       0.266865         
+##   Used_conv_and_CAM/NN   0.543996         
+##   Used_conv_ONLY/NN      0.412605         
 ## 
 ## (Co-)Variances:
 ## Grouping level: cntry 
@@ -1756,8 +1579,8 @@ anova(mod1,mod2.lrgen,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -1903,8 +1726,8 @@ anova(mod1,mod2.lrecon,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -2051,8 +1874,8 @@ anova(mod1,mod2.galtan,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -2170,20 +1993,20 @@ pairs(mod2.galtan.eff,adjust="none",infer=c(T,T))
 ```
 
 ```
-##  contrast                                         estimate     SE  df asymp.LCL
-##  NN effect - Used_CAM_ONLY effect                   0.2338 0.1021 Inf    0.0337
-##  NN effect - Used_conv_and_CAM effect               0.1242 0.0374 Inf    0.0509
-##  NN effect - Used_conv_ONLY effect                  0.0406 0.0286 Inf   -0.0155
-##  Used_CAM_ONLY effect - Used_conv_and_CAM effect   -0.1095 0.1021 Inf   -0.3097
-##  Used_CAM_ONLY effect - Used_conv_ONLY effect      -0.1931 0.0996 Inf   -0.3883
-##  Used_conv_and_CAM effect - Used_conv_ONLY effect  -0.0836 0.0275 Inf   -0.1375
-##  asymp.UCL z.ratio p.value
-##    0.43379   2.291  0.0220
-##    0.19751   3.322  0.0009
-##    0.09672   1.419  0.1559
-##    0.09064  -1.072  0.2835
-##    0.00202  -1.940  0.0524
-##   -0.02967  -3.038  0.0024
+##  contrast                                         estimate     SE  df
+##  NN effect - Used_CAM_ONLY effect                   0.2338 0.1021 Inf
+##  NN effect - Used_conv_and_CAM effect               0.1242 0.0374 Inf
+##  NN effect - Used_conv_ONLY effect                  0.0406 0.0286 Inf
+##  Used_CAM_ONLY effect - Used_conv_and_CAM effect   -0.1095 0.1021 Inf
+##  Used_CAM_ONLY effect - Used_conv_ONLY effect      -0.1931 0.0996 Inf
+##  Used_conv_and_CAM effect - Used_conv_ONLY effect  -0.0836 0.0275 Inf
+##  asymp.LCL asymp.UCL z.ratio p.value
+##     0.0337   0.43379   2.291  0.0220
+##     0.0509   0.19751   3.322  0.0009
+##    -0.0155   0.09672   1.419  0.1559
+##    -0.3097   0.09064  -1.072  0.2835
+##    -0.3883   0.00202  -1.940  0.0524
+##    -0.1375  -0.02967  -3.038  0.0024
 ## 
 ## Results are averaged over the levels of: income.fr, edu.f 
 ## Confidence level used: 0.95
@@ -2235,8 +2058,8 @@ anova(mod1,mod2.antielite_salience,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -2380,8 +2203,8 @@ anova(mod1,mod2.corrupt_salience,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -2501,20 +2324,20 @@ pairs(mod2.corrupt_salience.eff,
 ```
 
 ```
-##  contrast                                         estimate     SE  df asymp.LCL
-##  NN effect - Used_CAM_ONLY effect                  -0.4112 0.1360 Inf   -0.6778
-##  NN effect - Used_conv_and_CAM effect               0.0176 0.0540 Inf   -0.0883
-##  NN effect - Used_conv_ONLY effect                  0.0523 0.0399 Inf   -0.0258
-##  Used_CAM_ONLY effect - Used_conv_and_CAM effect    0.4288 0.1369 Inf    0.1605
-##  Used_CAM_ONLY effect - Used_conv_ONLY effect       0.4636 0.1325 Inf    0.2038
-##  Used_conv_and_CAM effect - Used_conv_ONLY effect   0.0347 0.0413 Inf   -0.0462
-##  asymp.UCL z.ratio p.value
-##     -0.145  -3.023  0.0025
-##      0.123   0.326  0.7446
-##      0.131   1.312  0.1894
-##      0.697   3.132  0.0017
-##      0.723   3.497  0.0005
-##      0.116   0.842  0.3999
+##  contrast                                         estimate     SE  df
+##  NN effect - Used_CAM_ONLY effect                  -0.4112 0.1360 Inf
+##  NN effect - Used_conv_and_CAM effect               0.0176 0.0540 Inf
+##  NN effect - Used_conv_ONLY effect                  0.0523 0.0399 Inf
+##  Used_CAM_ONLY effect - Used_conv_and_CAM effect    0.4288 0.1369 Inf
+##  Used_CAM_ONLY effect - Used_conv_ONLY effect       0.4636 0.1325 Inf
+##  Used_conv_and_CAM effect - Used_conv_ONLY effect   0.0347 0.0413 Inf
+##  asymp.LCL asymp.UCL z.ratio p.value
+##    -0.6778    -0.145  -3.023  0.0025
+##    -0.0883     0.123   0.326  0.7446
+##    -0.0258     0.131   1.312  0.1894
+##     0.1605     0.697   3.132  0.0017
+##     0.2038     0.723   3.497  0.0005
+##    -0.0462     0.116   0.842  0.3999
 ## 
 ## Results are averaged over the levels of: income.fr, edu.f 
 ## Confidence level used: 0.95
@@ -2528,306 +2351,413 @@ export(data.frame(pairs(mod2.corrupt_salience.eff,
                         infer=c(T,T))),
   "../../results/mod2.corrupt_salience.eff.CAM.contrast.xlsx")
 ```
-
-
-## galtan and corrupt_salience
-
-
-```r
-mod2.galtan_corrupt<-
-  mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+strain.on.health.c+
-            galtan.z+
-            corrupt_salience.z,
-          random= ~1|cntry,
-          estimator="ML",
-          control = mmclogit.control(maxit = 250, trace=TRUE),
-          data=fdat,weights=anweight)
-```
-
-```
-## 
-## Iteration 1 - deviance = 28766.19 - criterion = 0.776775
-## Iteration 2 - deviance = 27479.35 - criterion = 0.1517282
-## Iteration 3 - deviance = 27312.64 - criterion = 0.02584414
-## Iteration 4 - deviance = 27275.84 - criterion = 0.0149708
-## Iteration 5 - deviance = 27269.58 - criterion = 0.004343879
-## Iteration 6 - deviance = 27268.51 - criterion = 0.0007014441
-## Iteration 7 - deviance = 27268.08 - criterion = 4.269254e-05
-## Iteration 8 - deviance = 27267.99 - criterion = 7.182468e-07
-## Iteration 9 - deviance = 27267.98 - criterion = 1.258482e-09
-## converged
-```
-
-```r
-# general model comparison
-
-anova(mod1,mod2.galtan_corrupt,test="Chisq")
-```
-
-```
-## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
-```
-
-```
-## Analysis of Deviance Table
-## 
-## Model 1: DV.f ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c
-## Model 2: DV.f ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + 
-##     galtan.z + corrupt_salience.z
-##   Resid. Df Resid. Dev Df Deviance  Pr(>Chi)    
-## 1     61725      27296                          
-## 2     61719      27268  6   27.651 0.0001093 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-```r
-anova(mod2.galtan,mod2.galtan_corrupt,test="Chisq")
-```
-
-```
-## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
-```
-
-```
-## Analysis of Deviance Table
-## 
-## Model 1: DV.f ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + 
-##     galtan.z
-## Model 2: DV.f ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + 
-##     galtan.z + corrupt_salience.z
-##   Resid. Df Resid. Dev Df Deviance Pr(>Chi)   
-## 1     61722      27280                        
-## 2     61719      27268  3   11.758 0.008261 **
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-```r
-anova(mod2.corrupt_salience,mod2.galtan_corrupt,test="Chisq")
-```
-
-```
-## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
-```
-
-```
-## Analysis of Deviance Table
-## 
-## Model 1: DV.f ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + 
-##     corrupt_salience.z
-## Model 2: DV.f ~ gndr.c + age10.c + income.fr + edu.f + strain.on.health.c + 
-##     galtan.z + corrupt_salience.z
-##   Resid. Df Resid. Dev Df Deviance Pr(>Chi)   
-## 1     61722      27283                        
-## 2     61719      27268  3   14.669 0.002123 **
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-### galtan trends
+## Figure for the main effects
 
 
 ```r
-# Is galtan_corrupt associated with using conventional medicine?
-ref_grid(mod2.galtan_corrupt)
+# vectors where the predicted values are saved
+
+preds.CM.lrgen<-list()
+preds.CAM.lrgen<-list()
+
+preds.CM.lrecon<-list()
+preds.CAM.lrecon<-list()
+
+preds.CM.galtan<-list()
+preds.CAM.galtan<-list()
+
+preds.CM.antielite_salience<-list()
+preds.CAM.antielite_salience<-list()
+
+preds.CM.corrupt_salience<-list()
+preds.CAM.corrupt_salience<-list()
+
+# Loop through each possible point and obtain prediction
+
+range(c(fdat$lrgen.z,
+        fdat$lrecon.z,
+        fdat$galtan.z,
+        fdat$antielite_salience.z,
+        fdat$corrupt_salience.z))
 ```
 
 ```
-## 'emmGrid' object with variables:
-##     gndr.c = -0.5,  0.5
-##     age10.c = 0.39152
-##     income.fr = quint.5, missing, quint.1, quint.2, quint.3, quint.4
-##     edu.f = 7. MA, 1. <LS, 2. LS, 3. LUS, 4. UUS, 5. AV, 6. BA
-##     strain.on.health.c = 0.065329
-##     galtan.z = -0.00084763
-##     corrupt_salience.z = -0.00015779
-##     DV.f = multivariate response levels: NN, Used_CAM_ONLY, Used_conv_and_CAM, Used_conv_ONLY
-```
-
-```r
-mod2.galtan_corrupt.galtan.trends<-
-  emtrends(mod2.galtan_corrupt,~1|DV.f,
-           var="galtan.z",infer=c(T,T),mode="latent",
-           at=list(gndr.c=0,age10.c=0,
-                   strain.on.health.c=0))
-
-#effects for each DV-category
-(mod2.galtan_corrupt.galtan.eff<-
-  contrast(mod2.galtan_corrupt.galtan.trends,simple="DV.f",
-         adjust="none","eff", infer=c(T,T)))
-```
-
-```
-##  contrast                 estimate     SE  df asymp.LCL asymp.UCL z.ratio
-##  NN effect                  0.0902 0.0317 Inf   0.02809    0.1523   2.846
-##  Used_CAM_ONLY effect      -0.1061 0.0721 Inf  -0.24737    0.0353  -1.471
-##  Used_conv_and_CAM effect  -0.0335 0.0317 Inf  -0.09568    0.0287  -1.056
-##  Used_conv_ONLY effect      0.0494 0.0269 Inf  -0.00334    0.1021   1.836
-##  p.value
-##   0.0044
-##   0.1413
-##   0.2908
-##   0.0664
-## 
-## Results are averaged over the levels of: income.fr, edu.f 
-## Confidence level used: 0.95
+## [1] -2.349310  2.696473
 ```
 
 ```r
-#save to file
-export(data.frame(mod2.galtan_corrupt.galtan.eff),
-       "../../results/mod2.galtan_corrupt.galtan.eff.MN.xlsx",
+focal.points.combined<-seq(from=-2.30,to=2.65,by=0.01)
+
+for (i in 1:length(focal.points.combined)){
+  
+  # lrgen
+  # estimates at certain focal points
+  temp.point.lrgen<-
+    emmeans(mod2.lrgen,~lrgen.z|DV.f,
+            at=list(lrgen.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.lrgen.eff<-
+    contrast(temp.point.lrgen,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.lrgen[[i]]<-
+    data.frame(contrast(temp.point.lrgen,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.lrgen.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.lrgen[[i]]<-
+    data.frame(contrast(temp.point.lrgen,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.lrgen.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # lrecon
+  # estimates at certain focal points
+  temp.point.lrecon<-
+    emmeans(mod2.lrecon,~lrecon.z|DV.f,
+            at=list(lrecon.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.lrecon.eff<-
+    contrast(temp.point.lrecon,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.lrecon[[i]]<-
+    data.frame(contrast(temp.point.lrecon,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.lrecon.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.lrecon[[i]]<-
+    data.frame(contrast(temp.point.lrecon,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.lrecon.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # galtan
+  # estimates at certain focal points
+  temp.point.galtan<-
+    emmeans(mod2.galtan,~galtan.z|DV.f,
+            at=list(galtan.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.galtan.eff<-
+    contrast(temp.point.galtan,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.galtan[[i]]<-
+    data.frame(contrast(temp.point.galtan,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.galtan.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.galtan[[i]]<-
+    data.frame(contrast(temp.point.galtan,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.galtan.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # antielite_salience
+  # estimates at certain focal points
+  temp.point.antielite_salience<-
+    emmeans(mod2.antielite_salience,~antielite_salience.z|DV.f,
+            at=list(antielite_salience.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.antielite_salience.eff<-
+    contrast(temp.point.antielite_salience,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.antielite_salience[[i]]<-
+    data.frame(contrast(temp.point.antielite_salience,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.antielite_salience.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.antielite_salience[[i]]<-
+    data.frame(contrast(temp.point.antielite_salience,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.antielite_salience.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # corrupt_salience
+  # estimates at certain focal points
+  temp.point.corrupt_salience<-
+    emmeans(mod2.corrupt_salience,~corrupt_salience.z|DV.f,
+            at=list(corrupt_salience.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.corrupt_salience.eff<-
+    contrast(temp.point.corrupt_salience,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.corrupt_salience[[i]]<-
+    data.frame(contrast(temp.point.corrupt_salience,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.corrupt_salience.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.corrupt_salience[[i]]<-
+    data.frame(contrast(temp.point.corrupt_salience,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.corrupt_salience.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  
+  
+}
+
+# save predictions to data frames
+preds.CM.lrgen.df<-do.call(rbind,preds.CM.lrgen)
+preds.CM.lrgen.df$'Use of Medicine'<-"Conventional"
+preds.CM.lrgen.df$PO<-"Left-right general"
+
+preds.CAM.lrgen.df<-do.call(rbind,preds.CAM.lrgen)
+preds.CAM.lrgen.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.lrgen.df$PO<-"Left-right general"
+
+
+preds.CM.lrecon.df<-do.call(rbind,preds.CM.lrecon)
+preds.CM.lrecon.df$'Use of Medicine'<-"Conventional"
+preds.CM.lrecon.df$PO<-"Left-right economic"
+
+preds.CAM.lrecon.df<-do.call(rbind,preds.CAM.lrecon)
+preds.CAM.lrecon.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.lrecon.df$PO<-"Left-right economic"
+
+
+preds.CM.galtan.df<-do.call(rbind,preds.CM.galtan)
+preds.CM.galtan.df$'Use of Medicine'<-"Conventional"
+preds.CM.galtan.df$PO<-"Gal-tan"
+
+preds.CAM.galtan.df<-do.call(rbind,preds.CAM.galtan)
+preds.CAM.galtan.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.galtan.df$PO<-"Gal-tan"
+
+
+preds.CM.antielite_salience.df<-do.call(rbind,preds.CM.antielite_salience)
+preds.CM.antielite_salience.df$'Use of Medicine'<-"Conventional"
+preds.CM.antielite_salience.df$PO<-"Anti-elite"
+
+preds.CAM.antielite_salience.df<-do.call(rbind,preds.CAM.antielite_salience)
+preds.CAM.antielite_salience.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.antielite_salience.df$PO<-"Anti-elite"
+
+preds.CM.corrupt_salience.df<-do.call(rbind,preds.CM.corrupt_salience)
+preds.CM.corrupt_salience.df$'Use of Medicine'<-"Conventional"
+preds.CM.corrupt_salience.df$PO<-"Anti-corruption"
+
+preds.CAM.corrupt_salience.df<-do.call(rbind,preds.CAM.corrupt_salience)
+preds.CAM.corrupt_salience.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.corrupt_salience.df$PO<-"Anti-corruption"
+
+# combine the data
+names(preds.CM.lrgen.df)[2]<-"point"
+names(preds.CAM.lrgen.df)[2]<-"point"
+names(preds.CM.lrecon.df)[2]<-"point"
+names(preds.CAM.lrecon.df)[2]<-"point"
+names(preds.CM.galtan.df)[2]<-"point"
+names(preds.CAM.galtan.df)[2]<-"point"
+names(preds.CM.antielite_salience.df)[2]<-"point"
+names(preds.CAM.antielite_salience.df)[2]<-"point"
+names(preds.CM.corrupt_salience.df)[2]<-"point"
+names(preds.CAM.corrupt_salience.df)[2]<-"point"
+
+preds.all<-rbind(preds.CM.lrgen.df,
+                 preds.CAM.lrgen.df,
+                 preds.CM.lrecon.df,
+                 preds.CAM.lrecon.df,
+                 preds.CM.galtan.df,
+                 preds.CAM.galtan.df,
+                 preds.CM.antielite_salience.df,
+                 preds.CAM.antielite_salience.df,
+                 preds.CM.corrupt_salience.df,
+                 preds.CAM.corrupt_salience.df)
+
+# transform to probabilities
+
+preds.all$P.USE<-
+  exp(preds.all$estimate)/(1+exp(preds.all$estimate))
+
+preds.all$P.USE.LL<-
+  exp(preds.all$asymp.LCL)/(1+exp(preds.all$asymp.LCL))
+
+preds.all$P.USE.UL<-
+  exp(preds.all$asymp.UCL)/(1+exp(preds.all$asymp.UCL))
+
+
+# export Figure data
+
+export(preds.all,
+       "../../results/figures/Fig_main.xlsx",
        overwrite=T)
 
-#Use of conventional medicine
+# produce the figure
 
-(mod2.galtan_corrupt.galtan.eff.CM<-
-    contrast(mod2.galtan_corrupt.galtan.trends,
-         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.galtan_corrupt.galtan.eff,
-                 signs=c(-2,-2,2,2))),
-         simple="DV.f", infer=c(T,T)))
+# relevel 
+
+preds.all$PO<-
+  factor(preds.all$PO,
+         levels=c("Left-right general","Left-right economic",
+                  "Gal-tan","Anti-elite","Anti-corruption"))
+
+# first separately for CM
+Fig_CM<-
+  ggplot(data=preds.all[preds.all$`Use of Medicine`=="Conventional",],
+         aes(y=P.USE,x=point))+
+  geom_line(size=2.75,color=met.brewer("Java")[1])+
+  geom_line(size=1,color=met.brewer("Java")[1],
+            linetype=2,
+            aes(x=point,y=P.USE.LL))+
+  geom_line(size=1,color=met.brewer("Java")[1],
+            linetype=2,
+            aes(x=point,y=P.USE.UL))+
+  xlab("")+
+  ylab("P(Use of Conventional Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))+
+  facet_wrap(PO~.,ncol=1)
 ```
 
 ```
-##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
-##  Conv - No conv  -0.0193 0.0351 Inf   -0.0882    0.0495  -0.551  0.5816
-## 
-## Results are averaged over the levels of: income.fr, edu.f 
-## Confidence level used: 0.95
-```
-
-```r
-#Use of CAM
-
-(mod2.galtan_corrupt.galtan.eff.CAM<-
-    contrast(mod2.galtan_corrupt.galtan.trends,
-         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.galtan_corrupt.galtan.eff,
-                 signs=c(-2,2,2,-2))),
-         simple="DV.f", infer=c(T,T)))
-```
-
-```
-##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
-##  CAM - No CAM   -0.119 0.0345 Inf    -0.187   -0.0511  -3.440  0.0006
-## 
-## Results are averaged over the levels of: income.fr, edu.f 
-## Confidence level used: 0.95
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
 ```
 
 ```r
-# save to file
-export(data.frame(rbind(
-  mod2.galtan_corrupt.galtan.eff.CM,
-  mod2.galtan_corrupt.galtan.eff.CAM,adjust="none")),
-  "../../results/mod2.galtan_corrupt.galtan.eff.COMB.xlsx")
+Fig_CM
 ```
 
-### corrupt_salience trends
-
+![](Analysis_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
 ```r
-# Is galtan_corrupt associated with using conventional medicine?
-ref_grid(mod2.galtan_corrupt)
+Fig_CAM<-
+  ggplot(data=preds.all[preds.all$`Use of Medicine`=="Complementary/Alternative",],
+         aes(y=P.USE,x=point))+
+  geom_line(size=2.75,color=met.brewer("Java")[5])+
+  geom_line(size=1,color=met.brewer("Java")[5],
+            linetype=2,
+            aes(x=point,y=P.USE.LL))+
+  geom_line(size=1,color=met.brewer("Java")[5],
+            linetype=2,
+            aes(x=point,y=P.USE.UL))+
+  xlab("")+
+  ylab("P(Use of Complementary/Alternative Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))+
+  facet_wrap(PO~.,ncol=1)
+
+Fig_CAM
 ```
 
-```
-## 'emmGrid' object with variables:
-##     gndr.c = -0.5,  0.5
-##     age10.c = 0.39152
-##     income.fr = quint.5, missing, quint.1, quint.2, quint.3, quint.4
-##     edu.f = 7. MA, 1. <LS, 2. LS, 3. LUS, 4. UUS, 5. AV, 6. BA
-##     strain.on.health.c = 0.065329
-##     galtan.z = -0.00084763
-##     corrupt_salience.z = -0.00015779
-##     DV.f = multivariate response levels: NN, Used_CAM_ONLY, Used_conv_and_CAM, Used_conv_ONLY
-```
+![](Analysis_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
 
 ```r
-mod2.galtan_corrupt.corrupt.trends<-
-  emtrends(mod2.galtan_corrupt,~1|DV.f,
-           var="corrupt_salience.z",infer=c(T,T),mode="latent",
-           at=list(gndr.c=0,age10.c=0,
-                   strain.on.health.c=0))
+Fig_main<-ggarrange(Fig_CM,Fig_CAM,ncol = 2)
 
-#effects for each DV-category
-(mod2.galtan_corrupt.corrupt.eff<-
-  contrast(mod2.galtan_corrupt.corrupt.trends,simple="DV.f",
-         adjust="none","eff", infer=c(T,T)))
+
+jpeg(filename = 
+       "../../results/figures/Fig_main.jpg",
+     units = "cm",
+     width = 21.0,height=29.7*(3/4),res = 600)
+Fig_main
+dev.off()
 ```
 
 ```
-##  contrast                 estimate     SE  df asymp.LCL asymp.UCL z.ratio
-##  NN effect                 -0.0788 0.0447 Inf    -0.167   0.00885  -1.762
-##  Used_CAM_ONLY effect       0.3239 0.1023 Inf     0.123   0.52446   3.165
-##  Used_conv_and_CAM effect  -0.1143 0.0462 Inf    -0.205  -0.02374  -2.474
-##  Used_conv_ONLY effect     -0.1307 0.0383 Inf    -0.206  -0.05557  -3.409
-##  p.value
-##   0.0780
-##   0.0016
-##   0.0134
-##   0.0007
-## 
-## Results are averaged over the levels of: income.fr, edu.f 
-## Confidence level used: 0.95
+## png 
+##   2
 ```
-
-```r
-#save to file
-export(data.frame(mod2.galtan_corrupt.corrupt.eff),
-       "../../results/mod2.galtan_corrupt.corrupt.eff.MN.xlsx",
-       overwrite=T)
-
-#Use of conventional medicine
-
-(mod2.galtan_corrupt.corrupt.eff.CM<-
-    contrast(mod2.galtan_corrupt.corrupt.trends,
-         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.galtan_corrupt.corrupt.eff,
-                 signs=c(-2,-2,2,2))),
-         simple="DV.f", infer=c(T,T)))
-```
-
-```
-##  contrast       estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
-##  Conv - No conv   -0.154 0.0491 Inf     -0.25   -0.0575  -3.133  0.0017
-## 
-## Results are averaged over the levels of: income.fr, edu.f 
-## Confidence level used: 0.95
-```
-
-```r
-#Use of CAM
-
-(mod2.galtan_corrupt.corrupt.eff.CAM<-
-    contrast(mod2.galtan_corrupt.corrupt.trends,
-         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.galtan_corrupt.corrupt.eff,
-                 signs=c(-2,2,2,-2))),
-         simple="DV.f", infer=c(T,T)))
-```
-
-```
-##  contrast     estimate     SE  df asymp.LCL asymp.UCL z.ratio p.value
-##  CAM - No CAM    0.121 0.0511 Inf    0.0211     0.221   2.374  0.0176
-## 
-## Results are averaged over the levels of: income.fr, edu.f 
-## Confidence level used: 0.95
-```
-
-```r
-# save to file
-export(data.frame(rbind(
-  mod2.galtan_corrupt.corrupt.eff.CM,
-  mod2.galtan_corrupt.corrupt.eff.CAM,adjust="none")),
-  "../../results/mod2.galtan_corrupt.corrupt.eff.COMB.xlsx")
-```
-
-
 
 # Interactions by strain on health
 
@@ -2868,8 +2798,8 @@ anova(mod2.lrgen,mod3.lrgen,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -3031,8 +2961,8 @@ anova(mod2.lrecon,mod3.lrecon,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -3195,8 +3125,8 @@ anova(mod2.galtan,mod3.galtan,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -3359,8 +3289,8 @@ anova(mod2.antielite_salience,
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -3825,8 +3755,8 @@ anova(mod2.corrupt_salience,
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -4432,61 +4362,18 @@ Fig1<-ggplot(data=preds.all,
                        met.brewer("Johnson",
                                   type = "continuous")
                      [c(2,3,4)])+
-  xlab("Corrupt Salience")+
+  xlab("Anti-corruption")+
   ylab("P(Use of Conventional Medicine)")+
   theme(text=element_text(size=16,  family="sans"))
 
 Fig1
 ```
 
-![](Analysis_files/figure-html/unnamed-chunk-34-1.png)<!-- -->
+![](Analysis_files/figure-html/unnamed-chunk-32-1.png)<!-- -->
 
 ```r
-png(filename = 
-      "../../results/figures/Fig1.png",
-    units = "cm",
-    width = 21.0,height=29.7/2,res = 600)
-Fig1
-dev.off()
-```
-
-```
-## png 
-##   2
-```
-
-### Plot association by strain on health without confidence band
-
-
-```r
-# produce the figure
-
-Fig1<-ggplot(data=preds.all,
-       aes(y=P.CONV.USE,x=corrupt_salience.z,
-           color=`Health Status`))+
-  geom_line(size=2.75)+
-  #geom_line(size=1,
-  #          linetype=2,
-  #          aes(x=corrupt_salience.z,y=P.CONV.USE.LL))+
-  #geom_line(size=1,
-  #          linetype=2,
-  #          aes(x=corrupt_salience.z,y=P.CONV.USE.UL))+
-  scale_color_manual(values=
-                       met.brewer("Johnson",
-                                  type = "continuous")
-                     [c(2,3,4)])+
-  xlab("Corrupt Salience")+
-  ylab("P(Use of Conventional Medicine)")+
-  theme(text=element_text(size=16,  family="sans"))
-
-Fig1
-```
-
-![](Analysis_files/figure-html/unnamed-chunk-35-1.png)<!-- -->
-
-```r
-png(filename = 
-      "../../results/figures/Fig1_alt.png",
+jpeg(filename = 
+      "../../results/figures/Figure 2 corrupt health status.jpg",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig1
@@ -4538,8 +4425,8 @@ anova(mod2.lrgen,mod4.lrgen,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -4593,8 +4480,8 @@ anova(mod2.lrecon,mod4.lrecon,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -4647,8 +4534,8 @@ anova(mod2.galtan,mod4.galtan,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -4694,8 +4581,8 @@ anova(mod5.galtan,mod4.galtan,test="Chisq")
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -4998,11 +4885,11 @@ Fig2<-
 Fig2
 ```
 
-![](Analysis_files/figure-html/unnamed-chunk-40-1.png)<!-- -->
+![](Analysis_files/figure-html/unnamed-chunk-37-1.png)<!-- -->
 
 ```r
-png(filename = 
-      "../../results/figures/Fig2.png",
+jpeg(filename = 
+      "../../results/figures/Figure 3 GALTAN CAM.jpg",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig2
@@ -5013,42 +4900,6 @@ dev.off()
 ## png 
 ##   2
 ```
-
-#### Plot predicted probabilities without confidence band
-
-
-```r
-Fig2<-
-  ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
-  geom_smooth(method = "glm", formula=y~poly(x,1),
-              method.args = list(family = "binomial"), 
-              se = FALSE,color=met.brewer("Johnson")[2],size=2.75)+
-  geom_smooth(method = "glm", formula=y~poly(x,2),
-              method.args = list(family = "binomial"), 
-              se = FALSE,color=met.brewer("Johnson")[4],size=2.75)+
-  xlab("GAL-TAN")+
-  ylab("P(Use of Complementary/Alternative Medicine)")+
-  theme(text=element_text(size=16,  family="sans"))
-Fig2
-```
-
-![](Analysis_files/figure-html/unnamed-chunk-41-1.png)<!-- -->
-
-```r
-png(filename = 
-      "../../results/figures/Fig2_alt.png",
-    units = "cm",
-    width = 21.0,height=29.7/2,res = 600)
-Fig2
-dev.off()
-```
-
-```
-## png 
-##   2
-```
-
-
 
 ### antielite_salience
 
@@ -5092,8 +4943,8 @@ anova(mod2.antielite_salience,
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -5170,8 +5021,8 @@ anova(mod2.corrupt_salience,
 
 ```
 ## Warning in anova.mclogitlist(c(list(object), dotargs), dispersion =
-## dispersion, : Results are unreliable, since deviances from quasi-likelihoods are
-## not comparable.
+## dispersion, : Results are unreliable, since deviances from quasi-likelihoods
+## are not comparable.
 ```
 
 ```
@@ -5192,29 +5043,11 @@ anova(mod2.corrupt_salience,
 
 
 ```r
+# for obtaining variables labels from ESS .sav files
 get.ESS.label<-function(var){
   attr(var,which = "label")
 }
 
-#for combining weights to analogous inference to logistic regression
-contrast.weights<-function(effects,group1,group2){
-  
-  d.eff<-data.frame(effects)
-  d.eff$inv.var<-1/(d.eff$SE^2)
-  
-  group1.weights<-d.eff[group1,"inv.var"]
-  group1.weights<-group1.weights/sum(group1.weights)
-  group1.weights
-  
-  group2.weights<-d.eff[group2,"inv.var"]
-  group2.weights<-group2.weights/sum(group2.weights)
-  group2.weights
-  
-  ordering<-c(group1,group2)
-  output<-c(group1.weights,-1*group2.weights)[ordering]
-  return(output)
-  
-}
 
 contrast.weights.total<-function(effects,signs){
   
@@ -5228,7 +5061,7 @@ contrast.weights.total<-function(effects,signs){
   
 }
 
-
+# variance inflation factor of predictors in multilevel models
 vif.mer <- function (fit) {
   ## adapted from rms::vif
   
@@ -5258,9 +5091,9 @@ print(s,locale=F)
 ```
 
 ```
-## R version 4.2.0 (2022-04-22 ucrt)
+## R version 4.2.2 (2022-10-31 ucrt)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 19043)
+## Running under: Windows 10 x64 (build 19045)
 ## 
 ## Matrix products: default
 ## 
@@ -5268,28 +5101,38 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] MetBrewer_0.2.0  lme4_1.1-29      ggplot2_3.3.5    psych_2.2.3     
-##  [5] memisc_0.99.30.7 MASS_7.3-56      lattice_0.20-45  rio_0.5.29      
-##  [9] dplyr_1.0.9      emmeans_1.7.3    mclogit_0.9.4.2  Matrix_1.4-1    
-## [13] knitr_1.39       rmarkdown_2.14  
+##  [1] MetBrewer_0.2.0  lme4_1.1-31      ggpubr_0.4.0     ggplot2_3.4.0   
+##  [5] psych_2.2.3      memisc_0.99.30.7 MASS_7.3-58.1    lattice_0.20-45 
+##  [9] emmeans_1.8.4-1  mclogit_0.9.4.2  Matrix_1.5-0     dplyr_1.1.0     
+## [13] sjlabelled_1.2.0 rio_0.5.29       knitr_1.39       rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.8.3      mvtnorm_1.1-3     digest_0.6.29     utf8_1.2.2       
-##  [5] R6_2.5.1          cellranger_1.1.0  repr_1.1.4        evaluate_0.15    
-##  [9] coda_0.19-4       highr_0.9         pillar_1.7.0      rlang_1.0.2      
-## [13] curl_4.3.2        readxl_1.4.0      minqa_1.2.4       data.table_1.14.2
-## [17] nloptr_2.0.0      car_3.0-12        jquerylib_0.1.4   labeling_0.4.2   
-## [21] splines_4.2.0     stringr_1.4.0     foreign_0.8-82    munsell_0.5.0    
-## [25] compiler_4.2.0    xfun_0.30         pkgconfig_2.0.3   base64enc_0.1-3  
-## [29] mnormt_2.0.2      tmvnsim_1.0-2     mgcv_1.8-40       htmltools_0.5.2  
-## [33] tidyselect_1.1.2  tibble_3.1.6      fansi_1.0.3       withr_2.5.0      
-## [37] crayon_1.5.1      grid_4.2.0        nlme_3.1-157      jsonlite_1.8.0   
-## [41] xtable_1.8-4      gtable_0.3.0      lifecycle_1.0.1   magrittr_2.0.3   
-## [45] scales_1.2.0      zip_2.2.0         estimability_1.3  cli_3.3.0        
-## [49] stringi_1.7.6     carData_3.0-5     farver_2.1.0      bslib_0.3.1      
-## [53] ellipsis_0.3.2    generics_0.1.2    vctrs_0.4.1       boot_1.3-28      
-## [57] openxlsx_4.2.5    tools_4.2.0       forcats_0.5.1     glue_1.6.2       
-## [61] purrr_0.3.4       hms_1.1.1         abind_1.4-5       parallel_4.2.0   
-## [65] fastmap_1.1.0     yaml_2.3.5        colorspace_2.0-3  haven_2.5.0      
-## [69] sass_0.4.1
+##  [1] sass_0.4.1         tidyr_1.2.1        jsonlite_1.8.4    
+##  [4] splines_4.2.2      carData_3.0-5      bslib_0.3.1       
+##  [7] highr_0.9          cellranger_1.1.0   yaml_2.3.5        
+## [10] backports_1.4.1    pillar_1.8.1       glue_1.6.2        
+## [13] digest_0.6.31      ggsignif_0.6.3     minqa_1.2.5       
+## [16] colorspace_2.0-3   sandwich_3.0-1     cowplot_1.1.1     
+## [19] htmltools_0.5.2    pkgconfig_2.0.3    broom_1.0.2       
+## [22] haven_2.5.0        purrr_1.0.1        xtable_1.8-4      
+## [25] mvtnorm_1.1-3      scales_1.2.1       openxlsx_4.2.5    
+## [28] tzdb_0.3.0         tibble_3.1.8       mgcv_1.8-41       
+## [31] farver_2.1.1       generics_0.1.3     car_3.0-12        
+## [34] ellipsis_0.3.2     TH.data_1.1-1      withr_2.5.0       
+## [37] repr_1.1.4         cli_3.6.0          mnormt_2.1.1      
+## [40] survival_3.4-0     magrittr_2.0.3     readxl_1.4.0      
+## [43] estimability_1.4.1 evaluate_0.20      fansi_1.0.4       
+## [46] nlme_3.1-160       rstatix_0.7.0      forcats_0.5.1     
+## [49] foreign_0.8-83     tools_4.2.2        data.table_1.14.2 
+## [52] hms_1.1.1          lifecycle_1.0.3    multcomp_1.4-20   
+## [55] stringr_1.5.0      munsell_0.5.0      zip_2.2.0         
+## [58] compiler_4.2.2     jquerylib_0.1.4    rlang_1.0.6       
+## [61] nloptr_2.0.3       grid_4.2.2         rstudioapi_0.13   
+## [64] labeling_0.4.2     base64enc_0.1-3    boot_1.3-28       
+## [67] gtable_0.3.1       codetools_0.2-18   abind_1.4-5       
+## [70] curl_4.3.2         R6_2.5.1           zoo_1.8-10        
+## [73] fastmap_1.1.0      utf8_1.2.3         insight_0.18.8    
+## [76] readr_2.1.2        stringi_1.7.12     parallel_4.2.2    
+## [79] Rcpp_1.0.10        vctrs_0.5.2        tidyselect_1.2.0  
+## [82] xfun_0.30          coda_0.19-4
 ```

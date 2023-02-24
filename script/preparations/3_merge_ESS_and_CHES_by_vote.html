@@ -433,8 +433,8 @@ vote.vars</code></pre>
 <pre class="r"><code># check if the remaining variable names are found in ESS
 
 vote.vars %in% names(ESS7)</code></pre>
-<pre><code>##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [15] TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
+<pre><code>##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [16] TRUE TRUE TRUE TRUE TRUE</code></pre>
 <pre class="r"><code># sum across the voting variables columns
 # this works because there is only one relevant column
 # for each participant; if there isn&#39;t the result is 0
@@ -442,19 +442,19 @@ vote.vars %in% names(ESS7)</code></pre>
 ESS7$pt.nmbr&lt;-rowSums(ESS7[,vote.vars],na.rm=T)
 table(ESS7$pt.nmbr,useNA=&quot;always&quot;)</code></pre>
 <pre><code>## 
-##     0     1     2     3     4     5     6     7     8     9    10    11 
-## 17379  4819  4501  2443  2076  1715  1405  1410  1107   690   831   400 
-##    12    13    14    15    16    17    18    19    44    55  &lt;NA&gt; 
-##   426   500   195    87    69    46    29    18    14    25     0</code></pre>
+##     0     1     2     3     4     5     6     7     8     9    10    11    12 
+## 17379  4819  4501  2443  2076  1715  1405  1410  1107   690   831   400   426 
+##    13    14    15    16    17    18    19    44    55  &lt;NA&gt; 
+##   500   195    87    69    46    29    18    14    25     0</code></pre>
 <pre class="r"><code># code zeros as NA
 
 ESS7$pt.nmbr&lt;-ifelse(ESS7$pt.nmbr==0,NA,ESS7$pt.nmbr)
 table(ESS7$pt.nmbr,useNA=&quot;always&quot;)</code></pre>
 <pre><code>## 
-##     1     2     3     4     5     6     7     8     9    10    11    12 
-##  4819  4501  2443  2076  1715  1405  1410  1107   690   831   400   426 
-##    13    14    15    16    17    18    19    44    55  &lt;NA&gt; 
-##   500   195    87    69    46    29    18    14    25 17379</code></pre>
+##     1     2     3     4     5     6     7     8     9    10    11    12    13 
+##  4819  4501  2443  2076  1715  1405  1410  1107   690   831   400   426   500 
+##    14    15    16    17    18    19    44    55  &lt;NA&gt; 
+##   195    87    69    46    29    18    14    25 17379</code></pre>
 </div>
 <div id="combine-the-election-coalitions-in-ches-ratings" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Combine the election
@@ -593,8 +593,7 @@ successful</h2>
 ## [2] &quot;Socialdemokraterne - the Danish social democrats&quot;
 ## [1] &quot;Venstre, Danmarks Liberale Parti - Venstre&quot;
 ## [2] &quot;Venstre, Danmarks Liberale Parti - Venstre&quot;
-## [1] &quot;Liberal Alliance - Liberal Alliance&quot;
-## [2] &quot;Liberal Alliance - Liberal Alliance&quot;
+## [1] &quot;Liberal Alliance - Liberal Alliance&quot; &quot;Liberal Alliance - Liberal Alliance&quot;
 ## [1] &quot;Det Radikale Venstre - Danish Social-Liberal Party&quot;
 ## [2] &quot;Det Radikale Venstre - Danish Social-Liberal Party&quot;
 ## [1] &quot;SF Socialistisk Folkeparti - Socialist People&#39;s Party&quot;
@@ -630,8 +629,7 @@ successful</h2>
 ## [2] &quot;Partido Popular - PP (con UPN en Navarra)&quot;
 ## [1] &quot;Partido Socialista Obrero Español (PSOE)&quot;
 ## [2] &quot;Partido Socialista Obrero Español (PSOE)&quot;
-## [1] &quot;Unión, Progreso y Democracia (UPyD)&quot;
-## [2] &quot;Unión, Progreso y Democracia (UPyD)&quot;
+## [1] &quot;Unión, Progreso y Democracia (UPyD)&quot; &quot;Unión, Progreso y Democracia (UPyD)&quot;
 ## [1] &quot;Izquierda Unida (IU) - (ICV en Cataluña)&quot;
 ## [2] &quot;Izquierda Unida (IU) - (ICV en Cataluña)&quot;
 ## [1] &quot;Esquerra Republicana de Catalunya (ERC)&quot;
@@ -825,8 +823,7 @@ successful</h2>
 ## [1] NA NA
 ## [1] &quot;NSI - Nova Slovenija – Kršcanski demokrati&quot;
 ## [2] &quot;NSI - Nova Slovenija – Kršcanski demokrati&quot;
-## [1] &quot;SDS - Slovenska demokratska stranka&quot;
-## [2] &quot;SDS - Slovenska demokratska stranka&quot;
+## [1] &quot;SDS - Slovenska demokratska stranka&quot; &quot;SDS - Slovenska demokratska stranka&quot;
 ## [1] &quot;SLS  - Slovenska ljudska stranka&quot; &quot;SLS  - Slovenska ljudska stranka&quot;
 ## [1] &quot;SMC - Stranka Mira Cerarja&quot; &quot;SMC - Stranka Mira Cerarja&quot;
 ## [1] &quot;ZL - Združena levica (DSD, IDS in Stranka TRS)&quot;
@@ -867,22 +864,22 @@ print(s,locale=F)</code></pre>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_1.0.10     sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
+## [1] dplyr_1.1.0      sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
 ## [5] rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] zip_2.2.0         Rcpp_1.0.9        cellranger_1.1.0  bslib_0.3.1      
+##  [1] zip_2.2.0         Rcpp_1.0.10       cellranger_1.1.0  bslib_0.3.1      
 ##  [5] compiler_4.2.2    pillar_1.8.1      jquerylib_0.1.4   forcats_0.5.1    
 ##  [9] tools_4.2.2       digest_0.6.31     jsonlite_1.8.4    evaluate_0.20    
 ## [13] lifecycle_1.0.3   tibble_3.1.8      pkgconfig_2.0.3   rlang_1.0.6      
-## [17] openxlsx_4.2.5    DBI_1.1.2         cli_3.6.0         rstudioapi_0.13  
-## [21] curl_4.3.2        yaml_2.3.5        haven_2.5.0       xfun_0.30        
-## [25] fastmap_1.1.0     withr_2.5.0       stringr_1.5.0     generics_0.1.3   
-## [29] vctrs_0.5.1       sass_0.4.1        hms_1.1.1         tidyselect_1.2.0 
-## [33] glue_1.6.2        data.table_1.14.2 R6_2.5.1          fansi_1.0.3      
-## [37] readxl_1.4.0      foreign_0.8-83    tzdb_0.3.0        readr_2.1.2      
-## [41] magrittr_2.0.3    htmltools_0.5.2   ellipsis_0.3.2    assertthat_0.2.1 
-## [45] insight_0.18.8    utf8_1.2.2        stringi_1.7.12</code></pre>
+## [17] openxlsx_4.2.5    cli_3.6.0         rstudioapi_0.13   curl_4.3.2       
+## [21] yaml_2.3.5        haven_2.5.0       xfun_0.30         fastmap_1.1.0    
+## [25] withr_2.5.0       stringr_1.5.0     generics_0.1.3    vctrs_0.5.2      
+## [29] sass_0.4.1        hms_1.1.1         tidyselect_1.2.0  glue_1.6.2       
+## [33] data.table_1.14.2 R6_2.5.1          fansi_1.0.4       readxl_1.4.0     
+## [37] foreign_0.8-83    tzdb_0.3.0        readr_2.1.2       magrittr_2.0.3   
+## [41] htmltools_0.5.2   ellipsis_0.3.2    insight_0.18.8    utf8_1.2.3       
+## [45] stringi_1.7.12</code></pre>
 </div>
 
 

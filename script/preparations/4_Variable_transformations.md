@@ -284,10 +284,8 @@ table(rowSums(dat[,hampered.vars]),useNA="always")
 
 ```
 ## 
-##     0     1     2     3     4     5     6     7     8     9    10    11 
-## 21914 10012  3688  1470   570   241   107    57    45    16     8     6 
-##  <NA> 
-##  2051
+##     0     1     2     3     4     5     6     7     8     9    10    11  <NA> 
+## 21914 10012  3688  1470   570   241   107    57    45    16     8     6  2051
 ```
 
 ```r
@@ -311,10 +309,8 @@ table(rowSums(dat[,problems.vars]),useNA="always")
 
 ```
 ## 
-##     0     1     2     3     4     5     6     7     8     9    10    11 
-## 10967  9545  7436  4752  2667  1445   713   328   174    64    29    14 
-##  <NA> 
-##  2051
+##     0     1     2     3     4     5     6     7     8     9    10    11  <NA> 
+## 10967  9545  7436  4752  2667  1445   713   328   174    64    29    14  2051
 ```
 
 ```r
@@ -360,10 +356,10 @@ table(dat$strain.on.health,useNA="always")
 
 ```
 ## 
-##     0     1     2     3     4     5     6     7     8     9    10    11 
-## 10967  5457  7171  4207  3934  1859  1778   884   757   323   336   125 
-##    12    13    14    15    16    17    18    19    20    21    22  <NA> 
-##   130    44    62    17    47     4    14     3     8     1     6  2051
+##     0     1     2     3     4     5     6     7     8     9    10    11    12 
+## 10967  5457  7171  4207  3934  1859  1778   884   757   323   336   125   130 
+##    13    14    15    16    17    18    19    20    21    22  <NA> 
+##    44    62    17    47     4    14     3     8     1     6  2051
 ```
 
 ## Dependent variable
@@ -591,6 +587,128 @@ table(dat$blgetmg.c,useNA="always")
 ## 37617  2568     0
 ```
 
+## Marital status
+
+
+```r
+# does live with husband/wife/partner?
+
+attributes(ESS.dat$icpart1)
+```
+
+```
+## $label
+## [1] "Interviewer code, lives with husband/wife/partner"
+## 
+## $format.spss
+## [1] "F1.0"
+## 
+## $display_width
+## [1] 9
+## 
+## $labels
+## Respondent lives with husband/wife/partner 
+##                                          1 
+##                                   Does not 
+##                                          2 
+##                              Not available 
+##                                          9
+```
+
+```r
+table(ESS.dat$icpart1,useNA="always")
+```
+
+```
+## 
+##     1     2  <NA> 
+## 23672 16363   150
+```
+
+```r
+# "Relationship with husband/wife/partner currently living with"
+
+attributes(ESS.dat$rshpsts)
+```
+
+```
+## $label
+## [1] "Relationship with husband/wife/partner currently living with"
+## 
+## $format.spss
+## [1] "F2.0"
+## 
+## $display_width
+## [1] 9
+## 
+## $labels
+##                                 Legally married 
+##                                               1 
+##             In a legally registered civil union 
+##                                               2 
+## Living with my partner - not legally recognised 
+##                                               3 
+##     Living with my partner - legally recognised 
+##                                               4 
+##                               Legally separated 
+##                                               5 
+##          Legally divorced/civil union dissolved 
+##                                               6 
+##                                  Not applicable 
+##                                              66 
+##                                         Refusal 
+##                                              77 
+##                                      Don't know 
+##                                              88 
+##                                       No answer 
+##                                              99
+```
+
+```r
+table(ESS.dat$rshpsts,useNA="always")
+```
+
+```
+## 
+##     1     2     3     4     5     6  <NA> 
+## 19130   236  3252   910     7    56 16594
+```
+
+```r
+table(ESS.dat$icpart1,ESS.dat$rshpsts,useNA="always")
+```
+
+```
+##       
+##            1     2     3     4     5     6  <NA>
+##   1    19103   236  3250   908     7    56   112
+##   2        0     0     0     0     0     0 16363
+##   <NA>    27     0     2     2     0     0   119
+```
+
+```r
+# factorial marital status
+dat$mstatus.f<-case_when(
+  dat$icpart1==1 & dat$rshpsts<5~"Married",
+  TRUE~"Non-married"
+)
+
+table(dat$mstatus.f,useNA="always")
+```
+
+```
+## 
+##     Married Non-married        <NA> 
+##       23497       16688           0
+```
+
+```r
+# numeric marital status
+dat$mstatus.c<-case_when(
+  dat$mstatus.f=="Married"~0.5,
+  TRUE~(-0.5))
+```
+
 # Final set of variables needed for the analysis
 
 
@@ -601,9 +719,10 @@ analysis.vars<-
     "gndr.f","gndr.c","agea","age10.c",
     "income","income.f","income.fr",
     "edu","edu.f","strain.on.health",
+    "blgetmg.f","blgetmg.c",
+    "mstatus.f","mstatus.c",
     "used.conv","used.CAM","DV",
     "used.CAM.no.home","DV.no.home",
-    "blgetmg","blgetmg.f","blgetmg.c",
     "lrgen","lrecon","galtan",
     "antielite_salience","corrupt_salience",
     "lrgen.scaling","lrecon.scaling","galtan.scaling",
@@ -614,9 +733,9 @@ analysis.vars %in% names(dat)
 ```
 
 ```
-##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [29] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 ```
 
 ```r
@@ -626,7 +745,7 @@ str(fdat)
 ```
 
 ```
-## 'data.frame':	40185 obs. of  36 variables:
+## 'data.frame':	40185 obs. of  37 variables:
 ##  $ idno                      : num  1 2 3 4 5 6 7 13 14 21 ...
 ##  $ cntry                     : chr  "AT" "AT" "AT" "AT" ...
 ##  $ dweight                   : num  0.938 0.938 0.938 0.938 0.938 ...
@@ -645,14 +764,15 @@ str(fdat)
 ##  $ edu                       : chr  "3. LUS" "1. <LS" "1. <LS" "3. LUS" ...
 ##  $ edu.f                     : Factor w/ 7 levels "7. MA","1. <LS",..: 4 2 2 4 4 4 4 6 1 4 ...
 ##  $ strain.on.health          : num  1 7 2 4 2 2 5 6 6 3 ...
+##  $ blgetmg.f                 : chr  "No" "No" "No" "No" ...
+##  $ blgetmg.c                 : num  -0.5 -0.5 -0.5 -0.5 -0.5 -0.5 -0.5 0.5 -0.5 -0.5 ...
+##  $ mstatus.f                 : chr  "Non-married" "Married" "Non-married" "Non-married" ...
+##  $ mstatus.c                 : num  -0.5 0.5 -0.5 -0.5 0.5 0.5 0.5 -0.5 -0.5 0.5 ...
 ##  $ used.conv                 : num  0 1 1 1 1 1 1 1 1 1 ...
 ##  $ used.CAM                  : num  0 0 0 0 0 0 0 1 0 1 ...
 ##  $ DV                        : chr  "NN" "Used_conv_ONLY" "Used_conv_ONLY" "Used_conv_ONLY" ...
 ##  $ used.CAM.no.home          : num  0 0 0 0 0 0 0 1 0 1 ...
 ##  $ DV.no.home                : chr  "NN" "Used_conv_ONLY" "Used_conv_ONLY" "Used_conv_ONLY" ...
-##  $ blgetmg                   : num  2 2 2 2 2 2 2 1 2 2 ...
-##  $ blgetmg.f                 : chr  "No" "No" "No" "No" ...
-##  $ blgetmg.c                 : num  -0.5 -0.5 -0.5 -0.5 -0.5 -0.5 -0.5 0.5 -0.5 -0.5 ...
 ##  $ lrgen                     : num  NA NA 6.1 8.7 NA ...
 ##  $ lrecon                    : num  NA NA 6.4 5.5 NA ...
 ##  $ galtan                    : num  NA NA 7.2 8.8 NA ...
@@ -689,35 +809,20 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] MetBrewer_0.2.0  lme4_1.1-31      ggplot2_3.4.0    psych_2.2.3     
-##  [5] memisc_0.99.30.7 MASS_7.3-58.1    lattice_0.20-45  rio_0.5.29      
-##  [9] dplyr_1.0.10     emmeans_1.8.4-1  mclogit_0.9.4.2  Matrix_1.5-0    
-## [13] knitr_1.39       rmarkdown_2.15  
+## [1] dplyr_1.1.0      sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
+## [5] rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] sass_0.4.1         jsonlite_1.8.4     splines_4.2.2     
-##  [4] carData_3.0-5      bslib_0.3.1        assertthat_0.2.1  
-##  [7] cellranger_1.1.0   yaml_2.3.5         pillar_1.8.1      
-## [10] glue_1.6.2         digest_0.6.31      minqa_1.2.5       
-## [13] colorspace_2.0-3   sandwich_3.0-1     htmltools_0.5.2   
-## [16] pkgconfig_2.0.3    haven_2.5.0        xtable_1.8-4      
-## [19] mvtnorm_1.1-3      scales_1.2.1       openxlsx_4.2.5    
-## [22] tzdb_0.3.0         tibble_3.1.8       generics_0.1.3    
-## [25] car_3.0-12         ellipsis_0.3.2     TH.data_1.1-1     
-## [28] withr_2.5.0        repr_1.1.4         cli_3.6.0         
-## [31] mnormt_2.1.1       survival_3.4-0     magrittr_2.0.3    
-## [34] readxl_1.4.0       estimability_1.4.1 evaluate_0.20     
-## [37] fansi_1.0.3        nlme_3.1-160       forcats_0.5.1     
-## [40] foreign_0.8-83     tools_4.2.2        data.table_1.14.2 
-## [43] hms_1.1.1          lifecycle_1.0.3    multcomp_1.4-20   
-## [46] stringr_1.5.0      munsell_0.5.0      zip_2.2.0         
-## [49] compiler_4.2.2     jquerylib_0.1.4    rlang_1.0.6       
-## [52] grid_4.2.2         nloptr_2.0.3       rstudioapi_0.13   
-## [55] base64enc_0.1-3    boot_1.3-28        gtable_0.3.1      
-## [58] codetools_0.2-18   abind_1.4-5        DBI_1.1.2         
-## [61] curl_4.3.2         R6_2.5.1           zoo_1.8-10        
-## [64] fastmap_1.1.0      utf8_1.2.2         readr_2.1.2       
-## [67] stringi_1.7.12     parallel_4.2.2     Rcpp_1.0.9        
-## [70] vctrs_0.5.1        tidyselect_1.2.0   xfun_0.30         
-## [73] coda_0.19-4
+##  [1] zip_2.2.0         Rcpp_1.0.10       cellranger_1.1.0  bslib_0.3.1      
+##  [5] compiler_4.2.2    pillar_1.8.1      jquerylib_0.1.4   forcats_0.5.1    
+##  [9] tools_4.2.2       digest_0.6.31     jsonlite_1.8.4    evaluate_0.20    
+## [13] lifecycle_1.0.3   tibble_3.1.8      pkgconfig_2.0.3   rlang_1.0.6      
+## [17] openxlsx_4.2.5    cli_3.6.0         rstudioapi_0.13   curl_4.3.2       
+## [21] yaml_2.3.5        haven_2.5.0       xfun_0.30         fastmap_1.1.0    
+## [25] withr_2.5.0       stringr_1.5.0     generics_0.1.3    vctrs_0.5.2      
+## [29] sass_0.4.1        hms_1.1.1         tidyselect_1.2.0  glue_1.6.2       
+## [33] data.table_1.14.2 R6_2.5.1          fansi_1.0.4       readxl_1.4.0     
+## [37] foreign_0.8-83    tzdb_0.3.0        readr_2.1.2       magrittr_2.0.3   
+## [41] htmltools_0.5.2   ellipsis_0.3.2    insight_0.18.8    utf8_1.2.3       
+## [45] stringi_1.7.12
 ```

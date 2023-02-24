@@ -472,8 +472,8 @@ vote.dat&lt;-
 CHES_2014 so that it matches with ESS</h1>
 <pre class="r"><code># countries in ESS
 unique(vote.dat$cntry)</code></pre>
-<pre><code>##  [1] &quot;AT&quot; &quot;BE&quot; &quot;CH&quot; &quot;CZ&quot; &quot;DE&quot; &quot;DK&quot; &quot;EE&quot; &quot;ES&quot; &quot;FI&quot; &quot;FR&quot; &quot;GB&quot; &quot;HU&quot; &quot;IE&quot; &quot;IL&quot;
-## [15] &quot;LT&quot; &quot;NL&quot; &quot;NO&quot; &quot;PL&quot; &quot;PT&quot; &quot;SE&quot; &quot;SI&quot;</code></pre>
+<pre><code>##  [1] &quot;AT&quot; &quot;BE&quot; &quot;CH&quot; &quot;CZ&quot; &quot;DE&quot; &quot;DK&quot; &quot;EE&quot; &quot;ES&quot; &quot;FI&quot; &quot;FR&quot; &quot;GB&quot; &quot;HU&quot; &quot;IE&quot; &quot;IL&quot; &quot;LT&quot;
+## [16] &quot;NL&quot; &quot;NO&quot; &quot;PL&quot; &quot;PT&quot; &quot;SE&quot; &quot;SI&quot;</code></pre>
 <pre class="r"><code># countries in CHES
 unique(CHES_2014$cname)</code></pre>
 <pre><code>##  [1] &quot;bel&quot;  &quot;den&quot;  &quot;ger&quot;  &quot;gre&quot;  &quot;spa&quot;  &quot;fra&quot;  &quot;ire&quot;  &quot;it&quot;   &quot;net&quot;  &quot;uk&quot;  
@@ -538,8 +538,8 @@ country in ESS.</p>
 ## 13      13               Don&#39;t know
 ## 14      14                No answer</code></pre>
 <pre class="r"><code>CHES_2014[CHES_2014$cntry==&quot;AT&quot;,&quot;party_name&quot;]</code></pre>
-<pre><code>## [1] &quot;SPO&quot;          &quot;OVP&quot;          &quot;FPO&quot;          &quot;GRUNE&quot;       
-## [5] &quot;NEOS&quot;         &quot;BZO&quot;          &quot;TeamStronach&quot;</code></pre>
+<pre><code>## [1] &quot;SPO&quot;          &quot;OVP&quot;          &quot;FPO&quot;          &quot;GRUNE&quot;        &quot;NEOS&quot;        
+## [6] &quot;BZO&quot;          &quot;TeamStronach&quot;</code></pre>
 <pre class="r"><code>CHES_2014$pt.nmbr.AT&lt;-case_when(
   CHES_2014$cntry==&quot;AT&quot; &amp; CHES_2014$party_name==&quot;SPO&quot;~1,
   CHES_2014$cntry==&quot;AT&quot; &amp; CHES_2014$party_name==&quot;OVP&quot;~2,
@@ -1359,8 +1359,8 @@ names through the party number values within countries</h1>
 countries&lt;-unique(vote.dat$cntry)
 countries&lt;-countries[-which(countries==&quot;IL&quot;)]
 countries</code></pre>
-<pre><code>##  [1] &quot;AT&quot; &quot;BE&quot; &quot;CH&quot; &quot;CZ&quot; &quot;DE&quot; &quot;DK&quot; &quot;EE&quot; &quot;ES&quot; &quot;FI&quot; &quot;FR&quot; &quot;GB&quot; &quot;HU&quot; &quot;IE&quot; &quot;LT&quot;
-## [15] &quot;NL&quot; &quot;NO&quot; &quot;PL&quot; &quot;PT&quot; &quot;SE&quot; &quot;SI&quot;</code></pre>
+<pre><code>##  [1] &quot;AT&quot; &quot;BE&quot; &quot;CH&quot; &quot;CZ&quot; &quot;DE&quot; &quot;DK&quot; &quot;EE&quot; &quot;ES&quot; &quot;FI&quot; &quot;FR&quot; &quot;GB&quot; &quot;HU&quot; &quot;IE&quot; &quot;LT&quot; &quot;NL&quot;
+## [16] &quot;NO&quot; &quot;PL&quot; &quot;PT&quot; &quot;SE&quot; &quot;SI&quot;</code></pre>
 <pre class="r"><code># obtain vector for party numbers within countries
 nmbr.vars&lt;-paste0(&quot;pt.nmbr.&quot;,countries)
 nmbr.vars</code></pre>
@@ -1371,8 +1371,8 @@ nmbr.vars</code></pre>
 <pre class="r"><code># check if each country-party number variables is in the CHES Data
 
 nmbr.vars %in% names(CHES_2014)</code></pre>
-<pre><code>##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [15] TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
+<pre><code>##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [16] TRUE TRUE TRUE TRUE TRUE</code></pre>
 <pre class="r"><code># sum across the rows to construct a single party number variable
 CHES_2014$pt.nmbr&lt;-rowSums(CHES_2014[,nmbr.vars],na.rm=T)
 table(CHES_2014$pt.nmbr,useNA=&quot;always&quot;)</code></pre>
@@ -1394,39 +1394,33 @@ CHES_2014.vote.keys&lt;-left_join(
   x=CHES_2014,
   y=vote.dat,
   by=c(&quot;cntry&quot;,&quot;pt.nmbr&quot;)
-)
-
-
-# exclude the country-specific party number variables
+)</code></pre>
+<pre><code>## Warning in left_join(x = CHES_2014, y = vote.dat, by = c(&quot;cntry&quot;, &quot;pt.nmbr&quot;)): Each row in `x` is expected to match at most 1 row in `y`.
+## ℹ Row 23 of `x` matches multiple rows.
+## ℹ If multiple matches are expected, set `multiple = &quot;all&quot;` to silence this
+##   warning.</code></pre>
+<pre class="r"><code># exclude the country-specific party number variables
 CHES_2014.vote.keys&lt;-
   CHES_2014.vote.keys[,-which(names(CHES_2014.vote.keys) %in% nmbr.vars)]
 
 # check if the variable names look like they should
 names(CHES_2014.vote.keys)</code></pre>
-<pre><code>##  [1] &quot;country&quot;                &quot;cname&quot;                 
-##  [3] &quot;party_id&quot;               &quot;party_name&quot;            
-##  [5] &quot;eu_position&quot;            &quot;eu_position_sd&quot;        
-##  [7] &quot;eu_salience&quot;            &quot;eu_dissent&quot;            
-##  [9] &quot;eu_benefit&quot;             &quot;eu_ep&quot;                 
-## [11] &quot;eu_intmark&quot;             &quot;eu_cohesion&quot;           
-## [13] &quot;eu_foreign&quot;             &quot;eu_turkey&quot;             
-## [15] &quot;eu_budgets&quot;             &quot;lrgen&quot;                 
-## [17] &quot;lrgen_sd&quot;               &quot;lrecon&quot;                
-## [19] &quot;lrecon_salience&quot;        &quot;lrecon_sd&quot;             
-## [21] &quot;galtan&quot;                 &quot;galtan_salience&quot;       
-## [23] &quot;galtan_sd&quot;              &quot;spendvtax&quot;             
-## [25] &quot;deregulation&quot;           &quot;redistribution&quot;        
-## [27] &quot;econ_interven&quot;          &quot;civlib_laworder&quot;       
-## [29] &quot;sociallifestyle&quot;        &quot;religious_principle&quot;   
-## [31] &quot;immigrate_policy&quot;       &quot;multiculturalism&quot;      
-## [33] &quot;urban_rural&quot;            &quot;environment&quot;           
-## [35] &quot;regions&quot;                &quot;international_security&quot;
-## [37] &quot;ethnic_minorities&quot;      &quot;nationalism&quot;           
-## [39] &quot;antielite_salience&quot;     &quot;corrupt_salience&quot;      
-## [41] &quot;mip_one&quot;                &quot;mip_two&quot;               
-## [43] &quot;mip_three&quot;              &quot;cntry&quot;                 
-## [45] &quot;pt.nmbr&quot;                &quot;vote.var&quot;              
-## [47] &quot;pt.name&quot;</code></pre>
+<pre><code>##  [1] &quot;country&quot;                &quot;cname&quot;                  &quot;party_id&quot;              
+##  [4] &quot;party_name&quot;             &quot;eu_position&quot;            &quot;eu_position_sd&quot;        
+##  [7] &quot;eu_salience&quot;            &quot;eu_dissent&quot;             &quot;eu_benefit&quot;            
+## [10] &quot;eu_ep&quot;                  &quot;eu_intmark&quot;             &quot;eu_cohesion&quot;           
+## [13] &quot;eu_foreign&quot;             &quot;eu_turkey&quot;              &quot;eu_budgets&quot;            
+## [16] &quot;lrgen&quot;                  &quot;lrgen_sd&quot;               &quot;lrecon&quot;                
+## [19] &quot;lrecon_salience&quot;        &quot;lrecon_sd&quot;              &quot;galtan&quot;                
+## [22] &quot;galtan_salience&quot;        &quot;galtan_sd&quot;              &quot;spendvtax&quot;             
+## [25] &quot;deregulation&quot;           &quot;redistribution&quot;         &quot;econ_interven&quot;         
+## [28] &quot;civlib_laworder&quot;        &quot;sociallifestyle&quot;        &quot;religious_principle&quot;   
+## [31] &quot;immigrate_policy&quot;       &quot;multiculturalism&quot;       &quot;urban_rural&quot;           
+## [34] &quot;environment&quot;            &quot;regions&quot;                &quot;international_security&quot;
+## [37] &quot;ethnic_minorities&quot;      &quot;nationalism&quot;            &quot;antielite_salience&quot;    
+## [40] &quot;corrupt_salience&quot;       &quot;mip_one&quot;                &quot;mip_two&quot;               
+## [43] &quot;mip_three&quot;              &quot;cntry&quot;                  &quot;pt.nmbr&quot;               
+## [46] &quot;vote.var&quot;               &quot;pt.name&quot;</code></pre>
 <pre class="r"><code># save to a file
 
 export(CHES_2014.vote.keys,
@@ -1448,22 +1442,21 @@ print(s,locale=F)</code></pre>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_1.0.10     sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
+## [1] dplyr_1.1.0      sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
 ## [5] rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] zip_2.2.0         Rcpp_1.0.9        cellranger_1.1.0  bslib_0.3.1      
+##  [1] zip_2.2.0         Rcpp_1.0.10       cellranger_1.1.0  bslib_0.3.1      
 ##  [5] compiler_4.2.2    pillar_1.8.1      jquerylib_0.1.4   forcats_0.5.1    
 ##  [9] tools_4.2.2       digest_0.6.31     jsonlite_1.8.4    evaluate_0.20    
 ## [13] lifecycle_1.0.3   tibble_3.1.8      pkgconfig_2.0.3   rlang_1.0.6      
-## [17] openxlsx_4.2.5    DBI_1.1.2         cli_3.6.0         rstudioapi_0.13  
-## [21] curl_4.3.2        yaml_2.3.5        haven_2.5.0       xfun_0.30        
-## [25] fastmap_1.1.0     stringr_1.5.0     generics_0.1.3    vctrs_0.5.1      
-## [29] sass_0.4.1        hms_1.1.1         tidyselect_1.2.0  glue_1.6.2       
-## [33] data.table_1.14.2 R6_2.5.1          fansi_1.0.3       readxl_1.4.0     
-## [37] foreign_0.8-83    tzdb_0.3.0        readr_2.1.2       magrittr_2.0.3   
-## [41] htmltools_0.5.2   ellipsis_0.3.2    assertthat_0.2.1  insight_0.18.8   
-## [45] utf8_1.2.2        stringi_1.7.12</code></pre>
+## [17] openxlsx_4.2.5    cli_3.6.0         rstudioapi_0.13   curl_4.3.2       
+## [21] yaml_2.3.5        haven_2.5.0       xfun_0.30         fastmap_1.1.0    
+## [25] stringr_1.5.0     generics_0.1.3    vctrs_0.5.2       sass_0.4.1       
+## [29] hms_1.1.1         tidyselect_1.2.0  glue_1.6.2        data.table_1.14.2
+## [33] R6_2.5.1          fansi_1.0.4       readxl_1.4.0      foreign_0.8-83   
+## [37] tzdb_0.3.0        readr_2.1.2       magrittr_2.0.3    htmltools_0.5.2  
+## [41] ellipsis_0.3.2    insight_0.18.8    utf8_1.2.3        stringi_1.7.12</code></pre>
 </div>
 
 

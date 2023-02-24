@@ -74,8 +74,8 @@ vote.vars %in% names(ESS7)
 ```
 
 ```
-##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [15] TRUE TRUE TRUE TRUE TRUE TRUE
+##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [16] TRUE TRUE TRUE TRUE TRUE
 ```
 
 ```r
@@ -89,10 +89,10 @@ table(ESS7$pt.nmbr,useNA="always")
 
 ```
 ## 
-##     0     1     2     3     4     5     6     7     8     9    10    11 
-## 17379  4819  4501  2443  2076  1715  1405  1410  1107   690   831   400 
-##    12    13    14    15    16    17    18    19    44    55  <NA> 
-##   426   500   195    87    69    46    29    18    14    25     0
+##     0     1     2     3     4     5     6     7     8     9    10    11    12 
+## 17379  4819  4501  2443  2076  1715  1405  1410  1107   690   831   400   426 
+##    13    14    15    16    17    18    19    44    55  <NA> 
+##   500   195    87    69    46    29    18    14    25     0
 ```
 
 ```r
@@ -104,10 +104,10 @@ table(ESS7$pt.nmbr,useNA="always")
 
 ```
 ## 
-##     1     2     3     4     5     6     7     8     9    10    11    12 
-##  4819  4501  2443  2076  1715  1405  1410  1107   690   831   400   426 
-##    13    14    15    16    17    18    19    44    55  <NA> 
-##   500   195    87    69    46    29    18    14    25 17379
+##     1     2     3     4     5     6     7     8     9    10    11    12    13 
+##  4819  4501  2443  2076  1715  1405  1410  1107   690   831   400   426   500 
+##    14    15    16    17    18    19    44    55  <NA> 
+##   195    87    69    46    29    18    14    25 17379
 ```
 
 # Combine the election coalitions in CHES ratings
@@ -261,8 +261,7 @@ for (i in 1:length(vote.vars)){
 ## [2] "Socialdemokraterne - the Danish social democrats"
 ## [1] "Venstre, Danmarks Liberale Parti - Venstre"
 ## [2] "Venstre, Danmarks Liberale Parti - Venstre"
-## [1] "Liberal Alliance - Liberal Alliance"
-## [2] "Liberal Alliance - Liberal Alliance"
+## [1] "Liberal Alliance - Liberal Alliance" "Liberal Alliance - Liberal Alliance"
 ## [1] "Det Radikale Venstre - Danish Social-Liberal Party"
 ## [2] "Det Radikale Venstre - Danish Social-Liberal Party"
 ## [1] "SF Socialistisk Folkeparti - Socialist People's Party"
@@ -298,8 +297,7 @@ for (i in 1:length(vote.vars)){
 ## [2] "Partido Popular - PP (con UPN en Navarra)"
 ## [1] "Partido Socialista Obrero Español (PSOE)"
 ## [2] "Partido Socialista Obrero Español (PSOE)"
-## [1] "Unión, Progreso y Democracia (UPyD)"
-## [2] "Unión, Progreso y Democracia (UPyD)"
+## [1] "Unión, Progreso y Democracia (UPyD)" "Unión, Progreso y Democracia (UPyD)"
 ## [1] "Izquierda Unida (IU) - (ICV en Cataluña)"
 ## [2] "Izquierda Unida (IU) - (ICV en Cataluña)"
 ## [1] "Esquerra Republicana de Catalunya (ERC)"
@@ -493,8 +491,7 @@ for (i in 1:length(vote.vars)){
 ## [1] NA NA
 ## [1] "NSI - Nova Slovenija – Kršcanski demokrati"
 ## [2] "NSI - Nova Slovenija – Kršcanski demokrati"
-## [1] "SDS - Slovenska demokratska stranka"
-## [2] "SDS - Slovenska demokratska stranka"
+## [1] "SDS - Slovenska demokratska stranka" "SDS - Slovenska demokratska stranka"
 ## [1] "SLS  - Slovenska ljudska stranka" "SLS  - Slovenska ljudska stranka"
 ## [1] "SMC - Stranka Mira Cerarja" "SMC - Stranka Mira Cerarja"
 ## [1] "ZL - Združena levica (DSD, IDS in Stranka TRS)"
@@ -542,20 +539,20 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_1.0.10     sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
+## [1] dplyr_1.1.0      sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
 ## [5] rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] zip_2.2.0         Rcpp_1.0.9        cellranger_1.1.0  bslib_0.3.1      
+##  [1] zip_2.2.0         Rcpp_1.0.10       cellranger_1.1.0  bslib_0.3.1      
 ##  [5] compiler_4.2.2    pillar_1.8.1      jquerylib_0.1.4   forcats_0.5.1    
 ##  [9] tools_4.2.2       digest_0.6.31     jsonlite_1.8.4    evaluate_0.20    
 ## [13] lifecycle_1.0.3   tibble_3.1.8      pkgconfig_2.0.3   rlang_1.0.6      
-## [17] openxlsx_4.2.5    DBI_1.1.2         cli_3.6.0         rstudioapi_0.13  
-## [21] curl_4.3.2        yaml_2.3.5        haven_2.5.0       xfun_0.30        
-## [25] fastmap_1.1.0     withr_2.5.0       stringr_1.5.0     generics_0.1.3   
-## [29] vctrs_0.5.1       sass_0.4.1        hms_1.1.1         tidyselect_1.2.0 
-## [33] glue_1.6.2        data.table_1.14.2 R6_2.5.1          fansi_1.0.3      
-## [37] readxl_1.4.0      foreign_0.8-83    tzdb_0.3.0        readr_2.1.2      
-## [41] magrittr_2.0.3    htmltools_0.5.2   ellipsis_0.3.2    assertthat_0.2.1 
-## [45] insight_0.18.8    utf8_1.2.2        stringi_1.7.12
+## [17] openxlsx_4.2.5    cli_3.6.0         rstudioapi_0.13   curl_4.3.2       
+## [21] yaml_2.3.5        haven_2.5.0       xfun_0.30         fastmap_1.1.0    
+## [25] withr_2.5.0       stringr_1.5.0     generics_0.1.3    vctrs_0.5.2      
+## [29] sass_0.4.1        hms_1.1.1         tidyselect_1.2.0  glue_1.6.2       
+## [33] data.table_1.14.2 R6_2.5.1          fansi_1.0.4       readxl_1.4.0     
+## [37] foreign_0.8-83    tzdb_0.3.0        readr_2.1.2       magrittr_2.0.3   
+## [41] htmltools_0.5.2   ellipsis_0.3.2    insight_0.18.8    utf8_1.2.3       
+## [45] stringi_1.7.12
 ```

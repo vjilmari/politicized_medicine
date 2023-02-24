@@ -1,5 +1,5 @@
 #' ---
-#' title: "Analysis (homeopathy included in CAMs)"
+#' title: "Analysis"
 #' output: 
 #'   html_document: 
 #'     toc: yes
@@ -8,7 +8,7 @@
 #'     number_sections: yes
 #' ---
 #' 
-## ----setup, include=FALSE-----------------------------------------------------
+## ----setup, include=FALSE----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 #' 
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #' 
 #' ## Packages
 #' 
-## -----------------------------------------------------------------------------
+## ----message=FALSE, warning=FALSE--------------------------------------------
 
 library(mclogit)
 library(emmeans)
@@ -25,16 +25,15 @@ library(rio)
 library(memisc)
 library(psych)
 library(ggplot2)
+library(ggpubr)
 library(lme4)
 library(MetBrewer)
 source("../custom_functions.R")
 
 #' ## Dataset
 #' 
-## -----------------------------------------------------------------------------
-dat<-import("../../data/processed/fdat.xlsx")
-
-str(dat)
+## ----------------------------------------------------------------------------
+fdat<-import("../../data/processed/fdat.xlsx")
 
 #' 
 #' ## Data transformations
@@ -43,46 +42,42 @@ str(dat)
 #' 
 #' ### Income
 #' 
-## -----------------------------------------------------------------------------
-dat$income.f<-case_when(
-  is.na(dat$income) ~ "missing",
-  TRUE ~ dat$income
+## ----------------------------------------------------------------------------
+fdat$income.f<-case_when(
+  is.na(fdat$income) ~ "missing",
+  TRUE ~ fdat$income
 )
 
 #define reference level (top quintile)
-table(dat$income.f,useNA="always")
-dat$income.fr = relevel(as.factor(dat$income.f), ref="quint.5")
-table(dat$income.fr,useNA="always")
+table(fdat$income.f,useNA="always")
+fdat$income.fr = relevel(as.factor(fdat$income.f), ref="quint.5")
+table(fdat$income.fr,useNA="always")
 
 #' 
 #' ### Education
 #' 
-## -----------------------------------------------------------------------------
-table(dat$edu,useNA="always")
-dat$edu.f<-relevel(as.factor(dat$edu),ref="7. MA")
-table(dat$edu.f,useNA="always")
+## ----------------------------------------------------------------------------
+table(fdat$edu,useNA="always")
+fdat$edu.f<-relevel(as.factor(fdat$edu),ref="7. MA")
+table(fdat$edu.f,useNA="always")
 
 #' 
 #' ### DV
 #' 
-## -----------------------------------------------------------------------------
-table(dat$DV,useNA="always")
-dat$DV.f<-relevel(as.factor(dat$DV),ref="NN")
-table(dat$DV.f,useNA="always")
-
-table(dat$DV.no.home,useNA="always")
-dat$DV.no.home.f<-relevel(as.factor(dat$DV.no.home),ref="NN")
-table(dat$DV.no.home.f,useNA="always")
+## ----------------------------------------------------------------------------
+table(fdat$DV,useNA="always")
+fdat$DV.f<-relevel(as.factor(fdat$DV),ref="NN")
+table(fdat$DV.f,useNA="always")
 
 #' 
 #' ### Strain on health and political orientation
 #' 
 #' Calculate country means for centering
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # Calculate country means for centering
 
-cntry.means<-dat %>%
+cntry.means<-fdat %>%
   group_by(cntry) %>%
   summarise(strain.on.health.cntry.mean=
               mean(strain.on.health,na.rm=T),
@@ -99,48 +94,48 @@ cntry.means<-dat %>%
 
 #combine data frames
 
-dat<-left_join(
-  x=dat,
+fdat<-left_join(
+  x=fdat,
   y=cntry.means,
   by="cntry"
 )
 
 #country-mean center strain on health
 
-dat$strain.on.health.c<-
-  dat$strain.on.health-dat$strain.on.health.cntry.mean
+fdat$strain.on.health.c<-
+  fdat$strain.on.health-fdat$strain.on.health.cntry.mean
 
 #country-mean center political orientation
 
-dat$lrgen.c<-
-  dat$lrgen-dat$lrgen.cntry.mean
-dat$lrecon.c<-
-  dat$lrecon-dat$lrecon.cntry.mean
-dat$galtan.c<-
-  dat$galtan-dat$galtan.cntry.mean
-dat$antielite_salience.c<-
-  dat$antielite_salience-dat$antielite_salience.cntry.mean
-dat$corrupt_salience.c<-
-  dat$corrupt_salience-dat$corrupt_salience.cntry.mean
+fdat$lrgen.c<-
+  fdat$lrgen-fdat$lrgen.cntry.mean
+fdat$lrecon.c<-
+  fdat$lrecon-fdat$lrecon.cntry.mean
+fdat$galtan.c<-
+  fdat$galtan-fdat$galtan.cntry.mean
+fdat$antielite_salience.c<-
+  fdat$antielite_salience-fdat$antielite_salience.cntry.mean
+fdat$corrupt_salience.c<-
+  fdat$corrupt_salience-fdat$corrupt_salience.cntry.mean
 
 #scale with CHES grand SD
-dat$lrgen.z<-
-  dat$lrgen.c/dat$lrgen.scaling
-dat$lrecon.z<-
-  dat$lrecon.c/dat$lrecon.scaling
-dat$galtan.z<-
-  dat$galtan.c/dat$galtan.scaling
-dat$antielite_salience.z<-
-  dat$antielite_salience.c/dat$antielite_salience.scaling
-dat$corrupt_salience.z<-
-  dat$corrupt_salience.c/dat$corrupt_salience.scaling
+fdat$lrgen.z<-
+  fdat$lrgen.c/fdat$lrgen.scaling
+fdat$lrecon.z<-
+  fdat$lrecon.c/fdat$lrecon.scaling
+fdat$galtan.z<-
+  fdat$galtan.c/fdat$galtan.scaling
+fdat$antielite_salience.z<-
+  fdat$antielite_salience.c/fdat$antielite_salience.scaling
+fdat$corrupt_salience.z<-
+  fdat$corrupt_salience.c/fdat$corrupt_salience.scaling
 
 #' 
 #' ## Exclude missing variable
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
-fdat<-dat %>%
+fdat<-fdat %>%
   filter(cntry!="IL" & cntry!="EE") %>%
   filter(!is.na(cntry) & 
          !is.na(gndr.c) &
@@ -159,7 +154,7 @@ fdat<-dat %>%
 #' 
 #' ## Construct anweight variable for weighting
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 fdat$anweight=fdat$pspwght*fdat$pweight
 
 #' 
@@ -167,7 +162,7 @@ fdat$anweight=fdat$pspwght*fdat$pweight
 #' 
 #' ## Check the presence of all DV-groups across countries
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 table(fdat$cntry,fdat$DV.f)
 round(100*prop.table(table(fdat$cntry,fdat$DV.f),
                      margin = 1),1)
@@ -178,7 +173,7 @@ round(100*prop.table(table(fdat$cntry,fdat$DV.f),
 #' 
 #' ## Empty model
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod0<-mblogit(DV.f~1,
               random= ~1|cntry,
               estimator="ML",
@@ -191,7 +186,7 @@ mtable(mod0,show.baselevel = T)
 #' 
 #' ## Model with covariates
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod1<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+
             strain.on.health.c,
@@ -206,7 +201,7 @@ mtable(mod1,show.baselevel = T)
 #' 
 #' ### Strain on health main effects
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 mod1.strain.trends<-
   emtrends(mod1,~1|DV.f,
@@ -250,7 +245,7 @@ export(data.frame(rbind(mod1.strain.eff.CM,
 #' 
 #' ### gender main effects
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 mod1.gndr.trends<-
   emtrends(mod1,~1|DV.f,
@@ -295,7 +290,7 @@ export(data.frame(rbind(mod1.gndr.eff.CM,
 #' 
 #' ### age main effects
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 mod1.age10.trends<-
   emtrends(mod1,~1|DV.f,
@@ -340,7 +335,7 @@ export(data.frame(rbind(mod1.age10.eff.CM,
 #' 
 #' ### education main effects
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # first take probabilities for all categories
 mod1.edu.f.trends<-emmeans(mod1,by="DV.f",
         specs="edu.f",
@@ -414,7 +409,7 @@ export(data.frame(rbind(mod1.edu.f.eff.CM,
 #' 
 #' ### income main effects
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # first take probabilities for all categories
 mod1.income.fr.trends<-emmeans(mod1,by="DV.f",
         specs="income.fr",
@@ -487,7 +482,7 @@ export(data.frame(rbind(mod1.income.fr.eff.CM,
 #' 
 #' ## Model for lrgen
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod2.lrgen<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+
             strain.on.health.c+
@@ -545,7 +540,7 @@ export(data.frame(rbind(
 #' 
 #' ## Model for lrecon
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod2.lrecon<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+
             strain.on.health.c+
@@ -603,7 +598,7 @@ export(data.frame(rbind(
 #' 
 #' ## Model for galtan
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod2.galtan<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+
             strain.on.health.c+
@@ -661,7 +656,7 @@ export(data.frame(rbind(
 #' 
 #' ### Contrast between CAM-only and CAM-and-conv against no-CAM
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 pairs(mod2.galtan.eff,adjust="none",infer=c(T,T))
 
@@ -676,7 +671,7 @@ export(data.frame(pairs(mod2.galtan.eff,
 #' 
 #' ## Model for antielite_salience
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod2.antielite_salience<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+
             strain.on.health.c+
@@ -734,7 +729,7 @@ export(data.frame(rbind(
 #' 
 #' ## Model for corrupt_salience
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod2.corrupt_salience<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+
             strain.on.health.c+
@@ -793,7 +788,7 @@ export(data.frame(rbind(
 #' 
 #' ### Contrast between CAM-only and CAM-and-conv against no-CAM
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 pairs(mod2.corrupt_salience.eff,
       adjust="none",infer=c(T,T))
@@ -805,126 +800,393 @@ export(data.frame(pairs(mod2.corrupt_salience.eff,
                         infer=c(T,T))),
   "../../results/mod2.corrupt_salience.eff.CAM.contrast.xlsx")
 
+#' ## Figure for the main effects
 #' 
-#' 
-#' ## galtan and corrupt_salience
-#' 
-## -----------------------------------------------------------------------------
-mod2.galtan_corrupt<-
-  mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+strain.on.health.c+
-            galtan.z+
-            corrupt_salience.z,
-          random= ~1|cntry,
-          estimator="ML",
-          control = mmclogit.control(maxit = 250, trace=TRUE),
-          data=fdat,weights=anweight)
+## ----------------------------------------------------------------------------
 
-# general model comparison
+# vectors where the predicted values are saved
 
-anova(mod1,mod2.galtan_corrupt,test="Chisq")
-anova(mod2.galtan,mod2.galtan_corrupt,test="Chisq")
-anova(mod2.corrupt_salience,mod2.galtan_corrupt,test="Chisq")
+preds.CM.lrgen<-list()
+preds.CAM.lrgen<-list()
 
-#' 
-#' ### galtan trends
-#' 
-## -----------------------------------------------------------------------------
-# Is galtan_corrupt associated with using conventional medicine?
-ref_grid(mod2.galtan_corrupt)
+preds.CM.lrecon<-list()
+preds.CAM.lrecon<-list()
 
-mod2.galtan_corrupt.galtan.trends<-
-  emtrends(mod2.galtan_corrupt,~1|DV.f,
-           var="galtan.z",infer=c(T,T),mode="latent",
-           at=list(gndr.c=0,age10.c=0,
-                   strain.on.health.c=0))
+preds.CM.galtan<-list()
+preds.CAM.galtan<-list()
 
-#effects for each DV-category
-(mod2.galtan_corrupt.galtan.eff<-
-  contrast(mod2.galtan_corrupt.galtan.trends,simple="DV.f",
-         adjust="none","eff", infer=c(T,T)))
+preds.CM.antielite_salience<-list()
+preds.CAM.antielite_salience<-list()
 
-#save to file
-export(data.frame(mod2.galtan_corrupt.galtan.eff),
-       "../../results/mod2.galtan_corrupt.galtan.eff.MN.xlsx",
+preds.CM.corrupt_salience<-list()
+preds.CAM.corrupt_salience<-list()
+
+# Loop through each possible point and obtain prediction
+
+range(c(fdat$lrgen.z,
+        fdat$lrecon.z,
+        fdat$galtan.z,
+        fdat$antielite_salience.z,
+        fdat$corrupt_salience.z))
+
+focal.points.combined<-seq(from=-2.30,to=2.65,by=0.01)
+
+for (i in 1:length(focal.points.combined)){
+  
+  # lrgen
+  # estimates at certain focal points
+  temp.point.lrgen<-
+    emmeans(mod2.lrgen,~lrgen.z|DV.f,
+            at=list(lrgen.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.lrgen.eff<-
+    contrast(temp.point.lrgen,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.lrgen[[i]]<-
+    data.frame(contrast(temp.point.lrgen,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.lrgen.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.lrgen[[i]]<-
+    data.frame(contrast(temp.point.lrgen,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.lrgen.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # lrecon
+  # estimates at certain focal points
+  temp.point.lrecon<-
+    emmeans(mod2.lrecon,~lrecon.z|DV.f,
+            at=list(lrecon.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.lrecon.eff<-
+    contrast(temp.point.lrecon,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.lrecon[[i]]<-
+    data.frame(contrast(temp.point.lrecon,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.lrecon.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.lrecon[[i]]<-
+    data.frame(contrast(temp.point.lrecon,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.lrecon.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # galtan
+  # estimates at certain focal points
+  temp.point.galtan<-
+    emmeans(mod2.galtan,~galtan.z|DV.f,
+            at=list(galtan.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.galtan.eff<-
+    contrast(temp.point.galtan,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.galtan[[i]]<-
+    data.frame(contrast(temp.point.galtan,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.galtan.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.galtan[[i]]<-
+    data.frame(contrast(temp.point.galtan,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.galtan.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # antielite_salience
+  # estimates at certain focal points
+  temp.point.antielite_salience<-
+    emmeans(mod2.antielite_salience,~antielite_salience.z|DV.f,
+            at=list(antielite_salience.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.antielite_salience.eff<-
+    contrast(temp.point.antielite_salience,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.antielite_salience[[i]]<-
+    data.frame(contrast(temp.point.antielite_salience,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.antielite_salience.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.antielite_salience[[i]]<-
+    data.frame(contrast(temp.point.antielite_salience,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.antielite_salience.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # corrupt_salience
+  # estimates at certain focal points
+  temp.point.corrupt_salience<-
+    emmeans(mod2.corrupt_salience,~corrupt_salience.z|DV.f,
+            at=list(corrupt_salience.z=
+                      focal.points.combined[i],
+                    strain.on.health.c=0,
+                    gndr.c=0,
+                    age.10.c=0),
+            infer=c(T,T),
+            mode="latent")
+  
+  # in contrast format
+  temp.point.corrupt_salience.eff<-
+    contrast(temp.point.corrupt_salience,
+             simple="DV.f",
+             adjust="none","eff",
+             infer=c(T,T))
+  
+  # pooled for CM
+  
+  preds.CM.corrupt_salience[[i]]<-
+    data.frame(contrast(temp.point.corrupt_salience,
+                        method = list("Conv - No conv" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.corrupt_salience.eff,
+                                          signs=c(-2,-2,2,2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  # pooled for CAM
+  
+  preds.CAM.corrupt_salience[[i]]<-
+    data.frame(contrast(temp.point.corrupt_salience,
+                        method = list("CAM - No CAM" = 
+                                        contrast.weights.total(
+                                          effects=
+                                            temp.point.corrupt_salience.eff,
+                                          signs=c(-2,2,2,-2))),
+                        simple="DV.f", infer=c(T,T)))
+  
+  
+  
+}
+
+# save predictions to data frames
+preds.CM.lrgen.df<-do.call(rbind,preds.CM.lrgen)
+preds.CM.lrgen.df$'Use of Medicine'<-"Conventional"
+preds.CM.lrgen.df$PO<-"Left-right general"
+
+preds.CAM.lrgen.df<-do.call(rbind,preds.CAM.lrgen)
+preds.CAM.lrgen.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.lrgen.df$PO<-"Left-right general"
+
+
+preds.CM.lrecon.df<-do.call(rbind,preds.CM.lrecon)
+preds.CM.lrecon.df$'Use of Medicine'<-"Conventional"
+preds.CM.lrecon.df$PO<-"Left-right economic"
+
+preds.CAM.lrecon.df<-do.call(rbind,preds.CAM.lrecon)
+preds.CAM.lrecon.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.lrecon.df$PO<-"Left-right economic"
+
+
+preds.CM.galtan.df<-do.call(rbind,preds.CM.galtan)
+preds.CM.galtan.df$'Use of Medicine'<-"Conventional"
+preds.CM.galtan.df$PO<-"Gal-tan"
+
+preds.CAM.galtan.df<-do.call(rbind,preds.CAM.galtan)
+preds.CAM.galtan.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.galtan.df$PO<-"Gal-tan"
+
+
+preds.CM.antielite_salience.df<-do.call(rbind,preds.CM.antielite_salience)
+preds.CM.antielite_salience.df$'Use of Medicine'<-"Conventional"
+preds.CM.antielite_salience.df$PO<-"Anti-elite"
+
+preds.CAM.antielite_salience.df<-do.call(rbind,preds.CAM.antielite_salience)
+preds.CAM.antielite_salience.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.antielite_salience.df$PO<-"Anti-elite"
+
+preds.CM.corrupt_salience.df<-do.call(rbind,preds.CM.corrupt_salience)
+preds.CM.corrupt_salience.df$'Use of Medicine'<-"Conventional"
+preds.CM.corrupt_salience.df$PO<-"Anti-corruption"
+
+preds.CAM.corrupt_salience.df<-do.call(rbind,preds.CAM.corrupt_salience)
+preds.CAM.corrupt_salience.df$'Use of Medicine'<-"Complementary/Alternative"
+preds.CAM.corrupt_salience.df$PO<-"Anti-corruption"
+
+# combine the data
+names(preds.CM.lrgen.df)[2]<-"point"
+names(preds.CAM.lrgen.df)[2]<-"point"
+names(preds.CM.lrecon.df)[2]<-"point"
+names(preds.CAM.lrecon.df)[2]<-"point"
+names(preds.CM.galtan.df)[2]<-"point"
+names(preds.CAM.galtan.df)[2]<-"point"
+names(preds.CM.antielite_salience.df)[2]<-"point"
+names(preds.CAM.antielite_salience.df)[2]<-"point"
+names(preds.CM.corrupt_salience.df)[2]<-"point"
+names(preds.CAM.corrupt_salience.df)[2]<-"point"
+
+preds.all<-rbind(preds.CM.lrgen.df,
+                 preds.CAM.lrgen.df,
+                 preds.CM.lrecon.df,
+                 preds.CAM.lrecon.df,
+                 preds.CM.galtan.df,
+                 preds.CAM.galtan.df,
+                 preds.CM.antielite_salience.df,
+                 preds.CAM.antielite_salience.df,
+                 preds.CM.corrupt_salience.df,
+                 preds.CAM.corrupt_salience.df)
+
+# transform to probabilities
+
+preds.all$P.USE<-
+  exp(preds.all$estimate)/(1+exp(preds.all$estimate))
+
+preds.all$P.USE.LL<-
+  exp(preds.all$asymp.LCL)/(1+exp(preds.all$asymp.LCL))
+
+preds.all$P.USE.UL<-
+  exp(preds.all$asymp.UCL)/(1+exp(preds.all$asymp.UCL))
+
+
+# export Figure data
+
+export(preds.all,
+       "../../results/figures/Fig_main.xlsx",
        overwrite=T)
 
-#Use of conventional medicine
+# produce the figure
 
-(mod2.galtan_corrupt.galtan.eff.CM<-
-    contrast(mod2.galtan_corrupt.galtan.trends,
-         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.galtan_corrupt.galtan.eff,
-                 signs=c(-2,-2,2,2))),
-         simple="DV.f", infer=c(T,T)))
+# relevel 
 
-#Use of CAM
+preds.all$PO<-
+  factor(preds.all$PO,
+         levels=c("Left-right general","Left-right economic",
+                  "Gal-tan","Anti-elite","Anti-corruption"))
 
-(mod2.galtan_corrupt.galtan.eff.CAM<-
-    contrast(mod2.galtan_corrupt.galtan.trends,
-         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.galtan_corrupt.galtan.eff,
-                 signs=c(-2,2,2,-2))),
-         simple="DV.f", infer=c(T,T)))
+# first separately for CM
+Fig_CM<-
+  ggplot(data=preds.all[preds.all$`Use of Medicine`=="Conventional",],
+         aes(y=P.USE,x=point))+
+  geom_line(size=2.75,color=met.brewer("Java")[1])+
+  geom_line(size=1,color=met.brewer("Java")[1],
+            linetype=2,
+            aes(x=point,y=P.USE.LL))+
+  geom_line(size=1,color=met.brewer("Java")[1],
+            linetype=2,
+            aes(x=point,y=P.USE.UL))+
+  xlab("")+
+  ylab("P(Use of Conventional Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))+
+  facet_wrap(PO~.,ncol=1)
 
+Fig_CM
 
-# save to file
-export(data.frame(rbind(
-  mod2.galtan_corrupt.galtan.eff.CM,
-  mod2.galtan_corrupt.galtan.eff.CAM,adjust="none")),
-  "../../results/mod2.galtan_corrupt.galtan.eff.COMB.xlsx")
+Fig_CAM<-
+  ggplot(data=preds.all[preds.all$`Use of Medicine`=="Complementary/Alternative",],
+         aes(y=P.USE,x=point))+
+  geom_line(size=2.75,color=met.brewer("Java")[5])+
+  geom_line(size=1,color=met.brewer("Java")[5],
+            linetype=2,
+            aes(x=point,y=P.USE.LL))+
+  geom_line(size=1,color=met.brewer("Java")[5],
+            linetype=2,
+            aes(x=point,y=P.USE.UL))+
+  xlab("")+
+  ylab("P(Use of Complementary/Alternative Medicine)")+
+  theme(text=element_text(size=16,  family="sans"))+
+  facet_wrap(PO~.,ncol=1)
 
-#' 
-#' ### corrupt_salience trends
-#' 
-## -----------------------------------------------------------------------------
-# Is galtan_corrupt associated with using conventional medicine?
-ref_grid(mod2.galtan_corrupt)
+Fig_CAM
 
-mod2.galtan_corrupt.corrupt.trends<-
-  emtrends(mod2.galtan_corrupt,~1|DV.f,
-           var="corrupt_salience.z",infer=c(T,T),mode="latent",
-           at=list(gndr.c=0,age10.c=0,
-                   strain.on.health.c=0))
-
-#effects for each DV-category
-(mod2.galtan_corrupt.corrupt.eff<-
-  contrast(mod2.galtan_corrupt.corrupt.trends,simple="DV.f",
-         adjust="none","eff", infer=c(T,T)))
-
-#save to file
-export(data.frame(mod2.galtan_corrupt.corrupt.eff),
-       "../../results/mod2.galtan_corrupt.corrupt.eff.MN.xlsx",
-       overwrite=T)
-
-#Use of conventional medicine
-
-(mod2.galtan_corrupt.corrupt.eff.CM<-
-    contrast(mod2.galtan_corrupt.corrupt.trends,
-         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.galtan_corrupt.corrupt.eff,
-                 signs=c(-2,-2,2,2))),
-         simple="DV.f", infer=c(T,T)))
-
-#Use of CAM
-
-(mod2.galtan_corrupt.corrupt.eff.CAM<-
-    contrast(mod2.galtan_corrupt.corrupt.trends,
-         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.galtan_corrupt.corrupt.eff,
-                 signs=c(-2,2,2,-2))),
-         simple="DV.f", infer=c(T,T)))
+Fig_main<-ggarrange(Fig_CM,Fig_CAM,ncol = 2)
 
 
-# save to file
-export(data.frame(rbind(
-  mod2.galtan_corrupt.corrupt.eff.CM,
-  mod2.galtan_corrupt.corrupt.eff.CAM,adjust="none")),
-  "../../results/mod2.galtan_corrupt.corrupt.eff.COMB.xlsx")
+jpeg(filename = 
+       "../../results/figures/Fig_main.jpg",
+     units = "cm",
+     width = 21.0,height=29.7*(3/4),res = 600)
+Fig_main
+dev.off()
 
-#' 
-#' 
 #' 
 #' # Interactions by strain on health
 #' 
 #' ## Model for lrgen
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod3.lrgen<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+
             edu.f+strain.on.health.c+lrgen.z+
@@ -997,7 +1259,7 @@ export(data.frame(rbind(
 #' 
 #' ## Model for lrecon
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod3.lrecon<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+
             edu.f+strain.on.health.c+lrecon.z+
@@ -1070,7 +1332,7 @@ export(data.frame(rbind(
 #' 
 #' (Here it was necessary to change the epsilon convergence criterion 1e-04 instead of 1e-08)
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod3.galtan<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+
             edu.f+strain.on.health.c+galtan.z+
@@ -1146,7 +1408,7 @@ export(data.frame(rbind(
 #' 
 #' ## Model for antielite_salience
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod3.antielite_salience<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+
             edu.f+strain.on.health.c+antielite_salience.z+
@@ -1221,7 +1483,7 @@ export(data.frame(rbind(
 #' 
 #' ### Probing simple slopes
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 ref_grid(mod3.antielite_salience)
 
 #pick points for inference
@@ -1393,7 +1655,7 @@ export(data.frame(rbind(
 #' 
 #' ## Model for corrupt_salience
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 mod3.corrupt_salience<-
   mblogit(DV.f~gndr.c+age10.c+income.fr+
             edu.f+strain.on.health.c+corrupt_salience.z+
@@ -1469,7 +1731,7 @@ export(data.frame(rbind(
 #' 
 #' ### Probing simple slopes
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 ref_grid(mod3.corrupt_salience)
 
 #pick points for inference
@@ -1641,7 +1903,7 @@ export(data.frame(rbind(
 #' 
 #' ### Plot association by strain on health
 #' 
-## ----message=FALSE, warning=FALSE---------------------------------------------
+## ----message=FALSE, warning=FALSE--------------------------------------------
 # obtain range of predictor values
 range(fdat$corrupt_salience.z)
 
@@ -1810,52 +2072,15 @@ Fig1<-ggplot(data=preds.all,
                        met.brewer("Johnson",
                                   type = "continuous")
                      [c(2,3,4)])+
-  xlab("Corrupt Salience")+
+  xlab("Anti-corruption")+
   ylab("P(Use of Conventional Medicine)")+
   theme(text=element_text(size=16,  family="sans"))
 
 Fig1
 
 
-png(filename = 
-      "../../results/figures/Fig1.png",
-    units = "cm",
-    width = 21.0,height=29.7/2,res = 600)
-Fig1
-dev.off()
-
-
-
-#' 
-#' ### Plot association by strain on health without confidence band
-#' 
-## ----message=FALSE, warning=FALSE---------------------------------------------
-
-# produce the figure
-
-Fig1<-ggplot(data=preds.all,
-       aes(y=P.CONV.USE,x=corrupt_salience.z,
-           color=`Health Status`))+
-  geom_line(size=2.75)+
-  #geom_line(size=1,
-  #          linetype=2,
-  #          aes(x=corrupt_salience.z,y=P.CONV.USE.LL))+
-  #geom_line(size=1,
-  #          linetype=2,
-  #          aes(x=corrupt_salience.z,y=P.CONV.USE.UL))+
-  scale_color_manual(values=
-                       met.brewer("Johnson",
-                                  type = "continuous")
-                     [c(2,3,4)])+
-  xlab("Corrupt Salience")+
-  ylab("P(Use of Conventional Medicine)")+
-  theme(text=element_text(size=16,  family="sans"))
-
-Fig1
-
-
-png(filename = 
-      "../../results/figures/Fig1_alt.png",
+jpeg(filename = 
+      "../../results/figures/Figure 2 corrupt health status.jpg",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig1
@@ -1870,7 +2095,7 @@ dev.off()
 #' 
 #' ### lrgen
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 fdat$lrgen.z.1<-fdat$lrgen.z
 fdat$lrgen.z.2<-fdat$lrgen.z^2
@@ -1890,7 +2115,7 @@ anova(mod2.lrgen,mod4.lrgen,test="Chisq")
 #' 
 #' ### lrecon
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 fdat$lrecon.z.1<-fdat$lrecon.z
 fdat$lrecon.z.2<-fdat$lrecon.z^2
@@ -1911,7 +2136,7 @@ anova(mod2.lrecon,mod4.lrecon,test="Chisq")
 #' 
 #' ### galtan
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 fdat$galtan.z.1<-fdat$galtan.z
 fdat$galtan.z.2<-fdat$galtan.z^2
@@ -1941,7 +2166,7 @@ anova(mod5.galtan,mod4.galtan,test="Chisq")
 #' 
 #' #### Simple slopes
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 #low
 mod4.galtan.slopes.low<-
@@ -2098,7 +2323,7 @@ export(data.frame(rbind(mod4.galtan.slopes.low.eff.CM,
 #' 
 #' #### Plot predicted probabilities
 #' 
-## ----message=FALSE, warning=FALSE---------------------------------------------
+## ----message=FALSE, warning=FALSE--------------------------------------------
 
 Fig2<-
   ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
@@ -2114,45 +2339,17 @@ Fig2<-
 Fig2
 
 
-png(filename = 
-      "../../results/figures/Fig2.png",
+jpeg(filename = 
+      "../../results/figures/Figure 3 GALTAN CAM.jpg",
     units = "cm",
     width = 21.0,height=29.7/2,res = 600)
 Fig2
 dev.off()
 
-#' 
-#' #### Plot predicted probabilities without confidence band
-#' 
-## ----message=FALSE, warning=FALSE---------------------------------------------
-
-Fig2<-
-  ggplot(data=fdat,aes(x=galtan.z,y=used.CAM))+
-  geom_smooth(method = "glm", formula=y~poly(x,1),
-              method.args = list(family = "binomial"), 
-              se = FALSE,color=met.brewer("Johnson")[2],size=2.75)+
-  geom_smooth(method = "glm", formula=y~poly(x,2),
-              method.args = list(family = "binomial"), 
-              se = FALSE,color=met.brewer("Johnson")[4],size=2.75)+
-  xlab("GAL-TAN")+
-  ylab("P(Use of Complementary/Alternative Medicine)")+
-  theme(text=element_text(size=16,  family="sans"))
-Fig2
-
-
-png(filename = 
-      "../../results/figures/Fig2_alt.png",
-    units = "cm",
-    width = 21.0,height=29.7/2,res = 600)
-Fig2
-dev.off()
-
-#' 
-#' 
 #' 
 #' ### antielite_salience
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 fdat$antielite_salience.z.1<-fdat$antielite_salience.z
 fdat$antielite_salience.z.2<-fdat$antielite_salience.z^2
@@ -2179,7 +2376,7 @@ anova(mod2.antielite_salience,
 #' 
 #' ### corrupt_salience
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 
 fdat$corrupt_salience.z.1<-fdat$corrupt_salience.z
 fdat$corrupt_salience.z.2<-fdat$corrupt_salience.z^2
@@ -2203,12 +2400,12 @@ anova(mod2.corrupt_salience,
 #' 
 #' # Print out custom functions
 #' 
-## ----code=readLines("../custom_functions.R")----------------------------------
+## ----code=readLines("../custom_functions.R")---------------------------------
 
 #' 
 #' # Session information
 #' 
-## -----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 s<-sessionInfo()
 print(s,locale=F)
 

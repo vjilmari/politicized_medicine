@@ -25,10 +25,7 @@ render(input = "script/analysis/Descriptive_statistics.Rmd",
 render(input = "script/analysis/Analysis.Rmd",
        envir = new.env())
 
-render(input = "script/analysis/Analysis_homeopathy_excluded.Rmd",
-       envir = new.env())
-
-render(input = "script/analysis/Analysis_with_minority_covariate.Rmd",
+render(input = "script/analysis/Analysis_added_covariates.Rmd",
        envir = new.env())
 
 # Convert RMD to R
@@ -57,6 +54,7 @@ purl(input="script/analysis/Analysis.Rmd",
      output="script/analysis/Analysis.R",
      documentation = 2)
 
-purl(input="script/analysis/Analysis_homeopathy_excluded.Rmd",
-     output="script/analysis/Analysis_homeopathy_excluded.R",
+purl(input="script/analysis/Analysis_added_covariates.Rmd",
+     output="script/analysis/Analysis_added_covariates.R",
      documentation = 2)
+

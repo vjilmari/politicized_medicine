@@ -96,8 +96,8 @@ unique(vote.dat$cntry)
 ```
 
 ```
-##  [1] "AT" "BE" "CH" "CZ" "DE" "DK" "EE" "ES" "FI" "FR" "GB" "HU" "IE" "IL"
-## [15] "LT" "NL" "NO" "PL" "PT" "SE" "SI"
+##  [1] "AT" "BE" "CH" "CZ" "DE" "DK" "EE" "ES" "FI" "FR" "GB" "HU" "IE" "IL" "LT"
+## [16] "NL" "NO" "PL" "PT" "SE" "SI"
 ```
 
 ```r
@@ -184,8 +184,8 @@ CHES_2014[CHES_2014$cntry=="AT","party_name"]
 ```
 
 ```
-## [1] "SPO"          "OVP"          "FPO"          "GRUNE"       
-## [5] "NEOS"         "BZO"          "TeamStronach"
+## [1] "SPO"          "OVP"          "FPO"          "GRUNE"        "NEOS"        
+## [6] "BZO"          "TeamStronach"
 ```
 
 ```r
@@ -1360,8 +1360,8 @@ countries
 ```
 
 ```
-##  [1] "AT" "BE" "CH" "CZ" "DE" "DK" "EE" "ES" "FI" "FR" "GB" "HU" "IE" "LT"
-## [15] "NL" "NO" "PL" "PT" "SE" "SI"
+##  [1] "AT" "BE" "CH" "CZ" "DE" "DK" "EE" "ES" "FI" "FR" "GB" "HU" "IE" "LT" "NL"
+## [16] "NO" "PL" "PT" "SE" "SI"
 ```
 
 ```r
@@ -1384,8 +1384,8 @@ nmbr.vars %in% names(CHES_2014)
 ```
 
 ```
-##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-## [15] TRUE TRUE TRUE TRUE TRUE TRUE
+##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+## [16] TRUE TRUE TRUE TRUE TRUE
 ```
 
 ```r
@@ -1423,8 +1423,16 @@ CHES_2014.vote.keys<-left_join(
   y=vote.dat,
   by=c("cntry","pt.nmbr")
 )
+```
 
+```
+## Warning in left_join(x = CHES_2014, y = vote.dat, by = c("cntry", "pt.nmbr")): Each row in `x` is expected to match at most 1 row in `y`.
+## ℹ Row 23 of `x` matches multiple rows.
+## ℹ If multiple matches are expected, set `multiple = "all"` to silence this
+##   warning.
+```
 
+```r
 # exclude the country-specific party number variables
 CHES_2014.vote.keys<-
   CHES_2014.vote.keys[,-which(names(CHES_2014.vote.keys) %in% nmbr.vars)]
@@ -1434,30 +1442,22 @@ names(CHES_2014.vote.keys)
 ```
 
 ```
-##  [1] "country"                "cname"                 
-##  [3] "party_id"               "party_name"            
-##  [5] "eu_position"            "eu_position_sd"        
-##  [7] "eu_salience"            "eu_dissent"            
-##  [9] "eu_benefit"             "eu_ep"                 
-## [11] "eu_intmark"             "eu_cohesion"           
-## [13] "eu_foreign"             "eu_turkey"             
-## [15] "eu_budgets"             "lrgen"                 
-## [17] "lrgen_sd"               "lrecon"                
-## [19] "lrecon_salience"        "lrecon_sd"             
-## [21] "galtan"                 "galtan_salience"       
-## [23] "galtan_sd"              "spendvtax"             
-## [25] "deregulation"           "redistribution"        
-## [27] "econ_interven"          "civlib_laworder"       
-## [29] "sociallifestyle"        "religious_principle"   
-## [31] "immigrate_policy"       "multiculturalism"      
-## [33] "urban_rural"            "environment"           
-## [35] "regions"                "international_security"
-## [37] "ethnic_minorities"      "nationalism"           
-## [39] "antielite_salience"     "corrupt_salience"      
-## [41] "mip_one"                "mip_two"               
-## [43] "mip_three"              "cntry"                 
-## [45] "pt.nmbr"                "vote.var"              
-## [47] "pt.name"
+##  [1] "country"                "cname"                  "party_id"              
+##  [4] "party_name"             "eu_position"            "eu_position_sd"        
+##  [7] "eu_salience"            "eu_dissent"             "eu_benefit"            
+## [10] "eu_ep"                  "eu_intmark"             "eu_cohesion"           
+## [13] "eu_foreign"             "eu_turkey"              "eu_budgets"            
+## [16] "lrgen"                  "lrgen_sd"               "lrecon"                
+## [19] "lrecon_salience"        "lrecon_sd"              "galtan"                
+## [22] "galtan_salience"        "galtan_sd"              "spendvtax"             
+## [25] "deregulation"           "redistribution"         "econ_interven"         
+## [28] "civlib_laworder"        "sociallifestyle"        "religious_principle"   
+## [31] "immigrate_policy"       "multiculturalism"       "urban_rural"           
+## [34] "environment"            "regions"                "international_security"
+## [37] "ethnic_minorities"      "nationalism"            "antielite_salience"    
+## [40] "corrupt_salience"       "mip_one"                "mip_two"               
+## [43] "mip_three"              "cntry"                  "pt.nmbr"               
+## [46] "vote.var"               "pt.name"
 ```
 
 ```r
@@ -1487,22 +1487,21 @@ print(s,locale=F)
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_1.0.10     sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
+## [1] dplyr_1.1.0      sjlabelled_1.2.0 rio_0.5.29       knitr_1.39      
 ## [5] rmarkdown_2.15  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] zip_2.2.0         Rcpp_1.0.9        cellranger_1.1.0  bslib_0.3.1      
+##  [1] zip_2.2.0         Rcpp_1.0.10       cellranger_1.1.0  bslib_0.3.1      
 ##  [5] compiler_4.2.2    pillar_1.8.1      jquerylib_0.1.4   forcats_0.5.1    
 ##  [9] tools_4.2.2       digest_0.6.31     jsonlite_1.8.4    evaluate_0.20    
 ## [13] lifecycle_1.0.3   tibble_3.1.8      pkgconfig_2.0.3   rlang_1.0.6      
-## [17] openxlsx_4.2.5    DBI_1.1.2         cli_3.6.0         rstudioapi_0.13  
-## [21] curl_4.3.2        yaml_2.3.5        haven_2.5.0       xfun_0.30        
-## [25] fastmap_1.1.0     stringr_1.5.0     generics_0.1.3    vctrs_0.5.1      
-## [29] sass_0.4.1        hms_1.1.1         tidyselect_1.2.0  glue_1.6.2       
-## [33] data.table_1.14.2 R6_2.5.1          fansi_1.0.3       readxl_1.4.0     
-## [37] foreign_0.8-83    tzdb_0.3.0        readr_2.1.2       magrittr_2.0.3   
-## [41] htmltools_0.5.2   ellipsis_0.3.2    assertthat_0.2.1  insight_0.18.8   
-## [45] utf8_1.2.2        stringi_1.7.12
+## [17] openxlsx_4.2.5    cli_3.6.0         rstudioapi_0.13   curl_4.3.2       
+## [21] yaml_2.3.5        haven_2.5.0       xfun_0.30         fastmap_1.1.0    
+## [25] stringr_1.5.0     generics_0.1.3    vctrs_0.5.2       sass_0.4.1       
+## [29] hms_1.1.1         tidyselect_1.2.0  glue_1.6.2        data.table_1.14.2
+## [33] R6_2.5.1          fansi_1.0.4       readxl_1.4.0      foreign_0.8-83   
+## [37] tzdb_0.3.0        readr_2.1.2       magrittr_2.0.3    htmltools_0.5.2  
+## [41] ellipsis_0.3.2    insight_0.18.8    utf8_1.2.3        stringi_1.7.12
 ```
 
 

@@ -151,6 +151,7 @@ export(CHES_2014.vote.keys.combined,
 
 export(dat,"../../data/processed/dat.xlsx",
        overwrite=T)
+
 ```
 
 # Session information

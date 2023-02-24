@@ -1,0 +1,1819 @@
+---
+title: "Analysis with belonging to minority and being in a relationship added as covariates"
+output: 
+  html_document: 
+    toc: yes
+    keep_md: yes
+    toc_depth: 5
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preparations
+
+## Packages
+
+```{r message=FALSE, warning=FALSE}
+
+library(mclogit)
+library(emmeans)
+library(dplyr)
+library(rio)
+library(memisc)
+library(psych)
+library(ggplot2)
+library(ggpubr)
+library(lme4)
+library(MetBrewer)
+source("../custom_functions.R")
+```
+## Dataset
+
+```{r}
+fdat<-import("../../data/processed/fdat.xlsx")
+```
+
+## Data transformations
+
+The reference levels for factorial variables need to be redefined, .xlsx format does not understand factor formats.
+
+### Income
+
+```{r}
+fdat$income.f<-case_when(
+  is.na(fdat$income) ~ "missing",
+  TRUE ~ fdat$income
+)
+
+#define reference level (top quintile)
+table(fdat$income.f,useNA="always")
+fdat$income.fr = relevel(as.factor(fdat$income.f), ref="quint.5")
+table(fdat$income.fr,useNA="always")
+```
+
+### Education
+
+```{r}
+table(fdat$edu,useNA="always")
+fdat$edu.f<-relevel(as.factor(fdat$edu),ref="7. MA")
+table(fdat$edu.f,useNA="always")
+```
+
+### DV
+
+```{r}
+table(fdat$DV,useNA="always")
+fdat$DV.f<-relevel(as.factor(fdat$DV),ref="NN")
+table(fdat$DV.f,useNA="always")
+```
+
+### Strain on health and political orientation
+
+Calculate country means for centering
+
+```{r}
+# Calculate country means for centering
+
+cntry.means<-fdat %>%
+  group_by(cntry) %>%
+  summarise(strain.on.health.cntry.mean=
+              mean(strain.on.health,na.rm=T),
+            lrgen.cntry.mean=
+              mean(lrgen,na.rm=T),
+            lrecon.cntry.mean=
+              mean(lrecon,na.rm=T),
+            galtan.cntry.mean=
+              mean(galtan,na.rm=T),
+            antielite_salience.cntry.mean=
+              mean(antielite_salience,na.rm=T),
+            corrupt_salience.cntry.mean=
+              mean(corrupt_salience,na.rm=T))
+
+#combine data frames
+
+fdat<-left_join(
+  x=fdat,
+  y=cntry.means,
+  by="cntry"
+)
+
+#country-mean center strain on health
+
+fdat$strain.on.health.c<-
+  fdat$strain.on.health-fdat$strain.on.health.cntry.mean
+
+#country-mean center political orientation
+
+fdat$lrgen.c<-
+  fdat$lrgen-fdat$lrgen.cntry.mean
+fdat$lrecon.c<-
+  fdat$lrecon-fdat$lrecon.cntry.mean
+fdat$galtan.c<-
+  fdat$galtan-fdat$galtan.cntry.mean
+fdat$antielite_salience.c<-
+  fdat$antielite_salience-fdat$antielite_salience.cntry.mean
+fdat$corrupt_salience.c<-
+  fdat$corrupt_salience-fdat$corrupt_salience.cntry.mean
+
+#scale with CHES grand SD
+fdat$lrgen.z<-
+  fdat$lrgen.c/fdat$lrgen.scaling
+fdat$lrecon.z<-
+  fdat$lrecon.c/fdat$lrecon.scaling
+fdat$galtan.z<-
+  fdat$galtan.c/fdat$galtan.scaling
+fdat$antielite_salience.z<-
+  fdat$antielite_salience.c/fdat$antielite_salience.scaling
+fdat$corrupt_salience.z<-
+  fdat$corrupt_salience.c/fdat$corrupt_salience.scaling
+```
+
+## Exclude missing variable
+
+```{r}
+
+fdat<-fdat %>%
+  filter(cntry!="IL" & cntry!="EE") %>%
+  filter(!is.na(cntry) & 
+         !is.na(gndr.c) &
+         !is.na(age10.c) &
+         !is.na(income.fr) &
+           !is.na(edu.f) &
+           !is.na(strain.on.health.c) &
+           !is.na(DV) &
+           !is.na(lrgen.z) &
+           !is.na(lrecon.z) &
+           !is.na(galtan.z) &
+           !is.na(antielite_salience.z) &
+           !is.na(corrupt_salience.z))
+
+```
+
+## Construct anweight variable for weighting
+
+```{r}
+fdat$anweight=fdat$pspwght*fdat$pweight
+```
+
+# Descriptive analysis
+
+## Check the presence of all DV-groups across countries
+
+```{r}
+table(fdat$cntry,fdat$DV.f)
+round(100*prop.table(table(fdat$cntry,fdat$DV.f),
+                     margin = 1),1)
+```
+
+
+# Analysis
+
+## Empty model
+
+```{r}
+mod0<-mblogit(DV.f~1,
+              random= ~1|cntry,
+              estimator="ML",
+              data=fdat,weights=anweight)
+
+mod0
+summary(mod0)
+mtable(mod0,show.baselevel = T)
+```
+
+## Model with covariates
+
+```{r}
+mod1<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+blgetmg.c+mstatus.c+
+            strain.on.health.c,
+              random= ~1|cntry,
+              estimator="ML",
+              data=fdat,weights=anweight)
+
+summary(mod1)
+mod1
+mtable(mod1,show.baselevel = T)
+```
+
+### Strain on health main effects
+
+```{r}
+
+mod1.strain.trends<-
+  emtrends(mod1,~1|DV.f,
+           var="strain.on.health.c",
+           infer=T,mode="latent",
+           at=list(gndr.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod1.strain.eff<-
+  contrast(mod1.strain.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.strain.eff),
+       "../../results/Added_covariates/mod1.strain.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.strain.eff.CM<-
+  contrast(mod1.strain.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.strain.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.f",
+           infer=c(T,T)))
+
+
+(mod1.strain.eff.CAM<-
+    contrast(mod1.strain.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.strain.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f",
+           infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(mod1.strain.eff.CM,
+      mod1.strain.eff.CAM,adjust="none")),
+      "../../results/Added_covariates/mod1.strain.eff.COMB.xlsx")
+
+```
+
+### gender main effects
+
+```{r}
+
+mod1.gndr.trends<-
+  emtrends(mod1,~1|DV.f,
+           var="gndr.c",
+           infer=T,mode="latent",
+           at=list(strain.on.health.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod1.gndr.eff<-
+  contrast(mod1.gndr.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.gndr.eff),
+       "../../results/Added_covariates/mod1.gndr.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.gndr.eff.CM<-
+  contrast(mod1.gndr.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.gndr.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.f",
+           infer=c(T,T)))
+
+
+(mod1.gndr.eff.CAM<-
+    contrast(mod1.gndr.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.gndr.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f",
+           infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(mod1.gndr.eff.CM,
+      mod1.gndr.eff.CAM,adjust="none")),
+      "../../results/Added_covariates/mod1.gndr.eff.COMB.xlsx")
+
+```
+
+
+### age main effects
+
+```{r}
+
+mod1.age10.trends<-
+  emtrends(mod1,~1|DV.f,
+           var="age10.c",
+           infer=T,mode="latent",
+           at=list(strain.on.health.c=0,gndr.c=0))
+
+#effects for each DV-category
+(mod1.age10.eff<-
+  contrast(mod1.age10.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.age10.eff),
+       "../../results/Added_covariates/mod1.age10.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod1.age10.eff.CM<-
+  contrast(mod1.age10.trends,
+           method = list("Conv - No conv" = contrast.weights.total(effects=mod1.age10.eff,
+          signs=c(-2,-2,2,2))),
+           simple="DV.f",
+           infer=c(T,T)))
+
+
+(mod1.age10.eff.CAM<-
+    contrast(mod1.age10.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod1.age10.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f",
+           infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(mod1.age10.eff.CM,
+      mod1.age10.eff.CAM,adjust="none")),
+      "../../results/Added_covariates/mod1.age10.eff.COMB.xlsx")
+
+```
+
+
+### education main effects
+
+```{r}
+# first take probabilities for all categories
+mod1.edu.f.trends<-emmeans(mod1,by="DV.f",
+        specs="edu.f",
+        infer=T,mode="prob",
+        at=list(strain.on.health.c=0,gndr.c=0,age10.c=0))
+
+mod1.edu.f.trends
+
+
+export(data.frame(mod1.edu.f.trends),
+       "../../results/Added_covariates/mod1.edu.f.eff.MN.xlsx",
+       overwrite=T)
+
+
+#effects for each DV-category
+(mod1.edu.f.eff<-
+    contrast(mod1.edu.f.trends,#simple="edu.f",
+             adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.edu.f.eff),
+       "../../results/Added_covariates/mod1.edu.f.eff.MN.xlsx",
+       overwrite=T)
+
+# No Conv versus Conv
+
+(mod1.edu.f.eff_DV<-
+    contrast(mod1.edu.f.trends,simple="DV.f",
+             adjust="none","eff",infer=c(T,T)))
+
+
+(mod1.edu.f.eff.CM<-
+    contrast(mod1.edu.f.trends,
+             method = 
+               list("Conv - No conv" = c(0,0,1,1)),
+             simple="DV.f",
+             infer=c(T,T)))
+
+(mod1.edu.f.eff.CM_comp<-
+  contrast(mod1.edu.f.eff.CM,
+         simple="edu.f",method="eff",
+         infer=c(T,T),adjust="none"))
+
+# No CAM versus CAM
+
+
+(mod1.edu.f.eff.CAM<-
+    contrast(mod1.edu.f.trends,
+             method = 
+               list("CAM - No CAM" = c(0,1,1,0)),
+             simple="DV.f",
+             infer=c(T,T)))
+
+(mod1.edu.f.eff.CAM_comp<-
+    contrast(mod1.edu.f.eff.CAM,
+             simple="edu.f",method="eff",
+             infer=c(T,T),adjust="none"))
+
+
+# save to file
+export(data.frame(rbind(mod1.edu.f.eff.CM_comp,
+                        mod1.edu.f.eff.CAM_comp,adjust="none")),
+       "../../results/Added_covariates/mod1.edu.f.eff.COMB_comp.xlsx",overwrite=T)
+
+# save to file
+export(data.frame(rbind(mod1.edu.f.eff.CM,
+                        mod1.edu.f.eff.CAM,adjust="none")),
+       "../../results/Added_covariates/mod1.edu.f.eff.COMB.xlsx",overwrite=T)
+```
+
+
+### income main effects
+
+```{r}
+# first take probabilities for all categories
+mod1.income.fr.trends<-emmeans(mod1,by="DV.f",
+        specs="income.fr",
+        infer=T,mode="prob",
+        at=list(strain.on.health.c=0,gndr.c=0,age10.c=0))
+
+mod1.income.fr.trends
+
+
+export(data.frame(mod1.income.fr.trends),
+       "../../results/Added_covariates/mod1.income.fr.eff.MN.xlsx",
+       overwrite=T)
+
+
+#effects for each DV-category
+(mod1.income.fr.eff<-
+    contrast(mod1.income.fr.trends,#simple="income.fr",
+             adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod1.income.fr.eff),
+       "../../results/Added_covariates/mod1.income.fr.eff.MN.xlsx",
+       overwrite=T)
+
+# No Conv versus Conv
+
+(mod1.income.fr.eff_DV<-
+    contrast(mod1.income.fr.trends,simple="DV.f",
+             adjust="none","eff",infer=c(T,T)))
+
+
+(mod1.income.fr.eff.CM<-
+    contrast(mod1.income.fr.trends,
+             method = 
+               list("Conv - No conv" = c(0,0,1,1)),
+             simple="DV.f",
+             infer=c(T,T)))
+
+(mod1.income.fr.eff.CM_comp<-
+  contrast(mod1.income.fr.eff.CM,
+         simple="income.fr",method="eff",
+         infer=c(T,T),adjust="none"))
+
+# No CAM versus CAM
+
+
+(mod1.income.fr.eff.CAM<-
+    contrast(mod1.income.fr.trends,
+             method = 
+               list("CAM - No CAM" = c(0,1,1,0)),
+             simple="DV.f",
+             infer=c(T,T)))
+
+(mod1.income.fr.eff.CAM_comp<-
+    contrast(mod1.income.fr.eff.CAM,
+             simple="income.fr",method="eff",
+             infer=c(T,T),adjust="none"))
+
+
+# save to file
+export(data.frame(rbind(mod1.income.fr.eff.CM_comp,
+                        mod1.income.fr.eff.CAM_comp,adjust="none")),
+       "../../results/Added_covariates/mod1.income.fr.eff.COMB_comp.xlsx",overwrite=T)
+
+# save to file
+export(data.frame(rbind(mod1.income.fr.eff.CM,
+                        mod1.income.fr.eff.CAM,adjust="none")),
+       "../../results/Added_covariates/mod1.income.fr.eff.COMB.xlsx",overwrite=T)
+```
+
+## Model for lrgen
+
+```{r}
+mod2.lrgen<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+blgetmg.c+mstatus.c+
+            strain.on.health.c+
+            lrgen.z,
+                    random= ~1|cntry,
+                    estimator="ML",
+                    control = mmclogit.control(maxit = 250, trace=TRUE),
+                    data=fdat,weights=anweight)
+
+# general model comparison
+
+anova(mod1,mod2.lrgen,test="Chisq")
+
+# Is lrgen associated with using conventional medicine?
+ref_grid(mod2.lrgen)
+mod2.lrgen.trends<-
+  emtrends(mod2.lrgen,~1|DV.f,
+           var="lrgen.z",infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0,
+                   strain.on.health.c=0))
+
+#effects for each DV-category
+(mod2.lrgen.eff<-
+  contrast(mod2.lrgen.trends,simple="DV.f",
+         adjust="none","eff", infer=c(T,T)))
+
+#save to file
+export(data.frame(mod2.lrgen.eff),
+       "../../results/Added_covariates/mod2.lrgen.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod2.lrgen.eff.CM<-
+    contrast(mod2.lrgen.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.lrgen.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+(mod2.lrgen.eff.CAM<-
+    contrast(mod2.lrgen.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.lrgen.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# save to file
+export(data.frame(rbind(
+  mod2.lrgen.eff.CM,
+  mod2.lrgen.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod2.lrgen.eff.COMB.xlsx")
+```
+
+## Model for lrecon
+
+```{r}
+mod2.lrecon<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+blgetmg.c+mstatus.c+
+            strain.on.health.c+
+            lrecon.z,
+                    random= ~1|cntry,
+                    estimator="ML",
+                    control = mmclogit.control(maxit = 250, trace=TRUE),
+                    data=fdat,weights=anweight)
+
+# general model comparison
+
+anova(mod1,mod2.lrecon,test="Chisq")
+
+# Is lrecon associated with using conventional medicine?
+ref_grid(mod2.lrecon)
+mod2.lrecon.trends<-
+  emtrends(mod2.lrecon,~1|DV.f,
+           var="lrecon.z",infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0,
+                   strain.on.health.c=0))
+
+#effects for each DV-category
+(mod2.lrecon.eff<-
+  contrast(mod2.lrecon.trends,simple="DV.f",
+         adjust="none","eff", infer=c(T,T)))
+
+#save to file
+export(data.frame(mod2.lrecon.eff),
+       "../../results/Added_covariates/mod2.lrecon.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod2.lrecon.eff.CM<-
+    contrast(mod2.lrecon.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.lrecon.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+(mod2.lrecon.eff.CAM<-
+    contrast(mod2.lrecon.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.lrecon.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# save to file
+export(data.frame(rbind(
+  mod2.lrecon.eff.CM,
+  mod2.lrecon.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod2.lrecon.eff.COMB.xlsx")
+```
+
+## Model for galtan
+
+```{r}
+mod2.galtan<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+blgetmg.c+mstatus.c+
+            strain.on.health.c+
+            galtan.z,
+                    random= ~1|cntry,
+                    estimator="ML",
+                    control = mmclogit.control(maxit = 250, trace=TRUE),
+                    data=fdat,weights=anweight)
+
+# general model comparison
+
+anova(mod1,mod2.galtan,test="Chisq")
+
+# Is galtan associated with using conventional medicine?
+ref_grid(mod2.galtan)
+mod2.galtan.trends<-
+  emtrends(mod2.galtan,~1|DV.f,
+           var="galtan.z",infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0,
+                   strain.on.health.c=0))
+
+#effects for each DV-category
+(mod2.galtan.eff<-
+  contrast(mod2.galtan.trends,simple="DV.f",
+         adjust="none","eff", infer=c(T,T)))
+
+#save to file
+export(data.frame(mod2.galtan.eff),
+       "../../results/Added_covariates/mod2.galtan.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod2.galtan.eff.CM<-
+    contrast(mod2.galtan.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.galtan.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+(mod2.galtan.eff.CAM<-
+    contrast(mod2.galtan.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.galtan.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# save to file
+export(data.frame(rbind(
+  mod2.galtan.eff.CM,
+  mod2.galtan.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod2.galtan.eff.COMB.xlsx")
+```
+
+### Contrast between CAM-only and CAM-and-conv against no-CAM
+
+```{r}
+
+pairs(mod2.galtan.eff,adjust="none",infer=c(T,T))
+
+#save to file
+
+export(data.frame(pairs(mod2.galtan.eff,
+                        adjust="none",
+                        infer=c(T,T))),
+  "../../results/Added_covariates/mod2.galtan.eff.CAM.contrast.xlsx")
+
+```
+
+## Model for antielite_salience
+
+```{r}
+mod2.antielite_salience<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+blgetmg.c+mstatus.c+
+            strain.on.health.c+
+            antielite_salience.z,
+                    random= ~1|cntry,
+                    estimator="ML",
+                    control = mmclogit.control(maxit = 250, trace=TRUE),
+                    data=fdat,weights=anweight)
+
+# general model comparison
+
+anova(mod1,mod2.antielite_salience,test="Chisq")
+
+# Is antielite_salience associated with using conventional medicine?
+ref_grid(mod2.antielite_salience)
+mod2.antielite_salience.trends<-
+  emtrends(mod2.antielite_salience,~1|DV.f,
+           var="antielite_salience.z",infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0,
+                   strain.on.health.c=0))
+
+#effects for each DV-category
+(mod2.antielite_salience.eff<-
+  contrast(mod2.antielite_salience.trends,simple="DV.f",
+         adjust="none","eff", infer=c(T,T)))
+
+#save to file
+export(data.frame(mod2.antielite_salience.eff),
+       "../../results/Added_covariates/mod2.antielite_salience.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod2.antielite_salience.eff.CM<-
+    contrast(mod2.antielite_salience.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.antielite_salience.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+(mod2.antielite_salience.eff.CAM<-
+    contrast(mod2.antielite_salience.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.antielite_salience.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# save to file
+export(data.frame(rbind(
+  mod2.antielite_salience.eff.CM,
+  mod2.antielite_salience.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod2.antielite_salience.eff.COMB.xlsx")
+```
+
+## Model for corrupt_salience
+
+```{r}
+mod2.corrupt_salience<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+blgetmg.c+mstatus.c+
+            strain.on.health.c+
+            corrupt_salience.z,
+                    random= ~1|cntry,
+                    estimator="ML",
+                    control = mmclogit.control(maxit = 250, trace=TRUE),
+                    data=fdat,weights=anweight)
+
+# general model comparison
+
+anova(mod1,mod2.corrupt_salience,test="Chisq")
+
+# Is corrupt_salience associated with using conventional medicine?
+ref_grid(mod2.corrupt_salience)
+mod2.corrupt_salience.trends<-
+  emtrends(mod2.corrupt_salience,~1|DV.f,
+           var="corrupt_salience.z",infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0,
+                   strain.on.health.c=0))
+
+#effects for each DV-category
+(mod2.corrupt_salience.eff<-
+  contrast(mod2.corrupt_salience.trends,simple="DV.f",
+         adjust="none","eff", infer=c(T,T)))
+
+#save to file
+export(data.frame(mod2.corrupt_salience.eff),
+       "../../results/Added_covariates/mod2.corrupt_salience.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod2.corrupt_salience.eff.CM<-
+    contrast(mod2.corrupt_salience.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod2.corrupt_salience.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+(mod2.corrupt_salience.eff.CAM<-
+    contrast(mod2.corrupt_salience.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod2.corrupt_salience.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# save to file
+export(data.frame(rbind(
+  mod2.corrupt_salience.eff.CM,
+  mod2.corrupt_salience.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod2.corrupt_salience.eff.COMB.xlsx")
+```
+
+
+### Contrast between CAM-only and CAM-and-conv against no-CAM
+
+```{r}
+
+pairs(mod2.corrupt_salience.eff,
+      adjust="none",infer=c(T,T))
+
+#save to file
+
+export(data.frame(pairs(mod2.corrupt_salience.eff,
+                        adjust="none",
+                        infer=c(T,T))),
+  "../../results/Added_covariates/mod2.corrupt_salience.eff.CAM.contrast.xlsx")
+```
+
+# Interactions by strain on health
+
+## Model for lrgen
+
+```{r}
+mod3.lrgen<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+lrgen.z+
+            strain.on.health.c:lrgen.z,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+anova(mod2.lrgen,mod3.lrgen,test="Chisq")
+
+#Alternative model with manually defined interaction
+fdat$lrgen.zXstrain.on.health.c<-fdat$lrgen.z*fdat$strain.on.health.c
+
+mod3.lrgen.alt<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+lrgen.z+
+            lrgen.zXstrain.on.health.c,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+
+mod3.lrgen.alt.trends<-
+  emtrends(mod3.lrgen.alt,~1|DV.f,
+           var="lrgen.zXstrain.on.health.c",
+           infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod3.lrgen.alt.eff<-
+  contrast(mod3.lrgen.alt.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod3.lrgen.alt.eff),
+       "../../results/Added_covariates/mod3.lrgenBYhealth.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod3.lrgen.eff.CM<-contrast(mod3.lrgen.alt.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod3.lrgen.alt.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+#weighted across all effects
+
+(mod3.lrgen.eff.CAM<-contrast(mod3.lrgen.alt.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod3.lrgen.alt.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(
+  mod3.lrgen.eff.CM,
+  mod3.lrgen.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod3.lrgenBYhealth.eff.COMB.xlsx")
+
+
+```
+
+
+## Model for lrecon
+
+```{r}
+mod3.lrecon<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+lrecon.z+
+            strain.on.health.c:lrecon.z,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             epsilon=0.0001,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+anova(mod2.lrecon,mod3.lrecon,test="Chisq")
+
+#Alternative model with manually defined interaction
+fdat$lrecon.zXstrain.on.health.c<-fdat$lrecon.z*fdat$strain.on.health.c
+
+mod3.lrecon.alt<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+lrecon.z+
+            lrecon.zXstrain.on.health.c,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             epsilon=0.0001,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+
+mod3.lrecon.alt.trends<-
+  emtrends(mod3.lrecon.alt,~1|DV.f,
+           var="lrecon.zXstrain.on.health.c",
+           infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod3.lrecon.alt.eff<-
+  contrast(mod3.lrecon.alt.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod3.lrecon.alt.eff),
+       "../../results/Added_covariates/mod3.lreconBYhealth.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod3.lrecon.eff.CM<-contrast(mod3.lrecon.alt.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod3.lrecon.alt.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+#weighted across all effects
+
+(mod3.lrecon.eff.CAM<-contrast(mod3.lrecon.alt.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod3.lrecon.alt.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(
+  mod3.lrecon.eff.CM,
+  mod3.lrecon.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod3.lreconBYhealth.eff.COMB.xlsx")
+```
+
+
+## Model for galtan
+
+(Here it was necessary to change the epsilon convergence criterion 1e-04 instead of 1e-08)
+
+```{r}
+mod3.galtan<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+galtan.z+
+            strain.on.health.c:galtan.z,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             epsilon=0.0001,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+
+
+anova(mod2.galtan,mod3.galtan,test="Chisq")
+
+#Alternative model with manually defined interaction
+fdat$galtan.zXstrain.on.health.c<-fdat$galtan.z*fdat$strain.on.health.c
+
+mod3.galtan.alt<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+galtan.z+
+            galtan.zXstrain.on.health.c,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             trace=TRUE,
+                             epsilon=0.0001),
+          data=fdat,weights=anweight)
+
+
+mod3.galtan.alt.trends<-
+  emtrends(mod3.galtan.alt,~1|DV.f,
+           var="galtan.zXstrain.on.health.c",
+           infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod3.galtan.alt.eff<-
+  contrast(mod3.galtan.alt.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod3.galtan.alt.eff),
+       "../../results/Added_covariates/mod3.galtanBYhealth.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod3.galtan.eff.CM<-contrast(mod3.galtan.alt.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod3.galtan.alt.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+#weighted across all effects
+
+(mod3.galtan.eff.CAM<-contrast(mod3.galtan.alt.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod3.galtan.alt.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(
+  mod3.galtan.eff.CM,
+  mod3.galtan.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod3.galtanBYhealth.eff.COMB.xlsx")
+```
+
+
+
+## Model for antielite_salience
+
+```{r}
+mod3.antielite_salience<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+antielite_salience.z+
+            strain.on.health.c:antielite_salience.z,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+anova(mod2.antielite_salience,
+      mod3.antielite_salience,test="Chisq")
+
+#Alternative model with manually defined interaction
+fdat$antielite_salience.zXstrain.on.health.c<-fdat$antielite_salience.z*fdat$strain.on.health.c
+
+mod3.antielite_salience.alt<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+antielite_salience.z+
+            antielite_salience.zXstrain.on.health.c,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+
+mod3.antielite_salience.alt.trends<-
+  emtrends(mod3.antielite_salience.alt,~1|DV.f,
+           var="antielite_salience.zXstrain.on.health.c",
+           infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod3.antielite_salience.alt.eff<-
+  contrast(mod3.antielite_salience.alt.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod3.antielite_salience.alt.eff),
+       "../../results/Added_covariates/mod3.antielite_salienceBYhealth.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod3.antielite_salience.eff.CM<-
+    contrast(mod3.antielite_salience.alt.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod3.antielite_salience.alt.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+#weighted across all effects
+
+(mod3.antielite_salience.eff.CAM<-
+    contrast(mod3.antielite_salience.alt.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod3.antielite_salience.alt.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(
+  mod3.antielite_salience.eff.CM,
+  mod3.antielite_salience.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod3.antielite_salienceBYhealth.eff.COMB.xlsx")
+
+
+```
+
+### Probing simple slopes
+
+```{r}
+ref_grid(mod3.antielite_salience)
+
+#pick points for inference
+
+strain.on.health.c.points<-
+  c(mean(fdat$strain.on.health.c)-
+      sd(fdat$strain.on.health.c),
+    mean(fdat$strain.on.health.c)-
+      0*sd(fdat$strain.on.health.c),
+    mean(fdat$strain.on.health.c)+
+      sd(fdat$strain.on.health.c))
+
+#conv
+
+#low
+
+mod3.antielite_salience.slopes.low<-
+  emtrends(mod3.antielite_salience,~1|DV.f,
+           var="antielite_salience.z",
+           by="strain.on.health.c",
+           at=list(strain.on.health.c=
+                     strain.on.health.c.points[1],
+                   gndr.c=0,
+                   age.10.c=0),
+           infer=c(T,T),
+           mode="latent")
+
+(mod3.antielite_salience.slopes.low.eff<-
+  contrast(mod3.antielite_salience.slopes.low,
+                                         simple="DV.f",
+                                         adjust="none","eff",
+           infer=c(T,T)))
+
+
+
+#mid
+
+
+mod3.antielite_salience.slopes.mid<-
+  emtrends(mod3.antielite_salience,~1|DV.f,
+           var="antielite_salience.z",
+           by="strain.on.health.c",
+           at=list(strain.on.health.c=
+                     strain.on.health.c.points[2],
+                   gndr.c=0,
+                   age.10.c=0),
+           infer=c(T,T),
+           mode="latent")
+
+(mod3.antielite_salience.slopes.mid.eff<-
+  contrast(mod3.antielite_salience.slopes.mid,
+                                         simple="DV.f",
+                                         adjust="none","eff",
+           infer=c(T,T)))
+
+
+#high
+
+
+mod3.antielite_salience.slopes.high<-
+  emtrends(mod3.antielite_salience,~1|DV.f,
+           var="antielite_salience.z",
+           by="strain.on.health.c",
+           at=list(strain.on.health.c=
+                     strain.on.health.c.points[3],
+                   gndr.c=0,
+                   age.10.c=0),
+           infer=c(T,T),
+           mode="latent")
+
+(mod3.antielite_salience.slopes.high.eff<-
+  contrast(mod3.antielite_salience.slopes.high,
+                                         simple="DV.f",
+                                         adjust="none","eff",
+           infer=c(T,T)))
+
+
+# save to file
+
+export(rbind(data.frame(mod3.antielite_salience.slopes.low.eff),
+             data.frame(mod3.antielite_salience.slopes.mid.eff),
+             data.frame(mod3.antielite_salience.slopes.high.eff)),
+       "../../results/Added_covariates/mod3.antielite_salience.slopes.eff.MN.xlsx")
+
+
+# combined CM for low
+
+(mod3.antielite_salience.slopes.low.CM<-
+  contrast(mod3.antielite_salience.slopes.low,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.antielite_salience.slopes.low.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# combined CM for mid
+
+(mod3.antielite_salience.slopes.mid.CM<-
+  contrast(mod3.antielite_salience.slopes.mid,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.antielite_salience.slopes.mid.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# combined CM for high
+
+(mod3.antielite_salience.slopes.high.CM<-
+  contrast(mod3.antielite_salience.slopes.high,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.antielite_salience.slopes.high.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+
+#Combined CAM for low
+
+
+(mod3.antielite_salience.slopes.low.CAM<-
+    contrast(mod3.antielite_salience.slopes.low,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.antielite_salience.slopes.low.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+#Combined CAM for mid
+
+
+(mod3.antielite_salience.slopes.mid.CAM<-
+    contrast(mod3.antielite_salience.slopes.mid,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.antielite_salience.slopes.mid.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Combined CAM for high
+
+
+(mod3.antielite_salience.slopes.high.CAM<-
+    contrast(mod3.antielite_salience.slopes.high,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.antielite_salience.slopes.high.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+export(data.frame(rbind(
+  mod3.antielite_salience.slopes.low.CM,
+  mod3.antielite_salience.slopes.mid.CM,
+  mod3.antielite_salience.slopes.high.CM,
+  mod3.antielite_salience.slopes.low.CAM,
+  mod3.antielite_salience.slopes.mid.CAM,
+  mod3.antielite_salience.slopes.high.CAM,adjust="none")),
+  "../../results/Added_covariates/mod3.antielite_salience.slopes.eff.COMB.xlsx")
+```
+
+## Model for corrupt_salience
+
+```{r}
+mod3.corrupt_salience<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+corrupt_salience.z+
+            strain.on.health.c:corrupt_salience.z,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+anova(mod2.corrupt_salience,
+      mod3.corrupt_salience,test="Chisq")
+
+#Alternative model with manually defined interaction
+fdat$corrupt_salience.zXstrain.on.health.c<-
+  fdat$corrupt_salience.z*fdat$strain.on.health.c
+
+mod3.corrupt_salience.alt<-
+  mblogit(DV.f~gndr.c+age10.c+income.fr+
+            edu.f+blgetmg.c+mstatus.c+strain.on.health.c+corrupt_salience.z+
+            corrupt_salience.zXstrain.on.health.c,
+          random= ~1|cntry,
+          estimator="ML",
+          control = 
+            mmclogit.control(maxit = 250,
+                             trace=TRUE),
+          data=fdat,weights=anweight)
+
+
+mod3.corrupt_salience.alt.trends<-
+  emtrends(mod3.corrupt_salience.alt,~1|DV.f,
+           var="corrupt_salience.zXstrain.on.health.c",
+           infer=c(T,T),mode="latent",
+           at=list(gndr.c=0,age10.c=0))
+
+#effects for each DV-category
+(mod3.corrupt_salience.alt.eff<-
+  contrast(mod3.corrupt_salience.alt.trends,simple="DV.f",
+         adjust="none","eff",infer=c(T,T)))
+
+#save to file
+export(data.frame(mod3.corrupt_salience.alt.eff),
+       "../../results/Added_covariates/mod3.corrupt_salienceBYhealth.eff.MN.xlsx",
+       overwrite=T)
+
+#Use of conventional medicine
+
+(mod3.corrupt_salience.eff.CM<-
+    contrast(mod3.corrupt_salience.alt.trends,
+         method = list("Conv - No conv" = contrast.weights.total(effects=mod3.corrupt_salience.alt.eff,
+                 signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Use of CAM
+
+#weighted across all effects
+
+(mod3.corrupt_salience.eff.CAM<-
+    contrast(mod3.corrupt_salience.alt.trends,
+         method = list("CAM - No CAM" = contrast.weights.total(effects=mod3.corrupt_salience.alt.eff,
+                 signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+# save to file
+export(data.frame(rbind(
+  mod3.corrupt_salience.eff.CM,
+  mod3.corrupt_salience.eff.CAM,adjust="none")),
+  "../../results/Added_covariates/mod3.corrupt_salienceBYhealth.eff.COMB.xlsx")
+
+
+```
+
+### Probing simple slopes
+
+```{r}
+ref_grid(mod3.corrupt_salience)
+
+#pick points for inference
+
+strain.on.health.c.points<-
+  c(mean(fdat$strain.on.health.c)-
+      sd(fdat$strain.on.health.c),
+    mean(fdat$strain.on.health.c)-
+      0*sd(fdat$strain.on.health.c),
+    mean(fdat$strain.on.health.c)+
+      sd(fdat$strain.on.health.c))
+
+#conv
+
+#low
+
+mod3.corrupt_salience.slopes.low<-
+  emtrends(mod3.corrupt_salience,~1|DV.f,
+           var="corrupt_salience.z",
+           by="strain.on.health.c",
+           at=list(strain.on.health.c=
+                     strain.on.health.c.points[1],
+                   gndr.c=0,
+                   age.10.c=0),
+           infer=c(T,T),
+           mode="latent")
+
+(mod3.corrupt_salience.slopes.low.eff<-
+  contrast(mod3.corrupt_salience.slopes.low,
+                                         simple="DV.f",
+                                         adjust="none","eff",
+           infer=c(T,T)))
+
+
+
+#mid
+
+
+mod3.corrupt_salience.slopes.mid<-
+  emtrends(mod3.corrupt_salience,~1|DV.f,
+           var="corrupt_salience.z",
+           by="strain.on.health.c",
+           at=list(strain.on.health.c=
+                     strain.on.health.c.points[2],
+                   gndr.c=0,
+                   age.10.c=0),
+           infer=c(T,T),
+           mode="latent")
+
+(mod3.corrupt_salience.slopes.mid.eff<-
+  contrast(mod3.corrupt_salience.slopes.mid,
+                                         simple="DV.f",
+                                         adjust="none","eff",
+           infer=c(T,T)))
+
+
+#high
+
+
+mod3.corrupt_salience.slopes.high<-
+  emtrends(mod3.corrupt_salience,~1|DV.f,
+           var="corrupt_salience.z",
+           by="strain.on.health.c",
+           at=list(strain.on.health.c=
+                     strain.on.health.c.points[3],
+                   gndr.c=0,
+                   age.10.c=0),
+           infer=c(T,T),
+           mode="latent")
+
+(mod3.corrupt_salience.slopes.high.eff<-
+  contrast(mod3.corrupt_salience.slopes.high,
+                                         simple="DV.f",
+                                         adjust="none","eff",
+           infer=c(T,T)))
+
+
+# save to file
+
+export(rbind(data.frame(mod3.corrupt_salience.slopes.low.eff),
+             data.frame(mod3.corrupt_salience.slopes.mid.eff),
+             data.frame(mod3.corrupt_salience.slopes.high.eff)),
+       "../../results/Added_covariates/mod3.corrupt_salience.slopes.eff.MN.xlsx")
+
+
+# combined CM for low
+
+(mod3.corrupt_salience.slopes.low.CM<-
+  contrast(mod3.corrupt_salience.slopes.low,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.corrupt_salience.slopes.low.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# combined CM for mid
+
+(mod3.corrupt_salience.slopes.mid.CM<-
+  contrast(mod3.corrupt_salience.slopes.mid,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.corrupt_salience.slopes.mid.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+# combined CM for high
+
+(mod3.corrupt_salience.slopes.high.CM<-
+  contrast(mod3.corrupt_salience.slopes.high,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.corrupt_salience.slopes.high.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+
+#Combined CAM for low
+
+
+(mod3.corrupt_salience.slopes.low.CAM<-
+    contrast(mod3.corrupt_salience.slopes.low,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.corrupt_salience.slopes.low.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+
+#Combined CAM for mid
+
+
+(mod3.corrupt_salience.slopes.mid.CAM<-
+    contrast(mod3.corrupt_salience.slopes.mid,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.corrupt_salience.slopes.mid.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+#Combined CAM for high
+
+
+(mod3.corrupt_salience.slopes.high.CAM<-
+    contrast(mod3.corrupt_salience.slopes.high,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod3.corrupt_salience.slopes.high.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f", infer=c(T,T)))
+
+export(data.frame(rbind(
+  mod3.corrupt_salience.slopes.low.CM,
+  mod3.corrupt_salience.slopes.mid.CM,
+  mod3.corrupt_salience.slopes.high.CM,
+  mod3.corrupt_salience.slopes.low.CAM,
+  mod3.corrupt_salience.slopes.mid.CAM,
+  mod3.corrupt_salience.slopes.high.CAM,adjust="none")),
+  "../../results/Added_covariates/mod3.corrupt_salience.slopes.eff.COMB.xlsx")
+```
+
+
+# Exploratory analysis
+
+## Nonlinearity
+
+### lrgen
+
+```{r}
+
+fdat$lrgen.z.1<-fdat$lrgen.z
+fdat$lrgen.z.2<-fdat$lrgen.z^2
+fdat$lrgen.z.3<-fdat$lrgen.z^3
+
+mod4.lrgen<-mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+blgetmg.c+mstatus.c+strain.on.health.c+
+                       lrgen.z+I(lrgen.z^2)+I(lrgen.z^3),
+                     random= ~1|cntry,
+                     estimator="ML",
+                     data=fdat,weights=anweight)
+
+anova(mod2.lrgen,mod4.lrgen,test="Chisq")
+
+
+```
+
+
+### lrecon
+
+```{r}
+
+fdat$lrecon.z.1<-fdat$lrecon.z
+fdat$lrecon.z.2<-fdat$lrecon.z^2
+fdat$lrecon.z.3<-fdat$lrecon.z^3
+
+mod4.lrecon<-mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+blgetmg.c+mstatus.c+strain.on.health.c+
+                       lrecon.z+I(lrecon.z^2)+I(lrecon.z^3),
+                     random= ~1|cntry,
+                     estimator="ML",
+                     data=fdat,weights=anweight)
+
+anova(mod2.lrecon,mod4.lrecon,test="Chisq")
+
+
+```
+
+
+
+### galtan
+
+```{r}
+
+fdat$galtan.z.1<-fdat$galtan.z
+fdat$galtan.z.2<-fdat$galtan.z^2
+fdat$galtan.z.3<-fdat$galtan.z^3
+
+mod4.galtan<-mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+
+                       strain.on.health.c+
+                       galtan.z+I(galtan.z^2)+I(galtan.z^3),
+                     random= ~1|cntry,
+                     estimator="ML",
+                     data=fdat,weights=anweight)
+
+anova(mod2.galtan,mod4.galtan,test="Chisq")
+
+mod5.galtan<-mblogit(DV.f~gndr.c+age10.c+income.fr+edu.f+
+                       strain.on.health.c+
+                       galtan.z+I(galtan.z^2),
+                     random= ~1|cntry,
+                     estimator="ML",
+                     data=fdat,weights=anweight)
+
+anova(mod5.galtan,mod4.galtan,test="Chisq")
+
+
+```
+
+
+#### Simple slopes
+
+```{r}
+
+#low
+mod4.galtan.slopes.low<-
+  emtrends(mod4.galtan,~1|DV.f,
+           var="galtan.z",
+           by="galtan.z",
+           at=list(strain.on.health.c=0,
+                   gndr.c=0,
+                   age10.c=0,
+                   galtan.z=c(-1)),
+           infer=c(T,T),
+           mode="latent")
+
+
+(mod4.galtan.slopes.low.eff<-
+  contrast(mod4.galtan.slopes.low,
+         simple="DV.f",
+         infer=c(T,T),
+         adjust="none","eff"))
+
+
+
+
+#mid
+mod4.galtan.slopes.mid<-
+  emtrends(mod4.galtan,~1|DV.f,
+           var="galtan.z",
+           by="galtan.z",
+           at=list(strain.on.health.c=0,
+                   gndr.c=0,
+                   age10.c=0,
+                   galtan.z=c(0)),
+           infer=c(T,T),
+           mode="latent")
+
+
+(mod4.galtan.slopes.mid.eff<-
+  contrast(mod4.galtan.slopes.mid,
+         simple="DV.f",
+         infer=c(T,T),
+         adjust="none","eff"))
+
+
+
+#high
+mod4.galtan.slopes.high<-
+  emtrends(mod4.galtan,~1|DV.f,
+           var="galtan.z",
+           by="galtan.z",
+           at=list(strain.on.health.c=0,
+                   gndr.c=0,
+                   age10.c=0,
+                   galtan.z=c(1)),
+           infer=c(T,T),
+           mode="latent")
+
+
+(mod4.galtan.slopes.high.eff<-
+  contrast(mod4.galtan.slopes.high,
+         simple="DV.f",
+         infer=c(T,T),
+         adjust="none","eff"))
+
+#save to file
+
+export(
+  data.frame(
+  rbind(
+    mod4.galtan.slopes.low.eff,
+    mod4.galtan.slopes.mid.eff,
+    mod4.galtan.slopes.high.eff,adjust="none")),
+  "../../results/Added_covariates/mod4.galtan.nonlinear.slopes.MN.xlsx")
+
+# CM low
+
+(mod4.galtan.slopes.low.eff.CM<-
+    contrast(mod4.galtan.slopes.low,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod4.galtan.slopes.low.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f",infer=c(T,T)))
+
+# CM mid
+
+(mod4.galtan.slopes.mid.eff.CM<-
+    contrast(mod4.galtan.slopes.mid,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod4.galtan.slopes.mid.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f",infer=c(T,T)))
+
+# CM high
+
+(mod4.galtan.slopes.high.eff.CM<-
+    contrast(mod4.galtan.slopes.high,
+         method = list("Conv - No conv" = 
+                         contrast.weights.total(
+                           effects=
+                           mod4.galtan.slopes.high.eff,
+                           signs=c(-2,-2,2,2))),
+         simple="DV.f",infer=c(T,T)))
+
+
+
+#CAM low
+
+(mod4.galtan.slopes.low.eff.CAM<-
+    contrast(mod4.galtan.slopes.low,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod4.galtan.slopes.low.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f",infer=c(T,T)))
+
+#CAM mid
+
+(mod4.galtan.slopes.mid.eff.CAM<-
+    contrast(mod4.galtan.slopes.mid,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod4.galtan.slopes.mid.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f",infer=c(T,T)))
+
+#CAM high
+
+(mod4.galtan.slopes.high.eff.CAM<-
+    contrast(mod4.galtan.slopes.high,
+         method = list("CAM - No CAM" = 
+                         contrast.weights.total(
+                           effects=
+                           mod4.galtan.slopes.high.eff,
+                           signs=c(-2,2,2,-2))),
+         simple="DV.f",infer=c(T,T)))
+
+
+export(data.frame(rbind(mod4.galtan.slopes.low.eff.CM,
+      mod4.galtan.slopes.mid.eff.CM,
+      mod4.galtan.slopes.high.eff.CM,
+      mod4.galtan.slopes.low.eff.CAM,
+      mod4.galtan.slopes.mid.eff.CAM,
+      mod4.galtan.slopes.high.eff.CAM,adjust="none")),
+      "../../results/Added_covariates/mod4.galtan.nonlinear.slopes.COMB.xlsx")
+
+
+
+```
+
+### antielite_salience
+
+```{r}
+
+fdat$antielite_salience.z.1<-fdat$antielite_salience.z
+fdat$antielite_salience.z.2<-fdat$antielite_salience.z^2
+fdat$antielite_salience.z.3<-fdat$antielite_salience.z^3
+
+mod4.antielite_salience<-
+  mblogit(DV.f~gndr.c+age10.c+
+            income.fr+edu.f+
+            strain.on.health.c+
+            antielite_salience.z+
+            I(antielite_salience.z^2)+
+            I(antielite_salience.z^3),
+                     random= ~1|cntry,
+                     estimator="ML",
+                     data=fdat,weights=anweight)
+
+anova(mod2.antielite_salience,
+      mod4.antielite_salience,test="Chisq")
+
+
+```
+
+
+
+### corrupt_salience
+
+```{r}
+
+fdat$corrupt_salience.z.1<-fdat$corrupt_salience.z
+fdat$corrupt_salience.z.2<-fdat$corrupt_salience.z^2
+fdat$corrupt_salience.z.3<-fdat$corrupt_salience.z^3
+
+mod4.corrupt_salience<-
+  mblogit(DV.f~gndr.c+age10.c+
+            income.fr+edu.f+blgetmg.c+mstatus.c+
+            strain.on.health.c+
+            corrupt_salience.z+
+            I(corrupt_salience.z^2)+
+            I(corrupt_salience.z^3),
+                     random= ~1|cntry,
+                     estimator="ML",
+                     data=fdat,weights=anweight)
+
+anova(mod2.corrupt_salience,
+      mod4.corrupt_salience,test="Chisq")
+
+```
+
+# Print out custom functions
+
+```{r,code=readLines("../custom_functions.R")}
+```
+
+# Session information
+
+```{r}
+s<-sessionInfo()
+print(s,locale=F)
+```

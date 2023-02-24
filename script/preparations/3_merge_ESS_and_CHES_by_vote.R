@@ -7,7 +7,7 @@
 #'     keep_md: yes
 #' ---
 #' 
-## ---- include=FALSE--------------------------------------------------------
+## ---- include=FALSE----------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 #' 
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #' 
 #' ## Packages
 #' 
-## ----message=FALSE, warning=FALSE------------------------------------------
+## ----message=FALSE, warning=FALSE--------------------------------------------
 library(dplyr)
 library(rio)
 library(sjlabelled)
@@ -23,7 +23,7 @@ library(sjlabelled)
 #' 
 #' ## Import ESS and CHES data with ESS party keys
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 ESS7<-
   import("../../data/raw/ESS7e02_2.sav")
 
@@ -33,7 +33,7 @@ CHES_2014.vote.keys<-
 #' 
 #' # Construct single vote party number variable in ESS
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # use vote.dat for that
 
 vote.dat<-
@@ -77,7 +77,7 @@ table(ESS7$pt.nmbr,useNA="always")
 #' 
 #' # Combine the election coalitions in CHES ratings
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # first select only the variables of interest
 
 CHES_2014.vote.keys.combined<-CHES_2014.vote.keys %>%
@@ -104,7 +104,7 @@ CHES_2014.vote.keys.combined<-CHES_2014.vote.keys.combined %>%
 #' 
 #' # Merge the files by country and party number
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 dat<-left_join(
   x=ESS7,
   y=CHES_2014.vote.keys.combined,
@@ -116,7 +116,7 @@ dat<-left_join(
 #' 
 #' ## Test if the merge was successful
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 for (i in 1:length(vote.vars)){
 
   vote.var<-vote.vars[i]
@@ -144,7 +144,7 @@ for (i in 1:length(vote.vars)){
 #' 
 #' # Export the combined party data and the entire long format dataset
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 export(CHES_2014.vote.keys.combined,
        "../../data/processed/CHES_2014.vote.keys.combined.xlsx",
        overwrite=T)
@@ -152,10 +152,11 @@ export(CHES_2014.vote.keys.combined,
 export(dat,"../../data/processed/dat.xlsx",
        overwrite=T)
 
+
 #' 
 #' # Session information
 #' 
-## --------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 s<-sessionInfo()
 print(s,locale=F)
 
